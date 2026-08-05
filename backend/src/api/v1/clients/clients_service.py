@@ -1,11 +1,12 @@
 from fastapi import HTTPException, status
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlalchemy import select
+from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.api.v1.clients.clients_models import Client
-from src.api.v1.clients.clients_schemas import ClientCreate, ClientPartial, ClientRead
+from src.api.v1.clients.clients_schemas import ClientCreate, ClientRead, ClientUpdate
 
 
 class ClientsService:
@@ -25,18 +26,28 @@ class ClientsService:
 
     @staticmethod
     async def create_client(db: AsyncSession, payload: ClientCreate, user_id: int):
-        conflicting_rows = await db.execute(
-            select(Client).where(Client.name == payload.name, Client.user_id == user_id)
+        conflict = await db.scalar(
+            select(
+                exists().where(Client.user_id == user_id, Client.name == payload.name)
+            )
         )
-        conflicts = conflicting_rows.scalars().all()
 
-        if len(conflicts) > 0:
+        if conflict:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT)
 
         new_client = Client(name=payload.name, user_id=user_id)
         db.add(new_client)
         await db.commit()
+
         await db.refresh(new_client)
+
+        result = await db.execute(
+            select(Client)
+            .where(Client.id == new_client.id)
+            .options(selectinload(Client.user))
+        )
+
+        new_client = result.scalar_one()
         return new_client
 
     @staticmethod
@@ -50,7 +61,7 @@ class ClientsService:
 
     @staticmethod
     async def update_client(
-        db: AsyncSession, id: int, payload: ClientPartial, user_id: int
+        db: AsyncSession, id: int, payload: ClientUpdate, user_id: int
     ):
         client = await db.get(Client, id)
         if client is None or client.user_id != user_id:

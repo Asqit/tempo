@@ -14,7 +14,8 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    # init
+    # init;;;;;;;;
+    #
     yield
     # de-init
 

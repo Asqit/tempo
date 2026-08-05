@@ -1,14 +1,17 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
+from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlalchemy import exists, select
+from sqlalchemy import exists, or_, select
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.api.v1.time_entries.time_entires_models import TimeEntry
 from src.api.v1.time_entries.time_entries_schemas import (
-    TimeEntryPartial,
-    TimeEntryWrite,
+    TimeEntryCreate,
+    TimeEntryRead,
+    TimeEntryUpdate,
 )
 
 
@@ -36,23 +39,49 @@ class TimeEntryService:
         return entry
 
     @staticmethod
-    async def get_all_time_entries(db: AsyncSession, user_id: int):
-        return await paginate(
-            db,
+    async def get_all_time_entries(
+        db: AsyncSession,
+        user_id: int,
+        project_id: int | None = None,
+        start_time: datetime | None = None,
+        end_time: datetime | None = None,
+    ) -> Page[TimeEntryRead]:
+        filters = [
+            TimeEntry.user_id == user_id,
+        ]
+
+        if project_id is not None:
+            filters.append(TimeEntry.project_id == project_id)
+
+        if start_time is not None:
+            filters.append(
+                or_(
+                    TimeEntry.end_time >= start_time,
+                    TimeEntry.end_time.is_(None),
+                )
+            )
+
+        if end_time is not None:
+            filters.append(TimeEntry.start_time <= end_time)
+
+        stmt = (
             select(TimeEntry)
-            .where(TimeEntry.user_id == user_id)
-            .order_by(TimeEntry.created_at),
+            .where(*filters)
+            .options(selectinload(TimeEntry.project))
+            .order_by(TimeEntry.created_at.desc())
         )
+
+        return await paginate(db, stmt)
 
     @staticmethod
     async def create_time_entry(
-        db: AsyncSession, user_id: int, payload: TimeEntryWrite
+        db: AsyncSession, user_id: int, payload: TimeEntryCreate
     ):
-        start = payload.start_time or datetime.now(timezone.utc)
+        start = payload.start_time or datetime.now(UTC)
         if start.tzinfo is None:
-            start = start.replace(tzinfo=timezone.utc)  # assume UTC
+            start = start.replace(tzinfo=UTC)  # assume UTC
         else:
-            start = start.astimezone(timezone.utc)
+            start = start.astimezone(UTC)
 
         conflict = await db.scalar(
             select(
@@ -71,6 +100,7 @@ class TimeEntryService:
             end_time=payload.end_time,
             description=payload.description,
             project_id=payload.project_id,
+            client_id=payload.client_id,
         )
         db.add(entry)
         await db.commit()
@@ -79,10 +109,10 @@ class TimeEntryService:
 
     @staticmethod
     async def update_time_entry(
-        db: AsyncSession, user_id: int, id: int, payload: TimeEntryPartial
+        db: AsyncSession, user_id: int, id: int, payload: TimeEntryUpdate
     ):
         if payload.end_time is not None and payload.end_time.tzinfo is None:
-            payload.end_time = payload.end_time.replace(tzinfo=timezone.utc)
+            payload.end_time = payload.end_time.replace(tzinfo=UTC)
 
         entry = await TimeEntryService.get_time_entry(db, user_id, id)
         for key, value in payload.model_dump(exclude_unset=True).items():

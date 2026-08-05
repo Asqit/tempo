@@ -7,6 +7,7 @@ from sqlalchemy.orm.base import Mapped
 if TYPE_CHECKING:
     from src.api.v1.auth.auth_models import User
     from src.api.v1.projects.projects_models import Project
+from src.api.v1.time_entries.time_entires_models import TimeEntry
 from src.core.database import Base
 
 
@@ -17,7 +18,10 @@ class Client(Base):
     name: Mapped[str] = mapped_column(String(30))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
-    user: Mapped["User"] = relationship(back_populates="clients", lazy="selectin")
+    user: Mapped["User"] = relationship(back_populates="clients")
+    time_entries: Mapped["TimeEntry"] = relationship(
+        back_populates="client", cascade="all, delete-orphan"
+    )
     projects: Mapped[list["Project"]] = relationship(
-        back_populates="client", cascade="all, delete-orphan", lazy="selectin"
+        back_populates="client", cascade="all, delete-orphan"
     )

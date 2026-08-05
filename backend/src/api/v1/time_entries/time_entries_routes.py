@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
@@ -7,9 +8,9 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.api.v1.auth.auth_helpers import get_current_user
 from src.api.v1.auth.auth_models import User
 from src.api.v1.time_entries.time_entries_schemas import (
-    TimeEntryPartial,
+    TimeEntryCreate,
     TimeEntryRead,
-    TimeEntryWrite,
+    TimeEntryUpdate,
 )
 from src.api.v1.time_entries.time_entries_service import TimeEntryService
 from src.core.database import get_db
@@ -21,8 +22,13 @@ router = APIRouter(prefix="/time-entries", tags=["TimeEntries"])
 async def get_all_time_entries(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
+    project_id: int | None = None,
+    start_time: datetime | None = None,
+    end_time: datetime | None = None,
 ):
-    return await TimeEntryService.get_all_time_entries(db, current_user.id)
+    return await TimeEntryService.get_all_time_entries(
+        db, current_user.id, project_id, start_time, end_time
+    )
 
 
 @router.get("/last", response_model=TimeEntryRead)
@@ -44,7 +50,7 @@ async def get_time_entry(
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=TimeEntryRead)
 async def create_time_entry(
-    payload: TimeEntryWrite,
+    payload: TimeEntryCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
 ):
@@ -54,7 +60,7 @@ async def create_time_entry(
 @router.put("/{id}", response_model=TimeEntryRead)
 async def update_time_entry(
     id: int,
-    payload: TimeEntryPartial,
+    payload: TimeEntryUpdate,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
 ):

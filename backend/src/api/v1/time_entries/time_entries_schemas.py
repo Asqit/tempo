@@ -1,31 +1,39 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from src.api.v1.auth.auth_schemas import UserRead
-from src.api.v1.projects.projects_schema import ProjectRead
+from src.api.v1.projects.projects_schema import ProjectShallow
 
 
-class TimeEntryRead(BaseModel):
+class TimeEntryCreate(BaseModel):
+    start_time: datetime | None = Field(default=None)
+    end_time: datetime | None = Field(default=None)
+    description: str | None = Field(default=None)
+    project_id: int | None = Field(default=None)
+    client_id: int | None = Field(default=None)
+    user_id: int
+
+
+class TimeEntryUpdate(BaseModel):
+    start_time: datetime | None = Field(default=None)
+    end_time: datetime | None = Field(default=None)
+    description: str | None = Field(default=None)
+    project_id: int | None = Field(default=None)
+    client_id: int | None = Field(default=None)
+
+
+# ------------------- READ
+
+
+class DBTimeEntryBase(BaseModel):
     model_config = {"from_attributes": True}
+
+
+class TimeEntryRead(DBTimeEntryBase):
     id: int
-    description: str
+    description: str | None
     start_time: datetime
     end_time: datetime | None
-    user: UserRead
-    project: ProjectRead | None
-
-
-class TimeEntryWrite(BaseModel):
-    description: str
-    user_id: int
     project_id: int | None
-    start_time: datetime | None
-    end_time: datetime | None
-
-
-class TimeEntryPartial(BaseModel):
-    description: str | None
-    project_id: int | None
-    start_time: datetime | None
-    end_time: datetime | None
+    user_id: int | None
+    project: ProjectShallow | None

@@ -1,25 +1,37 @@
-from __future__ import annotations
-
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
 from src.api.v1.auth.auth_schemas import UserRead
 
 
-class ClientRead(BaseModel):
+class ClientCreate(BaseModel):
+    name: str = Field(min_length=3)
+    user_id: int | None
+
+
+class ClientUpdate(BaseModel):
+    name: str | None = Field(default=None)
+    user_id: int | None = Field(default=None)
+
+
+# ------------------ READ
+
+
+class DBClientBase(BaseModel):
     model_config = {"from_attributes": True}
+
+
+class ClientRead(DBClientBase):
     id: int
-    name: str = Field()
+    name: str
     user: UserRead
     created_at: datetime
     updated_at: datetime
 
 
-class ClientCreate(BaseModel):
+class ClientShallow(DBClientBase):
+    id: int
     name: str
-
-
-class ClientPartial(BaseModel):
-    name: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+import secrets
+from datetime import UTC, datetime, timedelta
+from hashlib import sha256
 from typing import Annotated
 
 import jwt
@@ -32,12 +34,25 @@ class TokenData(BaseModel):
     email: str
 
 
+def hash256_token(token: str) -> str:
+    return sha256(token.encode("utf-8")).hexdigest()
+
+
+def generate_refresh_token():
+    raw = secrets.token_urlsafe(64)
+    return (
+        raw,
+        hash256_token(raw),
+        datetime.now(UTC) + timedelta(days=30),
+    )
+
+
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+        expire = datetime.now(UTC) + timedelta(minutes=15)
 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
