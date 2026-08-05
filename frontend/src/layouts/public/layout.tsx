@@ -4,7 +4,7 @@ import { Navbar } from "./components/navbar";
 
 export function PublicLayout() {
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="flex min-h-svh flex-col bg-transparent">
       <Navbar />
       <main className="flex flex-1">
         <Outlet />

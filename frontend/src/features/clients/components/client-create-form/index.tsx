@@ -30,6 +30,7 @@ export function ClientCreateForm({ onCreated }: ClientCreateFormProps) {
       const createdClient = await mutateAsync({
         body: {
           name: trimmedName,
+          user_id: null,
         },
       });
 
@@ -42,12 +43,16 @@ export function ClientCreateForm({ onCreated }: ClientCreateFormProps) {
   };
 
   return (
-    <form className="flex items-center gap-2" onSubmit={handleSubmit}>
+    <form
+      className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center"
+      onSubmit={handleSubmit}
+    >
       <Input
         value={name}
         onChange={(event) => setName(event.target.value)}
         placeholder="Nazev klienta"
         disabled={isPending}
+        className="sm:flex-1"
       />
       <Button type="submit" disabled={isPending}>
         {isPending ? "Vytvarim..." : "Vytvorit klienta"}

@@ -8,8 +8,15 @@ interface Props {
 
 export function TimerStart({ state, callback }: Props) {
   return (
-    <Button className={"rounded-full size-10"} onClick={() => callback()}>
-      {state === "playing" ? <Pause /> : <Play />}
+    <Button
+      className="group size-10 rounded-none border border-primary/40 shadow-sm transition-all hover:scale-[1.02]"
+      onClick={() => callback()}
+    >
+      {state === "playing" ? (
+        <Pause className="group-hover:fill-current group-hover:stroke-none" />
+      ) : (
+        <Play className="ml-0.5 group-hover:fill-current group-hover:stroke-none" />
+      )}
     </Button>
   );
 }

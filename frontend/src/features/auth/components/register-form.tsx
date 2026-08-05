@@ -19,48 +19,36 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { $api } from "@/lib/api";
-import { useAuthStore } from "../store";
 import type { components } from "@/lib/api.d";
 import { useNavigate } from "@tanstack/react-router";
 
 const formSchema = z.object({
-  username: z.string().min(1, "Uzivatelske jmeno je povinne"),
-  password: z.string().min(1, "Heslo je povinne"),
-});
+  email: z.email().min(5),
+  country: z.string(),
+  password: z.string(),
+  name: z.string(),
+}) satisfies z.ZodType<components["schemas"]["UserCreate"]>;
 
-export function LoginForm() {
-  const { mutateAsync } = $api.useMutation("post", "/api/v1/auth/");
-  const { login } = useAuthStore.getState();
+export function RegisterForm() {
+  const { mutateAsync } = $api.useMutation("post", "/api/v1/auth/new");
   const navigate = useNavigate();
   const form = useForm({
     defaultValues: {
-      username: "",
+      name: "",
+      email: "",
       password: "",
+      country: "",
     },
     validators: {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
       try {
-        const response: components["schemas"]["LoginResponse"] =
-          await mutateAsync({
-            body: {
-              username: value.username,
-              password: value.password,
-              scope: "",
-            },
-            bodySerializer(body) {
-              const fd = new FormData();
-              for (const name in body) {
-                // @ts-expect-error stupid little iteration error
-                fd.append(name, body[name]);
-              }
-              return fd;
-            },
-          });
+        await mutateAsync({
+          body: value,
+        });
 
-        login(response.user, response.token.access_token);
-        navigate({ to: "/app" });
+        navigate({ to: "/login" });
       } catch {
         toast.error("Prihlaseni se nezdarilo");
       }
@@ -70,14 +58,14 @@ export function LoginForm() {
   return (
     <Card className="w-full border-border/80 shadow-md sm:max-w-sm">
       <CardHeader>
-        <CardTitle>Přihlášení</CardTitle>
+        <CardTitle>Vytvoření účtu</CardTitle>
         <CardDescription>
-          Zadej prihlasovaci udaje pro pokracovani.
+          Vyplň základní údaje a začni sledovat svůj čas.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form
-          id="login-form"
+          id="register-form"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();
@@ -85,15 +73,13 @@ export function LoginForm() {
         >
           <FieldGroup>
             <form.Field
-              name="username"
+              name="name"
               children={(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Uzivatelske jmeno
-                    </FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Jméno</FieldLabel>
                     <Input
                       id={field.name}
                       name={field.name}
@@ -102,7 +88,7 @@ export function LoginForm() {
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
                       placeholder="tvoje.jmeno"
-                      autoComplete="username"
+                      autoComplete="name"
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -111,6 +97,58 @@ export function LoginForm() {
                 );
               }}
             />
+
+            <form.Field
+              name="email"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>E-mail</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      placeholder="tvůj.email"
+                      autoComplete="email"
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            />
+
+            <form.Field
+              name="country"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Země</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      placeholder="Kde Bydlíš?"
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            />
+
             <form.Field
               name="password"
               children={(field) => {
@@ -145,8 +183,8 @@ export function LoginForm() {
           <Button type="button" variant="outline" onClick={() => form.reset()}>
             Vymazat
           </Button>
-          <Button type="submit" form="login-form">
-            Prihlasit se
+          <Button type="submit" form="register-form">
+            Jdeme na to!
           </Button>
         </Field>
       </CardFooter>

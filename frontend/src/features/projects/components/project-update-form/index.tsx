@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -25,11 +25,6 @@ export function ProjectUpdateForm({
     "put",
     "/api/v1/projects/{id}",
   );
-
-  useEffect(() => {
-    setName(initialName);
-    setClientId(initialClientId);
-  }, [initialClientId, initialName]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -66,7 +61,10 @@ export function ProjectUpdateForm({
   };
 
   return (
-    <form className="flex flex-wrap items-center gap-2" onSubmit={handleSubmit}>
+    <form
+      className="flex flex-col items-stretch gap-3 md:flex-row md:flex-wrap md:items-center"
+      onSubmit={handleSubmit}
+    >
       <Input
         value={name}
         onChange={(event) => setName(event.target.value)}
@@ -79,7 +77,7 @@ export function ProjectUpdateForm({
         onChange={setClientId}
         disabled={isPending}
       />
-      <Button type="submit" variant="outline" disabled={isPending}>
+      <Button type="submit" disabled={isPending}>
         {isPending ? "Ukladam..." : "Ulozit zmeny"}
       </Button>
     </form>

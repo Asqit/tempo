@@ -72,6 +72,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh */
+        post: operations["refresh_api_v1_auth_refresh_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Logout */
+        delete: operations["logout_api_v1_auth_logout_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/clients/": {
         parameters: {
             query?: never;
@@ -121,7 +155,8 @@ export interface paths {
         put?: never;
         /** Create Project */
         post: operations["create_project_api_v1_projects__post"];
-        delete?: never;
+        /** Bulk Delete */
+        delete: operations["bulk_delete_api_v1_projects__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -232,11 +267,8 @@ export interface components {
         ClientCreate: {
             /** Name */
             name: string;
-        };
-        /** ClientPartial */
-        ClientPartial: {
-            /** Name */
-            name?: string | null;
+            /** User Id */
+            user_id: number | null;
         };
         /** ClientRead */
         ClientRead: {
@@ -255,6 +287,13 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** ClientUpdate */
+        ClientUpdate: {
+            /** Name */
+            name?: string | null;
+            /** User Id */
+            user_id?: number | null;
         };
         /** DbStat */
         DbStat: {
@@ -280,18 +319,8 @@ export interface components {
         };
         /** LoginResponse */
         LoginResponse: {
-            /** Id */
-            id: number;
-            /** Email */
-            email: string;
-            /** Country */
-            country: string;
-            /** Name */
-            name: string;
-            /** Access Token */
-            access_token: string;
-            /** Token Type */
-            token_type: string;
+            user: components["schemas"]["UserRead"];
+            token: components["schemas"]["Token"];
         };
         /** Page[ClientRead] */
         Page_ClientRead_: {
@@ -332,10 +361,23 @@ export interface components {
             /** Pages */
             pages: number;
         };
-        /** ProjectPartial */
-        ProjectPartial: {
+        /** ProjectBulkDelete */
+        ProjectBulkDelete: {
+            /** Ids */
+            ids: number[];
+        };
+        /** ProjectCreate */
+        ProjectCreate: {
             /** Name */
-            name: string | null;
+            name: string;
+            /** Client Id */
+            client_id?: number | null;
+            /** Description */
+            description?: string | null;
+            /** Start Time */
+            start_time?: string | null;
+            /** End Time */
+            end_time?: string | null;
         };
         /** ProjectRead */
         ProjectRead: {
@@ -343,33 +385,71 @@ export interface components {
             id: number;
             /** Name */
             name: string;
-            client: components["schemas"]["ClientRead"];
-            user: components["schemas"]["UserRead"];
-        };
-        /** ProjectWrite */
-        ProjectWrite: {
-            /** Name */
-            name: string;
-            /** Client Id */
-            client_id: number;
-        };
-        /** TimeEntryPartial */
-        TimeEntryPartial: {
+            client: components["schemas"]["ClientRead"] | null;
             /** Description */
             description: string | null;
-            /** Project Id */
-            project_id: number | null;
             /** Start Time */
             start_time: string | null;
             /** End Time */
             end_time: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ProjectShallow */
+        ProjectShallow: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /** Start Time */
+            start_time: string | null;
+            /** End Time */
+            end_time: string | null;
+        };
+        /** ProjectUpdate */
+        ProjectUpdate: {
+            /** Name */
+            name: string;
+            /** Client Id */
+            client_id?: number | null;
+            /** Description */
+            description?: string | null;
+            /** Start Time */
+            start_time?: string | null;
+            /** End Time */
+            end_time?: string | null;
+        };
+        /** TimeEntryCreate */
+        TimeEntryCreate: {
+            /** Start Time */
+            start_time?: string | null;
+            /** End Time */
+            end_time?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Project Id */
+            project_id?: number | null;
+            /** Client Id */
+            client_id?: number | null;
+            /** User Id */
+            user_id: number;
         };
         /** TimeEntryRead */
         TimeEntryRead: {
             /** Id */
             id: number;
             /** Description */
-            description: string;
+            description: string | null;
             /**
              * Start Time
              * Format: date-time
@@ -377,27 +457,40 @@ export interface components {
             start_time: string;
             /** End Time */
             end_time: string | null;
-            user: components["schemas"]["UserRead"];
-            project: components["schemas"]["ProjectRead"] | null;
-        };
-        /** TimeEntryWrite */
-        TimeEntryWrite: {
-            /** Description */
-            description: string;
-            /** User Id */
-            user_id: number;
             /** Project Id */
             project_id: number | null;
+            /** User Id */
+            user_id: number | null;
+            project: components["schemas"]["ProjectShallow"] | null;
+        };
+        /** TimeEntryUpdate */
+        TimeEntryUpdate: {
             /** Start Time */
-            start_time: string | null;
+            start_time?: string | null;
             /** End Time */
-            end_time: string | null;
+            end_time?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Project Id */
+            project_id?: number | null;
+            /** Client Id */
+            client_id?: number | null;
+        };
+        /** Token */
+        Token: {
+            /** Access Token */
+            access_token: string;
+            /** Token Type */
+            token_type: string;
         };
         /** UserCreate */
         UserCreate: {
             /** Email */
             email: string;
-            /** Country */
+            /**
+             * Country
+             * @default CZ
+             */
             country: string;
             /** Name */
             name: string;
@@ -406,14 +499,14 @@ export interface components {
         };
         /** UserRead */
         UserRead: {
-            /** Id */
-            id: number;
             /** Email */
             email: string;
             /** Country */
             country: string;
             /** Name */
             name: string;
+            /** Id */
+            id: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -543,6 +636,66 @@ export interface operations {
             };
         };
     };
+    refresh_api_v1_auth_refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                refresh_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    logout_api_v1_auth_logout_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                refresh_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_clients_api_v1_clients__get: {
         parameters: {
             query?: {
@@ -627,7 +780,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ClientRead"];
                 };
             };
             /** @description Validation Error */
@@ -652,7 +805,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ClientPartial"];
+                "application/json": components["schemas"]["ClientUpdate"];
             };
         };
         responses: {
@@ -662,7 +815,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ClientRead"];
                 };
             };
             /** @description Validation Error */
@@ -710,6 +863,7 @@ export interface operations {
     get_projects_api_v1_projects__get: {
         parameters: {
             query?: {
+                client_id?: number | null;
                 /** @description Page number */
                 page?: number;
                 /** @description Page size */
@@ -750,7 +904,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ProjectWrite"];
+                "application/json": components["schemas"]["ProjectCreate"];
             };
         };
         responses: {
@@ -760,8 +914,39 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ProjectRead"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    bulk_delete_api_v1_projects__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProjectBulkDelete"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -791,7 +976,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ProjectRead"];
                 };
             };
             /** @description Validation Error */
@@ -816,7 +1001,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ProjectPartial"];
+                "application/json": components["schemas"]["ProjectUpdate"];
             };
         };
         responses: {
@@ -872,6 +1057,9 @@ export interface operations {
     get_all_time_entries_api_v1_time_entries__get: {
         parameters: {
             query?: {
+                project_id?: number | null;
+                start_time?: string | null;
+                end_time?: string | null;
                 /** @description Page number */
                 page?: number;
                 /** @description Page size */
@@ -912,7 +1100,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["TimeEntryWrite"];
+                "application/json": components["schemas"]["TimeEntryCreate"];
             };
         };
         responses: {
@@ -998,7 +1186,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["TimeEntryPartial"];
+                "application/json": components["schemas"]["TimeEntryUpdate"];
             };
         };
         responses: {

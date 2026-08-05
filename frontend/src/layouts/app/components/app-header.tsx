@@ -2,12 +2,14 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export function AppHeader() {
   return (
-    <header className="flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur">
+    <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border/70 bg-background/85 px-4 backdrop-blur md:px-8">
       <SidebarTrigger />
       <div className="min-w-0">
-        <h1 className="truncate text-sm font-medium">Tick</h1>
-        <p className="truncate text-xs text-muted-foreground">
-          Time tracking and invoicing made easy
+        <h1 className="truncate text-base font-semibold tracking-tight">
+          Tempo
+        </h1>
+        <p className="truncate text-xs text-muted-foreground/90">
+          Time tracking and invoicing for focused teams
         </p>
       </div>
     </header>

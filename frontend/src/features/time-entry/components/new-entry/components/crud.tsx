@@ -1,6 +1,8 @@
 import type { components } from "@/lib/api.d";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ClientPicker } from "@/features/clients/components/client-picker";
+import { ProjectPicker } from "@/features/projects/components/project-picker";
 import { $api } from "@/lib/api";
 import { Tag, User2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -24,6 +26,8 @@ export function TimerCRUD({ id }: Props) {
   const hasId = id !== null && id !== undefined;
   const queryId = id ?? 0;
   const [now, setNow] = useState(() => Date.now());
+  const [clientId, setClientId] = useState<number | null>(null);
+  const [projectId, setProjectId] = useState<number | null>(null);
 
   const { data, isLoading, isError } = $api.useQuery(
     "get",
@@ -66,7 +70,7 @@ export function TimerCRUD({ id }: Props) {
       }
 
       try {
-        const payload: components["schemas"]["TimeEntryPartial"] = {
+        const payload: components["schemas"]["TimeEntryUpdate"] = {
           description: null,
           project_id: null,
           start_time: null,
@@ -75,7 +79,7 @@ export function TimerCRUD({ id }: Props) {
 
         switch (type) {
           case "client":
-            // not-implemented!
+            payload.client_id = Number(value);
             break;
           case "description":
             payload.description = String(value);
@@ -104,36 +108,77 @@ export function TimerCRUD({ id }: Props) {
   const debouncedUpdate = useDebounceCallback(handleUpdate, 500);
 
   const isDisabled = !hasId || isLoading || isError;
+  const resolvedProjectId =
+    projectId ??
+    (typeof data?.project_id === "number" ? data.project_id : null);
   const startTime = data?.start_time
     ? new Date(data.start_time).getTime()
     : null;
   const endTime = data?.end_time ? new Date(data.end_time).getTime() : null;
   const elapsedTimeMs = startTime === null ? 0 : (endTime ?? now) - startTime;
 
+  const handleClientChange = (nextClientId: number) => {
+    setClientId(nextClientId);
+    void handleUpdate("client", nextClientId);
+  };
+
+  const handleProjectChange = (nextProjectId: number) => {
+    setProjectId(nextProjectId);
+    void handleUpdate("project", nextProjectId);
+  };
+
   return (
-    <div className="flex items-center gap-2 grow">
+    <div className="flex grow flex-wrap items-center gap-2 md:flex-nowrap">
       <Input
         disabled={isDisabled}
-        className="flex-1"
+        className="min-w-56 flex-1"
         type="text"
         placeholder="Zadejte popis úlohy"
         defaultValue={data?.description ?? ""}
         onChange={(e) => debouncedUpdate("description", e.target.value)}
       />
       <time
-        className="tabular-nums text-xs text-muted-foreground"
+        className="rounded-none border border-border/70 bg-background px-2.5 py-1.5 text-xs font-semibold tabular-nums text-foreground"
         aria-label="Elapsed time"
       >
         {formatElapsedTime(elapsedTimeMs)}
       </time>
-      <ul className="flex items-center gap-2">
-        <Button disabled={isDisabled}>
-          <User2 />
-        </Button>
-        <Button disabled={isDisabled}>
-          <Tag />
-        </Button>
-      </ul>
+      <div className="flex items-center gap-1.5">
+        <ClientPicker
+          value={clientId}
+          onChange={handleClientChange}
+          disabled={isDisabled}
+          placeholder="Vyber klienta"
+          trigger={({ selected, disabled, placeholder }) => (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-sm"
+              disabled={disabled}
+              aria-label={selected?.name ?? placeholder}
+            >
+              <User2 />
+            </Button>
+          )}
+        />
+        <ProjectPicker
+          value={resolvedProjectId}
+          onChange={handleProjectChange}
+          disabled={isDisabled}
+          placeholder="Vyber projekt"
+          trigger={({ selected, disabled, placeholder }) => (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-sm"
+              disabled={disabled}
+              aria-label={selected?.name ?? placeholder}
+            >
+              <Tag />
+            </Button>
+          )}
+        />
+      </div>
     </div>
   );
 }

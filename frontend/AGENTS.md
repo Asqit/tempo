@@ -11,6 +11,11 @@ This workspace is the Tick frontend app. It uses Vite, React 19, TypeScript, Tai
 - Do not hand-edit generated router output in `src/routeTree.gen.ts`.
 - Prefer the generated API client in `src/lib/api.ts` and `src/lib/api.d.ts` over ad-hoc fetch logic.
 - Use Zod for form and request validation, and `sonner` for user-facing toast notifications.
+- Feature-related code must stay in the appropriate feature folder.
+- When a component becomes complex, split it into smaller components.
+- When splitting a component into parent/child parts, create a folder using kebab-case naming for the component, with a nested `components` folder for the children.
+- If anything is unclear, ask Andy first instead of doing expensive dependency or node_modules lookup.
+- Keep the root components folder split into `src/components/ui` for third-party/shadcn-style primitives and `src/components/share` for project-specific shared components.
 
 ## Common workflows
 
@@ -22,5 +27,6 @@ This workspace is the Tick frontend app. It uses Vite, React 19, TypeScript, Tai
 ## Notes
 
 - The app setup and project overview are documented in [README.md](README.md).
+- The repository-wide instructions live in [../AGENTS.md](../AGENTS.md).
 - `bun run dev` starts Vite and also runs the OpenAPI type generation step, which expects the backend to expose `/openapi.json` at `http://127.0.0.1:8000`.
 - Keep changes minimal and consistent with the existing architecture; avoid introducing new state libraries or tooling unless necessary.

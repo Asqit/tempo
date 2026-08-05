@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
+import { Building2, CalendarDays } from "lucide-react";
 
+import { ColorAvatar } from "@/components/share/color-avatar";
 import {
   Card,
   CardContent,
@@ -7,9 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ProjectsTable } from "@/features/projects/components/projects-table";
 import { $api } from "@/lib/api";
-
-import { ClientUpdateForm } from "../client-update-form";
 
 type ClientDetailProps = {
   id: number;
@@ -17,7 +18,6 @@ type ClientDetailProps = {
 
 type ClientDetailData = {
   name: string;
-  ownerName: string;
   createdAt: string | null;
   updatedAt: string | null;
 };
@@ -40,8 +40,6 @@ function normalizeClientDetail(data: unknown): ClientDetailData | null {
 
   return {
     name: raw.name,
-    ownerName:
-      raw.user && typeof raw.user.name === "string" ? raw.user.name : "-",
     createdAt: typeof raw.created_at === "string" ? raw.created_at : null,
     updatedAt: typeof raw.updated_at === "string" ? raw.updated_at : null,
   };
@@ -56,8 +54,6 @@ function formatDateTime(value: string | null) {
 }
 
 export function ClientDetail({ id }: ClientDetailProps) {
-  const [localName, setLocalName] = useState<string | null>(null);
-
   const { data, isLoading, isError } = $api.useQuery(
     "get",
     "/api/v1/clients/{id}",
@@ -72,56 +68,98 @@ export function ClientDetail({ id }: ClientDetailProps) {
 
   const client = useMemo(() => normalizeClientDetail(data), [data]);
 
-  useEffect(() => {
-    setLocalName(null);
-  }, [id]);
-
   if (isLoading) {
-    return (
-      <p className="text-sm text-muted-foreground">Nacitam detail klienta...</p>
-    );
+    return <p className="text-sm text-muted-foreground">Načítám klienta...</p>;
   }
 
   if (isError || !client) {
     return (
-      <p className="text-sm text-destructive">
-        Detail klienta se nepodarilo nacist.
-      </p>
+      <p className="text-sm text-destructive">Klienta se nepodařilo načíst.</p>
     );
   }
 
-  const displayName = localName ?? client.name;
+  const displayName = client.name;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{displayName}</CardTitle>
-        <CardDescription>
-          Detail klienta a rychla aktualizace nazvu.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <dl className="grid gap-2 text-xs">
-          <div className="flex items-center justify-between gap-2 border-b pb-1">
-            <dt className="text-muted-foreground">Vlastnik</dt>
-            <dd>{client.ownerName}</dd>
-          </div>
-          <div className="flex items-center justify-between gap-2 border-b pb-1">
-            <dt className="text-muted-foreground">Vytvoreno</dt>
-            <dd>{formatDateTime(client.createdAt)}</dd>
-          </div>
-          <div className="flex items-center justify-between gap-2 border-b pb-1">
-            <dt className="text-muted-foreground">Aktualizovano</dt>
-            <dd>{formatDateTime(client.updatedAt)}</dd>
-          </div>
-        </dl>
+    <div className="space-y-5">
+      <section className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
+        <Card className="border-border/80">
+          <CardHeader className="border-b border-border/70">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+              <ColorAvatar name={displayName} className="size-12" />
+              <div className="space-y-1">
+                <CardTitle className="text-2xl">{displayName}</CardTitle>
+                <CardDescription>
+                  Vše důležité o klientovi na jednom místě.
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-5 pt-5">
+            <div className="rounded-none border border-border/70 bg-muted/20 p-4">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex size-10 items-center justify-center rounded-none border border-border/70 bg-background">
+                  <Building2 className="size-4 text-muted-foreground" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                    Klient
+                  </p>
+                  <p className="mt-1 font-medium text-foreground">
+                    {displayName}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Základní info a hned vedle práce, která na klienta navazuje.
+                  </p>
+                </div>
+              </div>
+            </div>
 
-        <ClientUpdateForm
-          id={id}
-          initialName={displayName}
-          onUpdated={setLocalName}
-        />
-      </CardContent>
-    </Card>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-none border border-border/70 bg-card p-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                  Vytvořeno
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <CalendarDays className="size-4 text-muted-foreground" />
+                  <span className="font-medium text-foreground">
+                    {formatDateTime(client.createdAt)}
+                  </span>
+                </div>
+              </div>
+              <div className="rounded-none border border-border/70 bg-card p-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                  Aktualizováno
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <CalendarDays className="size-4 text-muted-foreground" />
+                  <span className="font-medium text-foreground">
+                    {formatDateTime(client.updatedAt)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/80">
+          <CardHeader>
+            <CardTitle className="text-lg">Na čem se maká</CardTitle>
+            <CardDescription>
+              Přehled projektů, které pod tohohle klienta spadají.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ProjectsTable
+              clientId={id}
+              hideHeader
+              compact
+              title="Projekty"
+              description="Co je teď kolem klienta rozjeté"
+            />
+          </CardContent>
+        </Card>
+      </section>
+    </div>
   );
 }

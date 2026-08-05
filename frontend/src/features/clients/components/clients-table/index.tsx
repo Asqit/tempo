@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 
 import { $api } from "@/lib/api";
+import { ColorAvatar } from "@/components/share/color-avatar";
 import {
   Pagination,
   PaginationContent,
@@ -75,69 +76,118 @@ export function ClientsTable() {
 
   return (
     <div className="space-y-3">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Jmeno klienta</TableHead>
-            <TableHead>Vlastnik</TableHead>
-            <TableHead>Vytvoreno</TableHead>
-            <TableHead>Aktualizovano</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
+      <div className="overflow-hidden rounded-none border border-border/70 bg-card">
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={4} className="text-muted-foreground">
-                Nacitam klienty...
-              </TableCell>
+              <TableHead>Jmeno klienta</TableHead>
+              <TableHead>Vlastnik</TableHead>
+              <TableHead>Vytvoreno</TableHead>
+              <TableHead>Aktualizovano</TableHead>
             </TableRow>
-          ) : null}
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="py-6 text-center text-muted-foreground"
+                >
+                  Nacitam klienty...
+                </TableCell>
+              </TableRow>
+            ) : null}
 
-          {!isLoading && isError ? (
-            <TableRow>
-              <TableCell colSpan={4} className="text-destructive">
-                Klienty se nepodarilo nacist.
-              </TableCell>
-            </TableRow>
-          ) : null}
+            {!isLoading && isError ? (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="py-6 text-center text-destructive"
+                >
+                  Klienty se nepodarilo nacist.
+                </TableCell>
+              </TableRow>
+            ) : null}
 
-          {!isLoading && !isError && clients.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={4} className="text-muted-foreground">
-                Zatim nemas zadne klienty.
-              </TableCell>
-            </TableRow>
-          ) : null}
+            {!isLoading && !isError && clients.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="py-6 text-center text-muted-foreground"
+                >
+                  Zatim nemas zadne klienty.
+                </TableCell>
+              </TableRow>
+            ) : null}
 
-          {!isLoading && !isError
-            ? clients.map((client) => {
-                const clientId = (client as { id?: unknown }).id;
-                const hasClientId = typeof clientId === "number";
+            {!isLoading && !isError
+              ? clients.map((client) => {
+                  const clientId = (client as { id?: unknown }).id;
+                  const hasClientId = typeof clientId === "number";
+                  const ownerName = client.user?.name ?? "-";
+                  const ownerEmail = client.user?.email ?? null;
 
-                return (
-                  <TableRow key={`${client.name}-${client.created_at}`}>
-                    <TableCell className="font-medium">
-                      {hasClientId ? (
-                        <Link
-                          to="/app/clients/$id"
-                          params={{ id: String(clientId) }}
-                          className="underline-offset-4 hover:underline"
-                        >
-                          {client.name}
-                        </Link>
-                      ) : (
-                        <span>{client.name}</span>
-                      )}
-                    </TableCell>
-                    <TableCell>{client.user.name}</TableCell>
-                    <TableCell>{formatDateTime(client.created_at)}</TableCell>
-                    <TableCell>{formatDateTime(client.updated_at)}</TableCell>
-                  </TableRow>
-                );
-              })
-            : null}
-        </TableBody>
-      </Table>
+                  return (
+                    <TableRow key={`${client.name}-${client.created_at}`}>
+                      <TableCell className="py-3">
+                        <div className="flex items-center gap-3">
+                          <ColorAvatar
+                            name={client.name}
+                            className="size-9 text-sm"
+                          />
+                          <div className="min-w-0">
+                            {hasClientId ? (
+                              <Link
+                                to="/app/clients/$id"
+                                params={{ id: String(clientId) }}
+                                className="block truncate font-semibold underline-offset-4 hover:underline"
+                              >
+                                {client.name}
+                              </Link>
+                            ) : (
+                              <span className="block truncate font-semibold">
+                                {client.name}
+                              </span>
+                            )}
+                            <p className="truncate text-xs text-muted-foreground">
+                              {ownerEmail ?? "Bez emailu"}
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-0.5">
+                          <p className="font-medium text-foreground">
+                            {ownerName}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Vlastník
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-0.5 text-sm">
+                          <p>{formatDateTime(client.created_at)}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Vytvořeno
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-0.5 text-sm">
+                          <p>{formatDateTime(client.updated_at)}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Aktualizováno
+                          </p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              : null}
+          </TableBody>
+        </Table>
+      </div>
 
       <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
         <span>
