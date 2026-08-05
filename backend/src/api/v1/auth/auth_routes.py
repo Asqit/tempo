@@ -8,6 +8,7 @@ from src.api.v1.auth.auth_helpers import get_current_user
 from src.api.v1.auth.auth_models import User
 from src.api.v1.auth.auth_schemas import LoginResponse, UserCreate, UserRead
 from src.api.v1.auth.auth_service import AuthService
+from src.core.config import app_config
 from src.core.database import get_db
 
 router = APIRouter(prefix="/auth", tags=["AUTH"])
@@ -16,9 +17,9 @@ router = APIRouter(prefix="/auth", tags=["AUTH"])
 COOKIE_SETTINGS = {
     "key": "refresh_token",
     "httponly": True,
-    "secure": True,
+    "secure": not app_config.DEBUG,
     "samesite": "lax",
-    "path": "/auth/refresh",
+    "path": "/",
 }
 
 
@@ -43,7 +44,10 @@ async def register(data: UserCreate, db: Annotated[AsyncSession, Depends(get_db)
 async def refresh(
     db: Annotated[AsyncSession, Depends(get_db)],
     res: Response,
-    refresh_token: Annotated[str | None, Cookie()] = None,
+    refresh_token: Annotated[
+        str | None,
+        Cookie(alias="refresh_token"),
+    ] = None,
 ):
     if refresh_token is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -61,12 +65,17 @@ async def refresh(
 @router.delete("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)],
+    _: Annotated[User, Depends(get_current_user)],
     res: Response,
-    refresh_token: Annotated[str | None, Cookie()] = None,
+    refresh_token: Annotated[
+        str | None,
+        Cookie(alias="refresh_token"),
+    ] = None,
 ):
     if refresh_token is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="missing cookie"
+        )
 
     await AuthService.revoke_refresh_token(db, refresh_token)
 

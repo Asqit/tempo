@@ -115,6 +115,7 @@ const middleware: Middleware = {
 
 const fetchClient = createFetchClient<paths>({
   baseUrl: BACKEND_URL,
+  credentials: "include",
 });
 
 fetchClient.use(middleware);

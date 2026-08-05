@@ -67,9 +67,6 @@ export function NewEntry() {
           },
         },
         body: {
-          description: null,
-          project_id: null,
-          start_time: null,
           end_time: new Date().toISOString(),
         },
       });
@@ -81,7 +78,7 @@ export function NewEntry() {
   }, [id, updateTimeEntry]);
 
   return (
-    <div className="flex flex-col gap-3 rounded-none border border-border/70 bg-muted/25 p-3 md:flex-row md:items-center">
+    <div className="relative z-10 flex flex-col gap-3 overflow-visible rounded-none border border-border/70 bg-muted/25 p-3 md:flex-row md:items-center">
       <TimerCRUD id={id} />
       <TimerStart
         state={id === null ? "stopped" : "playing"}

@@ -70,12 +70,7 @@ export function TimerCRUD({ id }: Props) {
       }
 
       try {
-        const payload: components["schemas"]["TimeEntryUpdate"] = {
-          description: null,
-          project_id: null,
-          start_time: null,
-          end_time: null,
-        };
+        const payload: components["schemas"]["TimeEntryUpdate"] = {};
 
         switch (type) {
           case "client":

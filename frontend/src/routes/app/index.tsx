@@ -48,7 +48,7 @@ function RouteComponent() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <EntriesTable />
+          <EntriesTable showQuickActions />
         </CardContent>
       </Card>
     </div>

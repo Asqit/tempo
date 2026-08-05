@@ -25,7 +25,7 @@ function ClientDetailPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
+    <div className="mx-auto flex w-full flex-col gap-5">
       <div className="flex items-center justify-between gap-3">
         <Button
           variant="outline"

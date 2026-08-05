@@ -313,10 +313,10 @@ export function ClientPicker({
   };
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative z-[60] overflow-visible">
       {resolvedTrigger}
       {isOpen ? (
-        <div className="absolute z-50 mt-2 w-64 border border-border bg-popover text-popover-foreground shadow-md">
+        <div className="absolute z-[1000] mt-2 w-64 overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-xl ring-1 ring-black/10">
           <div className="max-h-72 overflow-y-auto">
             {options.length > 0 ? (
               options.map((option) => (

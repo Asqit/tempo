@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.api.v1.auth.auth_helpers import get_current_user
 from src.api.v1.auth.auth_models import User
 from src.api.v1.time_entries.time_entries_schemas import (
+    TimeEntryBulkDelete,
     TimeEntryCreate,
     TimeEntryRead,
     TimeEntryUpdate,
@@ -74,3 +75,12 @@ async def delete_time_entry(
     current_user: Annotated[User, Depends(get_current_user)],
 ):
     return await TimeEntryService.delete_time_entry(db, current_user.id, id)
+
+
+@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+async def bulk_delete(
+    body: TimeEntryBulkDelete,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    return await TimeEntryService.bulk_delete(db, current_user.id, body.ids)

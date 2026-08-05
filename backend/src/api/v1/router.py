@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 
-from src.api.v1.auth import auth_routes, auth_schemas
-from src.api.v1.clients import clients_routes, clients_schemas
-from src.api.v1.health import health_routes, health_schemas
+from src.api.v1.auth import auth_routes
+from src.api.v1.clients import clients_routes
+from src.api.v1.health import health_routes
 from src.api.v1.projects import projects_routes, projects_schema
-from src.api.v1.time_entries import time_entries_routes, time_entries_schemas
+from src.api.v1.time_entries import time_entries_routes
 
 v1 = APIRouter(prefix="/api/v1")
 

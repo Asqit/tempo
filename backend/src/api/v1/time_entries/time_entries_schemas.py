@@ -14,6 +14,10 @@ class TimeEntryCreate(BaseModel):
     user_id: int
 
 
+class TimeEntryBulkDelete(BaseModel):
+    ids: list[int]
+
+
 class TimeEntryUpdate(BaseModel):
     start_time: datetime | None = Field(default=None)
     end_time: datetime | None = Field(default=None)

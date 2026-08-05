@@ -193,7 +193,8 @@ export interface paths {
         put?: never;
         /** Create Time Entry */
         post: operations["create_time_entry_api_v1_time_entries__post"];
-        delete?: never;
+        /** Bulk Delete */
+        delete: operations["bulk_delete_api_v1_time_entries__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -428,6 +429,11 @@ export interface components {
             start_time?: string | null;
             /** End Time */
             end_time?: string | null;
+        };
+        /** TimeEntryBulkDelete */
+        TimeEntryBulkDelete: {
+            /** Ids */
+            ids: number[];
         };
         /** TimeEntryCreate */
         TimeEntryCreate: {
@@ -1112,6 +1118,37 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["TimeEntryRead"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    bulk_delete_api_v1_time_entries__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TimeEntryBulkDelete"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
