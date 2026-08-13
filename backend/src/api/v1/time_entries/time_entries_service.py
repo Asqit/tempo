@@ -92,6 +92,23 @@ class TimeEntryService:
             )
 
     @staticmethod
+    async def get_calendar_entries(
+        db: AsyncSession, user_id: int, start_time: datetime, end_time: datetime
+    ):
+        result = await db.execute(
+            select(TimeEntry).where(
+                TimeEntry.user_id == user_id,
+                or_(
+                    TimeEntry.end_time >= start_time,
+                    TimeEntry.end_time.is_(None),
+                ),
+                TimeEntry.start_time <= end_time,
+            )
+        )
+
+        return result.scalars().all()
+
+    @staticmethod
     async def get_last_entry(db: AsyncSession, user_id: int):
         row = await db.execute(
             select(TimeEntry)

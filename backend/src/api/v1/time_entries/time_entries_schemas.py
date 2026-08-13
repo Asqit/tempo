@@ -2,6 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
+from src.api.v1.auth.auth_schemas import UserSummary
 from src.api.v1.projects.projects_schema import ProjectShallow
 
 
@@ -41,3 +42,12 @@ class TimeEntryRead(DBTimeEntryBase):
     project_id: int | None
     user_id: int | None
     project: ProjectShallow | None
+
+
+class TimeEntrySummary(DBTimeEntryBase):
+    id: int
+    description: str | None
+    start_time: datetime
+    end_time: datetime | None
+    project: ProjectShallow | None
+    user: UserSummary | None

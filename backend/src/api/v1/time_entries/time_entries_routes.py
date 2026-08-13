@@ -11,6 +11,7 @@ from src.api.v1.time_entries.time_entries_schemas import (
     TimeEntryBulkDelete,
     TimeEntryCreate,
     TimeEntryRead,
+    TimeEntrySummary,
     TimeEntryUpdate,
 )
 from src.api.v1.time_entries.time_entries_service import TimeEntryService
@@ -29,6 +30,18 @@ async def get_all_time_entries(
 ):
     return await TimeEntryService.get_all_time_entries(
         db, current_user.id, project_id, start_time, end_time
+    )
+
+
+@router.get("/calendar", response_model=list[TimeEntrySummary])
+async def get_calendar_entries(
+    start_time: datetime,
+    end_time: datetime,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    return await TimeEntryService.get_calendar_entries(
+        db, current_user.id, start_time, end_time
     )
 
 

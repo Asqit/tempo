@@ -48,3 +48,4 @@ from src.api.v1.auth import auth_models  # noqa: F401
 from src.api.v1.clients import clients_models  # noqa: F401
 from src.api.v1.projects import projects_models  # noqa: F401
 from src.api.v1.time_entries import time_entires_models  # noqa: F401
+from src.api.v1.workspace import workspace_models  # noqa: F401

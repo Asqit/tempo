@@ -1,15 +1,12 @@
+from __future__ import annotations
+
 from datetime import datetime
-from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.api.v1.workspace.workspace_models import Workspace
 from src.core.database import Base
-
-if TYPE_CHECKING:
-    from src.api.v1.clients.clients_models import Client
-    from src.api.v1.projects.projects_models import Project
-    from src.api.v1.time_entries.time_entires_models import TimeEntry
 
 
 class RefreshToken(Base):
@@ -40,14 +37,6 @@ class User(Base):
     country: Mapped[str] = mapped_column(String())
     hashed_password: Mapped[str] = mapped_column(String(255))
 
-    clients: Mapped[list["Client"]] = relationship(
-        back_populates="user", cascade="all, delete-orphan"
-    )
-
-    projects: Mapped[list["Project"]] = relationship(
-        back_populates="user", cascade="all, delete-orphan"
-    )
-
-    time_entries: Mapped[list["TimeEntry"]] = relationship(
+    workspaces: Mapped[list[Workspace]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )

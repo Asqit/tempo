@@ -1,12 +1,13 @@
+from __future__ import annotations
+
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy.orm.base import Mapped
 
 if TYPE_CHECKING:
-    from src.api.v1.auth.auth_models import User
     from src.api.v1.clients.clients_models import Client
     from src.api.v1.time_entries.time_entires_models import TimeEntry
 from src.core.database import Base
@@ -21,16 +22,15 @@ class Project(Base):
     start_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     end_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
-    client_id: Mapped[int | None] = mapped_column(ForeignKey("clients.id"))
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-
-    user: Mapped["User"] = relationship(back_populates="projects")
-    client: Mapped[Optional["Client"]] = relationship(
-        back_populates="projects", lazy="selectin"
+    # Deleting a client should remove its projects at the DB level
+    client_id: Mapped[int] = mapped_column(
+        ForeignKey("clients.id", ondelete="CASCADE"), nullable=False
     )
-    time_entries: Mapped[list["TimeEntry"]] = relationship(
+    client: Mapped[Client] = relationship(back_populates="projects", lazy="selectin")
+
+    # Deleting a project should NOT delete time entries; the FK uses ON DELETE SET NULL
+    time_entries: Mapped[list[TimeEntry]] = relationship(
         back_populates="project",
         lazy="selectin",
-        cascade="all, delete-orphan",  # ORM manipulations
         passive_deletes=True,
     )
