@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Pencil } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -22,11 +22,13 @@ type TimeEntryUpdateDialogProps = {
     end_time: string | null;
   };
   onUpdated?: () => void;
+  children?: ReactNode;
 };
 
 export function TimeEntryUpdateDialog({
   entry,
   onUpdated,
+  children,
 }: TimeEntryUpdateDialogProps) {
   const [open, setOpen] = useState(false);
 
@@ -38,11 +40,15 @@ export function TimeEntryUpdateDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
-        render={<Button type="button" variant="ghost" size="sm" />}
-      >
-        <Pencil className="size-3.5" />
-        Upravit
-      </DialogTrigger>
+        render={
+          children ?? (
+            <Button type="button" variant="ghost" size="sm">
+              <Pencil className="size-3.5" />
+              Upravit
+            </Button>
+          )
+        }
+      />
 
       <DialogContent>
         <DialogHeader>

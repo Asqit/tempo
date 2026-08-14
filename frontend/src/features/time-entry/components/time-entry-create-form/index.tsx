@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -7,30 +7,16 @@ import { ClientPicker } from "@/features/clients/components/client-picker";
 import { ProjectPicker } from "@/features/projects/components/project-picker";
 import { $api, getWorkspaceHeader } from "@/lib/api";
 
-type TimeEntryUpdateFormProps = {
-  id: number;
-  initialDescription: string | null;
-  initialProjectId: number | null;
-  initialStartTime: string;
-  initialEndTime: string | null;
-  onUpdated?: () => void;
+type TimeEntryCreateFormProps = {
+  onCreated?: () => void;
 };
 
-function toDateTimeLocalInput(value: string | null): string {
-  if (!value) {
-    return "";
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
+function toDateTimeLocalInput(value: Date): string {
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  const hours = String(value.getHours()).padStart(2, "0");
+  const minutes = String(value.getMinutes()).padStart(2, "0");
 
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
@@ -48,69 +34,18 @@ function fromDateTimeLocalInput(value: string): string | null {
   return date.toISOString();
 }
 
-function getProjectClientId(data: unknown): number | null {
-  if (!data || typeof data !== "object") {
-    return null;
-  }
-
-  const raw = data as {
-    client?: { id?: unknown } | null;
-  };
-
-  if (!raw.client || typeof raw.client.id !== "number") {
-    return null;
-  }
-
-  return raw.client.id;
-}
-
-export function TimeEntryUpdateForm({
-  id,
-  initialDescription,
-  initialProjectId,
-  initialStartTime,
-  initialEndTime,
-  onUpdated,
-}: TimeEntryUpdateFormProps) {
-  const [description, setDescription] = useState(initialDescription ?? "");
-  const [projectId, setProjectId] = useState<number | null>(initialProjectId);
+export function TimeEntryCreateForm({ onCreated }: TimeEntryCreateFormProps) {
+  const now = new Date();
+  const [description, setDescription] = useState("");
+  const [projectId, setProjectId] = useState<number | null>(null);
   const [clientId, setClientId] = useState<number | null>(null);
-  const [startTime, setStartTime] = useState(
-    toDateTimeLocalInput(initialStartTime),
-  );
-  const [endTime, setEndTime] = useState(toDateTimeLocalInput(initialEndTime));
+  const [startTime, setStartTime] = useState(toDateTimeLocalInput(now));
+  const [endTime, setEndTime] = useState("");
   const workspaceHeader = getWorkspaceHeader();
 
-  const { data: projectData } = $api.useQuery("get", "/api/v1/projects/{id}", {
-    params: {
-      path: {
-        id: projectId ?? 0,
-      },
-      query: {
-        client_id: 0,
-      },
-      header: workspaceHeader ?? { "X-Workspace-Id": 0 },
-    },
-    enabled: !!workspaceHeader && projectId !== null,
-  } as unknown as never);
-
-  const projectClientId = useMemo(
-    () => getProjectClientId(projectData),
-    [projectData],
-  );
-
-  useEffect(() => {
-    if (projectId === null) {
-      setClientId(null);
-      return;
-    }
-
-    setClientId(projectClientId);
-  }, [projectClientId, projectId]);
-
   const { mutateAsync, isPending } = $api.useMutation(
-    "put",
-    "/api/v1/time-entries/{id}",
+    "post",
+    "/api/v1/time-entries/",
   );
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -131,9 +66,6 @@ export function TimeEntryUpdateForm({
     try {
       await mutateAsync({
         params: {
-          path: {
-            id,
-          },
           header: workspaceHeader ?? { "X-Workspace-Id": 0 },
         },
         body: {
@@ -145,10 +77,10 @@ export function TimeEntryUpdateForm({
         },
       });
 
-      toast.success("Výkaz byl aktualizován.");
-      onUpdated?.();
+      toast.success("Výkaz byl vytvořen.");
+      onCreated?.();
     } catch {
-      toast.error("Aktualizace výkazu se nezdařila.");
+      toast.error("Vytvoření výkazu se nezdařilo.");
     }
   };
 
@@ -191,7 +123,7 @@ export function TimeEntryUpdateForm({
 
       <div className="flex justify-end">
         <Button type="submit" disabled={isPending}>
-          {isPending ? "Ukládám..." : "Uložit změny"}
+          {isPending ? "Vytvářím..." : "Vytvořit výkaz"}
         </Button>
       </div>
     </form>

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 
-import { $api } from "@/lib/api";
+import { $api, getWorkspaceHeader } from "@/lib/api";
 import { ColorAvatar } from "@/components/share/color-avatar";
 import {
   Pagination,
@@ -32,6 +32,11 @@ function formatDateTime(value: string | null) {
 
 export function ClientsTable() {
   const [page, setPage] = useState(1);
+  const workspaceHeader = getWorkspaceHeader();
+
+  if (!workspaceHeader) {
+    return null;
+  }
 
   const { data, isLoading, isError, isFetching } = $api.useQuery(
     "get",
@@ -42,6 +47,7 @@ export function ClientsTable() {
           page,
           size: PAGE_SIZE,
         },
+        header: workspaceHeader,
       },
     },
   );
@@ -124,8 +130,8 @@ export function ClientsTable() {
               ? clients.map((client) => {
                   const clientId = (client as { id?: unknown }).id;
                   const hasClientId = typeof clientId === "number";
-                  const ownerName = client.user?.name ?? "-";
-                  const ownerEmail = client.user?.email ?? null;
+                  const ownerName = "-";
+                  const ownerEmail = null;
 
                   return (
                     <TableRow key={`${client.name}-${client.created_at}`}>

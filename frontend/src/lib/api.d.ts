@@ -200,6 +200,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/time-entries/calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Calendar Entries */
+        get: operations["get_calendar_entries_api_v1_time_entries_calendar_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/time-entries/last": {
         parameters: {
             query?: never;
@@ -231,6 +248,59 @@ export interface paths {
         post?: never;
         /** Delete Time Entry */
         delete: operations["delete_time_entry_api_v1_time_entries__id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Workspace */
+        post: operations["create_workspace_api_v1_workspaces__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Workspaces */
+        get: operations["list_workspaces_api_v1_workspaces_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Workspace */
+        get: operations["get_workspace_api_v1_workspaces__workspace_id__get"];
+        /** Update Workspace */
+        put: operations["update_workspace_api_v1_workspaces__workspace_id__put"];
+        post?: never;
+        /** Delete Workspace */
+        delete: operations["delete_workspace_api_v1_workspaces__workspace_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -268,8 +338,6 @@ export interface components {
         ClientCreate: {
             /** Name */
             name: string;
-            /** User Id */
-            user_id: number | null;
         };
         /** ClientRead */
         ClientRead: {
@@ -277,7 +345,23 @@ export interface components {
             id: number;
             /** Name */
             name: string;
-            user: components["schemas"]["UserRead"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ClientShallow */
+        ClientShallow: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
             /**
              * Created At
              * Format: date-time
@@ -293,8 +377,6 @@ export interface components {
         ClientUpdate: {
             /** Name */
             name?: string | null;
-            /** User Id */
-            user_id?: number | null;
         };
         /** DbStat */
         DbStat: {
@@ -362,6 +444,19 @@ export interface components {
             /** Pages */
             pages: number;
         };
+        /** Page[WorkspaceRead] */
+        Page_WorkspaceRead_: {
+            /** Items */
+            items: components["schemas"]["WorkspaceRead"][];
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Size */
+            size: number;
+            /** Pages */
+            pages: number;
+        };
         /** ProjectBulkDelete */
         ProjectBulkDelete: {
             /** Ids */
@@ -371,8 +466,6 @@ export interface components {
         ProjectCreate: {
             /** Name */
             name: string;
-            /** Client Id */
-            client_id?: number | null;
             /** Description */
             description?: string | null;
             /** Start Time */
@@ -420,9 +513,7 @@ export interface components {
         /** ProjectUpdate */
         ProjectUpdate: {
             /** Name */
-            name: string;
-            /** Client Id */
-            client_id?: number | null;
+            name?: string | null;
             /** Description */
             description?: string | null;
             /** Start Time */
@@ -447,8 +538,6 @@ export interface components {
             project_id?: number | null;
             /** Client Id */
             client_id?: number | null;
-            /** User Id */
-            user_id: number;
         };
         /** TimeEntryRead */
         TimeEntryRead: {
@@ -463,10 +552,32 @@ export interface components {
             start_time: string;
             /** End Time */
             end_time: string | null;
+            /** Workspace Id */
+            workspace_id: number;
+            /** Client Id */
+            client_id: number | null;
             /** Project Id */
             project_id: number | null;
             /** User Id */
-            user_id: number | null;
+            user_id: number;
+            client: components["schemas"]["ClientRead"] | null;
+            project: components["schemas"]["ProjectShallow"] | null;
+        };
+        /** TimeEntrySummary */
+        TimeEntrySummary: {
+            /** Id */
+            id: number;
+            /** Description */
+            description: string | null;
+            /**
+             * Start Time
+             * Format: date-time
+             */
+            start_time: string;
+            /** End Time */
+            end_time: string | null;
+            /** Workspace Id */
+            workspace_id: number;
             project: components["schemas"]["ProjectShallow"] | null;
         };
         /** TimeEntryUpdate */
@@ -526,6 +637,38 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** WorkspaceCreate */
+        WorkspaceCreate: {
+            /** Name */
+            name: string;
+        };
+        /** WorkspaceRead */
+        WorkspaceRead: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            user: components["schemas"]["UserRead"];
+            /** Clients */
+            clients: components["schemas"]["ClientShallow"][];
+            /** Time Entries */
+            time_entries: components["schemas"]["TimeEntryRead"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** WorkspaceUpdate */
+        WorkspaceUpdate: {
+            /** Name */
+            name?: string | null;
         };
     };
     responses: never;
@@ -710,7 +853,9 @@ export interface operations {
                 /** @description Page size */
                 size?: number;
             };
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path?: never;
             cookie?: never;
         };
@@ -739,7 +884,9 @@ export interface operations {
     create_client_api_v1_clients__post: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path?: never;
             cookie?: never;
         };
@@ -772,7 +919,9 @@ export interface operations {
     get_client_api_v1_clients__id__get: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path: {
                 id: number;
             };
@@ -803,7 +952,9 @@ export interface operations {
     update_client_api_v1_clients__id__put: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path: {
                 id: number;
             };
@@ -838,7 +989,9 @@ export interface operations {
     delete_client_api_v1_clients__id__delete: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path: {
                 id: number;
             };
@@ -875,7 +1028,9 @@ export interface operations {
                 /** @description Page size */
                 size?: number;
             };
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path?: never;
             cookie?: never;
         };
@@ -903,8 +1058,12 @@ export interface operations {
     };
     create_project_api_v1_projects__post: {
         parameters: {
-            query?: never;
-            header?: never;
+            query: {
+                client_id: number;
+            };
+            header: {
+                "X-Workspace-Id": number;
+            };
             path?: never;
             cookie?: never;
         };
@@ -936,8 +1095,12 @@ export interface operations {
     };
     bulk_delete_api_v1_projects__delete: {
         parameters: {
-            query?: never;
-            header?: never;
+            query: {
+                client_id: number;
+            };
+            header: {
+                "X-Workspace-Id": number;
+            };
             path?: never;
             cookie?: never;
         };
@@ -968,7 +1131,9 @@ export interface operations {
     get_project_api_v1_projects__id__get: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path: {
                 id: number;
             };
@@ -998,8 +1163,12 @@ export interface operations {
     };
     update_project_api_v1_projects__id__put: {
         parameters: {
-            query?: never;
-            header?: never;
+            query: {
+                client_id: number;
+            };
+            header: {
+                "X-Workspace-Id": number;
+            };
             path: {
                 id: number;
             };
@@ -1033,8 +1202,12 @@ export interface operations {
     };
     delete_project_api_v1_projects__id__delete: {
         parameters: {
-            query?: never;
-            header?: never;
+            query: {
+                client_id: number;
+            };
+            header: {
+                "X-Workspace-Id": number;
+            };
             path: {
                 id: number;
             };
@@ -1071,7 +1244,9 @@ export interface operations {
                 /** @description Page size */
                 size?: number;
             };
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1100,7 +1275,9 @@ export interface operations {
     create_time_entry_api_v1_time_entries__post: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1133,7 +1310,9 @@ export interface operations {
     bulk_delete_api_v1_time_entries__delete: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1161,10 +1340,46 @@ export interface operations {
             };
         };
     };
+    get_calendar_entries_api_v1_time_entries_calendar_get: {
+        parameters: {
+            query: {
+                start_time: string;
+                end_time: string;
+            };
+            header: {
+                "X-Workspace-Id": number;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimeEntrySummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_last_entry_api_v1_time_entries_last_get: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1179,12 +1394,23 @@ export interface operations {
                     "application/json": components["schemas"]["TimeEntryRead"];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
     get_time_entry_api_v1_time_entries__id__get: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path: {
                 id: number;
             };
@@ -1215,7 +1441,9 @@ export interface operations {
     update_time_entry_api_v1_time_entries__id__put: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path: {
                 id: number;
             };
@@ -1250,9 +1478,173 @@ export interface operations {
     delete_time_entry_api_v1_time_entries__id__delete: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path: {
                 id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_workspace_api_v1_workspaces__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WorkspaceCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkspaceRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_workspaces_api_v1_workspaces_get: {
+        parameters: {
+            query?: {
+                /** @description Page number */
+                page?: number;
+                /** @description Page size */
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_WorkspaceRead_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_workspace_api_v1_workspaces__workspace_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkspaceRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_workspace_api_v1_workspaces__workspace_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WorkspaceUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkspaceRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_workspace_api_v1_workspaces__workspace_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: number;
             };
             cookie?: never;
         };

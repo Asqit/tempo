@@ -9,10 +9,10 @@ export const Route = createFileRoute("/_public/")({
         to: "/app",
         replace: true,
       });
-
-    throw redirect({
-      to: "/login",
-      replace: true,
-    });
   },
+  component: HomeView,
 });
+
+function HomeView() {
+  return <>domovská stránka</>;
+}

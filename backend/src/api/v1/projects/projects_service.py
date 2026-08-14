@@ -14,17 +14,34 @@ from src.api.v1.projects.projects_schema import (
     ProjectRead,
     ProjectUpdate,
 )
+from src.api.v1.workspace.workspace_models import Workspace
 
 logger = getLogger(__name__)
 
 
 class ProjectsService:
     @staticmethod
-    async def get_projects(
-        db: AsyncSession, user_id: int, client_id: int | None
-    ) -> Page[ProjectRead]:
-        filters = [Project.user_id == user_id]
+    async def _get_client_in_workspace(
+        db: AsyncSession, workspace: Workspace, client_id: int
+    ) -> Client:
+        """prefetched client"""
+        client = await db.scalar(
+            select(Client).where(
+                Client.id == client_id,
+                Client.workspace_id == workspace.id,
+            )
+        )
 
+        if client is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+        return client
+
+    @staticmethod
+    async def get_projects(
+        db: AsyncSession, workspace: Workspace, client_id: int | None
+    ) -> Page[ProjectRead]:
+        filters = []
         if client_id is not None:
             filters.append(Project.client_id == client_id)
 
@@ -32,29 +49,40 @@ class ProjectsService:
             db,
             select(Project)
             .where(*filters)
-            .options(selectinload(Project.client).options(selectinload(Client.user)))
+            .options(selectinload(Project.client))
             .order_by(Project.created_at),
         )
 
     @staticmethod
-    async def get_project(db: AsyncSession, user_id: int, project_id: int):
+    async def get_project(db: AsyncSession, workspace: Workspace, project_id: int):
+
         result = await db.execute(
             select(Project)
-            .where(Project.id == project_id, Project.user_id == user_id)
-            .options(selectinload(Project.client).options(selectinload(Client.user)))
+            .where(Project.id == project_id)
+            .options(selectinload(Project.client))
         )
 
         project = result.scalar_one_or_none()
         if project is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+        # check whenever client is within workspace
+        _ = await ProjectsService._get_client_in_workspace(
+            db, workspace, project.client_id
+        )
+
         return project
 
     @staticmethod
-    async def create_project(db: AsyncSession, user_id: int, payload: ProjectCreate):
+    async def create_project(
+        db: AsyncSession, workspace: Workspace, client_id: int, payload: ProjectCreate
+    ):
+        await ProjectsService._get_client_in_workspace(db, workspace, client_id)
+
         conflicting_rows = await db.execute(
             select(Project).where(
                 Project.name == payload.name,
-                Project.user_id == user_id,
+                Project.client_id == client_id,
             )
         )
         conflicts = conflicting_rows.scalars().all()
@@ -62,63 +90,76 @@ class ProjectsService:
         if len(conflicts) > 0:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT)
 
-        # validate that project's client belongs to our user
-        if payload.client_id is not None:
-            client = await db.get(Client, payload.client_id)
-            if client is None or client.user_id != user_id:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="client not found",
-                )
-
         new_proj = Project(
             name=payload.name,
-            user_id=user_id,
-            client_id=payload.client_id,
+            description=payload.description,
+            start_time=payload.start_time,
+            end_time=payload.end_time,
+            client_id=client_id,
         )
 
         db.add(new_proj)
         await db.commit()
         await db.refresh(new_proj)
 
-        # Reload with the relationships required by ProjectRead
-        project = await db.scalar(
+        return await db.scalar(
             select(Project)
             .where(Project.id == new_proj.id)
-            .options(selectinload(Project.client).options(selectinload(Client.user)))
+            .options(selectinload(Project.client))
         )
-
-        return project
 
     @staticmethod
     async def update_project(
-        db: AsyncSession, user_id: int, project_id: int, payload: ProjectUpdate
+        db: AsyncSession,
+        workspace: Workspace,
+        client_id: int,
+        project_id: int,
+        payload: ProjectUpdate,
     ):
+        await ProjectsService._get_client_in_workspace(db, workspace, client_id)
+
         project = await db.get(Project, project_id)
-        if project is None or project.user_id != user_id:
+        if project is None or project.client_id != client_id:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-        if payload.name:
+        if payload.name is not None:
             project.name = payload.name
+        if payload.description is not None:
+            project.description = payload.description
+        if payload.start_time is not None:
+            project.start_time = payload.start_time
+        if payload.end_time is not None:
+            project.end_time = payload.end_time
 
         await db.commit()
         await db.refresh(project)
         return project
 
     @staticmethod
-    async def delete_project(db: AsyncSession, user_id: int, project_id: int):
+    async def delete_project(
+        db: AsyncSession, workspace: Workspace, client_id: int, project_id: int
+    ):
+        await ProjectsService._get_client_in_workspace(db, workspace, client_id)
+
         project = await db.get(Project, project_id)
-        if project is None or project.user_id != user_id:
+        if project is None or project.client_id != client_id:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
         await db.delete(project)
         await db.commit()
 
         return project_id
 
     @staticmethod
-    async def bulk_delete(db: AsyncSession, user_id: int, ids: list[int]):
+    async def bulk_delete(
+        db: AsyncSession, workspace: Workspace, client_id: int, ids: list[int]
+    ):
+        await ProjectsService._get_client_in_workspace(db, workspace, client_id)
+
         stmt = (
-            delete(Project).where(Project.user_id == user_id).where(Project.id.in_(ids))
+            delete(Project)
+            .where(Project.client_id == client_id)
+            .where(Project.id.in_(ids))
         )
 
         await db.execute(stmt)

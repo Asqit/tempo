@@ -1,56 +1,100 @@
-import { EntriesTable } from "@/features/time-entry/components/entries-table";
 import { NewEntry } from "@/features/time-entry/components/new-entry";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { createFileRoute } from "@tanstack/react-router";
+import { ClientCreateDialog } from "@/features/clients/components/client-create-dialog";
+import { ProjectCreate } from "@/features/projects/components/project-create";
+import { EntriesTable } from "@/features/time-entry/components/entries-table";
+import { $api } from "@/lib/api";
+import { useWorkspaceStore } from "@/features/workspaces/store";
+import {
+  endOfWeek,
+  startOfWeek,
+  differenceInMinutes,
+  parseISO,
+  getHours,
+} from "date-fns";
+import { useMemo } from "react";
+import { Plus, PlusCircle, UserRoundPlus } from "lucide-react";
+import { TimeEntryCalendar } from "@/features/time-entry/components/calendar";
 
 export const Route = createFileRoute("/app/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const { activeWorkspace } = useWorkspaceStore();
+  const { data, isLoading } = $api.useQuery(
+    "get",
+    "/api/v1/time-entries/calendar",
+    {
+      params: {
+        query: {
+          start_time: startOfWeek(new Date()).toISOString(),
+          end_time: endOfWeek(new Date()).toISOString(),
+        },
+        header: {
+          "X-Workspace-Id": activeWorkspace!,
+        },
+      },
+    },
+  );
+
+  const totalDuration = useMemo(() => {
+    if (isLoading) return "00h:00m";
+    const totalMinutes = (data ?? []).reduce((acc, entry) => {
+      if (!entry.end_time) return acc; // skip running entries
+      console.log(entry);
+      return (
+        acc +
+        differenceInMinutes(
+          parseISO(entry.end_time),
+          parseISO(entry.start_time),
+        )
+      );
+    }, 0);
+
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+
+    return `${h}h:${String(m).padStart(2, "0")}m`;
+  }, [data, isLoading]);
+
+  const greeting = useMemo(() => {
+    const hour = getHours(new Date());
+    if (hour >= 5 && hour < 12) return "Dobré ráno.";
+    if (hour >= 12 && hour < 13) return "Dobré poledne.";
+    if (hour >= 13 && hour < 18) return "Dobrý den.";
+    if (hour >= 18 && hour < 22) return "Dobrý večer.";
+    return "Ještě pracuješ?";
+  }, []);
+
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-      <section className="space-y-1">
-        <p className="text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">
-          Workspace
-        </p>
-        <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
-          Přehled času
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Spusť záznam práce a měj přehled o všech posledních aktivitách.
-        </p>
-      </section>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Rychlý záznam</CardTitle>
-          <CardDescription>
-            Jedním klikem spustíš nebo zastavíš aktuální měření času.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <NewEntry />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Poslední záznamy</CardTitle>
-          <CardDescription>
-            Přehled nejnovějších položek včetně délky a stavu.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <EntriesTable showQuickActions />
-        </CardContent>
-      </Card>
+    <div className="space-y-6">
+      <header className="flex justify-between items-center border-b pb-2">
+        <div>
+          <h2 className="text-muted-foreground text-xs">PŘEHLED</h2>
+          <h1 className="text-3xl uppercase font-black">{greeting}</h1>
+        </div>
+        <div>
+          <ul className="flex gap-2 items-center">
+            <li className="flex flex-col items-end border-r pr-2">
+              <span className="text-xs text-muted-foreground">TENTO TÝDEN</span>
+              <time className="text-primary text-2xl font-black">
+                {totalDuration}
+              </time>
+            </li>
+            {/*
+             <li className="flex flex-col items-end">
+              <span className="text-xs text-muted-foreground">ZPOPLATNĚNÉ</span>
+              <time className="text-2xl font-black">38h 20m</time>
+            </li>
+           */}
+          </ul>
+        </div>
+      </header>
+      <main className="space-y-4">
+        <NewEntry />
+        <TimeEntryCalendar />
+      </main>
     </div>
   );
 }

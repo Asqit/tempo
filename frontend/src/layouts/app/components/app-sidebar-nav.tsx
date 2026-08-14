@@ -91,14 +91,12 @@ function renderSubItems(subItems: SidebarMenuSubItemConfig[]) {
             render={
               <Link
                 to={subItem.path}
-                className="group rounded-none transition-all [&.active]:bg-sidebar-accent [&.active]:text-sidebar-accent-foreground"
+                className="group border-l-4 border-transparent transition-all [&.active]:border-primary [&.active]:bg-primary/10 [&.active]:text-primary"
                 activeOptions={{ exact: true }}
               />
             }
           >
-            <span className="transition-transform group-[.active]:translate-x-0.5">
-              {subItem.label}
-            </span>
+            <span className="transition-transform">{subItem.label}</span>
           </SidebarMenuSubButton>
         </SidebarMenuSubItem>
       ))}
@@ -114,15 +112,13 @@ function renderItem(item: SidebarMenuItemConfig) {
           render={
             <Link
               to={item.path}
-              className="group rounded-none border border-transparent transition-all [&.active]:border-sidebar-border [&.active]:bg-sidebar-accent [&.active]:text-sidebar-accent-foreground"
+              className="group border-l-4 border-transparent transition-all [&.active]:border-primary [&.active]:bg-primary/10 [&.active]:text-primary"
               activeOptions={{ exact: true }}
             />
           }
         >
           <NavIcon icon={item.icon} className="transition-all" />
-          <span className="transition-transform group-[.active]:translate-x-1">
-            {item.label}
-          </span>
+          <span>{item.label}</span>
         </SidebarMenuButton>
       </SidebarMenuItem>
     );

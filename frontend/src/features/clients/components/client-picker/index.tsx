@@ -1,17 +1,15 @@
-import {
-  cloneElement,
-  isValidElement,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactElement,
-  type ReactNode,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { $api } from "@/lib/api";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { $api, getWorkspaceHeader } from "@/lib/api";
 
 type ClientOption = {
   id: number;
@@ -26,23 +24,11 @@ type ClientPage = {
   size: number;
 };
 
-type ClientPickerTriggerProps = {
-  selected: ClientOption | null;
-  disabled: boolean;
-  isLoading: boolean;
-  hasOptions: boolean;
-  isOpen: boolean;
-  placeholder: string;
-  onClick: () => void;
-};
-
 type ClientPickerProps = {
   value: number | null;
   onChange: (nextValue: number) => void;
   disabled?: boolean;
   placeholder?: string;
-  asChild?: boolean;
-  trigger?: ReactNode | ((props: ClientPickerTriggerProps) => ReactNode);
 };
 
 function normalizeClients(data: unknown): ClientOption[] {
@@ -107,19 +93,13 @@ function normalizeClientsPage(data: unknown): ClientPage {
     };
 
     const options = normalizeClients(payload.items ?? data);
-    const page = typeof payload.page === "number" ? payload.page : 1;
-    const pages = typeof payload.pages === "number" ? payload.pages : 1;
-    const total =
-      typeof payload.total === "number" ? payload.total : options.length;
-    const size =
-      typeof payload.size === "number" ? payload.size : options.length;
 
     return {
       options,
-      page,
-      pages,
-      total,
-      size,
+      page: typeof payload.page === "number" ? payload.page : 1,
+      pages: typeof payload.pages === "number" ? payload.pages : 1,
+      total: typeof payload.total === "number" ? payload.total : options.length,
+      size: typeof payload.size === "number" ? payload.size : options.length,
     };
   }
 
@@ -132,48 +112,13 @@ function normalizeClientsPage(data: unknown): ClientPage {
   };
 }
 
-function renderDefaultTrigger({
-  selected,
-  disabled,
-  isLoading,
-  hasOptions,
-  isOpen,
-  placeholder,
-  onClick,
-}: ClientPickerTriggerProps) {
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      disabled={disabled}
-      onClick={onClick}
-      className="min-w-48 justify-between"
-      aria-expanded={isOpen}
-      aria-haspopup="listbox"
-    >
-      <span className="truncate">
-        {selected?.name ??
-          (isLoading
-            ? "Nacitam klienty..."
-            : hasOptions
-              ? placeholder
-              : "Klienti nenalezeni")}
-      </span>
-      <ChevronsUpDownIcon className="size-4" />
-    </Button>
-  );
-}
-
 export function ClientPicker({
   value,
   onChange,
-  disabled,
+  disabled = false,
   placeholder = "Vyber klienta",
-  asChild = false,
-  trigger,
 }: ClientPickerProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isOpen, setIsOpen] = useState(false);
+  const workspaceHeader = getWorkspaceHeader();
   const [page, setPage] = useState(1);
   const [loadedPages, setLoadedPages] = useState<Record<number, ClientPage>>(
     {},
@@ -188,7 +133,9 @@ export function ClientPicker({
           page,
           size: 10,
         },
+        header: workspaceHeader ?? { "X-Workspace-Id": 0 },
       },
+      enabled: !!workspaceHeader,
     },
   );
 
@@ -198,32 +145,12 @@ export function ClientPicker({
     }
 
     const pageData = normalizeClientsPage(data);
+
     setLoadedPages((current) => ({
       ...current,
       [pageData.page]: pageData,
     }));
-  }, [data, page]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return undefined;
-    }
-
-    const handlePointerDown = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handlePointerDown);
-
-    return () => {
-      document.removeEventListener("mousedown", handlePointerDown);
-    };
-  }, [isOpen]);
+  }, [data]);
 
   const currentPageData = useMemo(() => {
     if (data) {
@@ -251,57 +178,12 @@ export function ClientPicker({
     () => options.find((option) => option.id === value) ?? null,
     [options, value],
   );
-  const hasOptions = options.length > 0;
-  const isDisabled = disabled || isLoading || !hasOptions;
+
   const hasMore = currentPageData.pages > currentPageData.page;
-
-  const triggerProps: ClientPickerTriggerProps = {
-    selected,
-    disabled: isDisabled,
-    isLoading,
-    hasOptions,
-    isOpen,
-    placeholder,
-    onClick: () => {
-      if (!isDisabled) {
-        setIsOpen((current) => !current);
-      }
-    },
-  };
-
-  const triggerContent =
-    typeof trigger === "function"
-      ? trigger(triggerProps)
-      : (trigger ?? renderDefaultTrigger(triggerProps));
-
-  const resolvedTrigger = isValidElement(triggerContent)
-    ? (() => {
-        const child = triggerContent as ReactElement<{
-          onClick?: (event: React.MouseEvent<HTMLElement>) => void;
-          disabled?: boolean;
-          [key: string]: unknown;
-        }>;
-
-        if (!asChild && typeof trigger !== "function") {
-          return child;
-        }
-
-        return cloneElement(child, {
-          ...child.props,
-          onClick: (event: React.MouseEvent<HTMLElement>) => {
-            child.props.onClick?.(event);
-            triggerProps.onClick();
-          },
-          "aria-expanded": isOpen,
-          "aria-haspopup": "listbox",
-          disabled: triggerProps.disabled,
-        });
-      })()
-    : triggerContent;
+  const isDisabled = disabled || isLoading || !options.length;
 
   const handleSelect = (nextValue: number) => {
     onChange(nextValue);
-    setIsOpen(false);
   };
 
   const handleShowMore = () => {
@@ -312,48 +194,70 @@ export function ClientPicker({
     setPage((current) => current + 1);
   };
 
+  if (!workspaceHeader) {
+    return null;
+  }
+
   return (
-    <div ref={containerRef} className="relative z-[60] overflow-visible">
-      {resolvedTrigger}
-      {isOpen ? (
-        <div className="absolute z-[1000] mt-2 w-64 overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-xl ring-1 ring-black/10">
-          <div className="max-h-72 overflow-y-auto">
-            {options.length > 0 ? (
-              options.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => handleSelect(option.id)}
-                  className="flex w-full items-center justify-between px-3 py-2 text-left text-sm transition-colors hover:bg-accent"
-                >
-                  <span className="truncate">{option.name}</span>
-                  {value === option.id ? (
-                    <CheckIcon className="size-4" />
-                  ) : null}
-                </button>
-              ))
-            ) : (
-              <div className="px-3 py-2 text-sm text-muted-foreground">
-                {isLoading ? "Načítám klienty..." : "Klienti nenalezeni"}
-              </div>
-            )}
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isDisabled}
+            className="min-w-48 justify-between"
+          />
+        }
+      >
+        <span className="truncate">
+          {selected?.name ??
+            (isLoading
+              ? "Načítám klienty..."
+              : options.length
+                ? placeholder
+                : "Klienti nenalezeni")}
+        </span>
+
+        <ChevronsUpDownIcon className="size-4" />
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent className="w-64">
+        {options.length > 0 ? (
+          options.map((option) => (
+            <DropdownMenuItem
+              key={option.id}
+              onSelect={() => handleSelect(option.id)}
+              className="justify-between"
+            >
+              <span className="truncate">{option.name}</span>
+
+              {value === option.id ? <CheckIcon className="size-4" /> : null}
+            </DropdownMenuItem>
+          ))
+        ) : (
+          <div className="px-2 py-1.5 text-sm text-muted-foreground">
+            {isLoading ? "Načítám klienty..." : "Klienti nenalezeni"}
           </div>
-          {hasMore ? (
-            <div className="border-t border-border p-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="w-full justify-center"
-                onClick={handleShowMore}
-                disabled={isFetching}
-              >
-                {isFetching ? "Načítám další..." : "Zobrazit další"}
-              </Button>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
+        )}
+
+        {hasMore ? (
+          <>
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem
+              disabled={isFetching}
+              onSelect={(event) => {
+                event.preventDefault();
+                handleShowMore();
+              }}
+              className="justify-center"
+            >
+              {isFetching ? "Načítám další..." : "Zobrazit další"}
+            </DropdownMenuItem>
+          </>
+        ) : null}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

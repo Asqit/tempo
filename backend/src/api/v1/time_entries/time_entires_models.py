@@ -31,7 +31,9 @@ class TimeEntry(Base):
         ForeignKey("workspaces.id", ondelete="CASCADE")
     )
 
-    client: Mapped[Client | None] = relationship(back_populates="time_entries")
+    client: Mapped[Client | None] = relationship(
+        back_populates="time_entries", lazy="selectin"
+    )
     client_id: Mapped[int | None] = mapped_column(
         ForeignKey("clients.id", ondelete="SET NULL")
     )

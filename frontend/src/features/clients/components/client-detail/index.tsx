@@ -10,7 +10,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ProjectsTable } from "@/features/projects/components/projects-table";
-import { $api } from "@/lib/api";
+import { Separator } from "@/components/ui/separator";
+import { $api, getWorkspaceHeader } from "@/lib/api";
+import { ClientHeader } from "./components/client-header";
 
 type ClientDetailProps = {
   id: number;
@@ -54,6 +56,8 @@ function formatDateTime(value: string | null) {
 }
 
 export function ClientDetail({ id }: ClientDetailProps) {
+  const workspaceHeader = getWorkspaceHeader();
+
   const { data, isLoading, isError } = $api.useQuery(
     "get",
     "/api/v1/clients/{id}",
@@ -62,11 +66,17 @@ export function ClientDetail({ id }: ClientDetailProps) {
         path: {
           id,
         },
+        header: workspaceHeader,
       },
+      enabled: !!workspaceHeader,
     },
   );
 
   const client = useMemo(() => normalizeClientDetail(data), [data]);
+
+  if (!workspaceHeader) {
+    return null;
+  }
 
   if (isLoading) {
     return <p className="text-sm text-muted-foreground">Načítám klienta...</p>;
@@ -81,7 +91,11 @@ export function ClientDetail({ id }: ClientDetailProps) {
   const displayName = client.name;
 
   return (
-    <div className="space-y-5">
+    <section className="space-y-6">
+      <ClientHeader client={data} />
+
+      <Separator />
+
       <section className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
         <Card className="border-border/80">
           <CardHeader className="border-b border-border/70">
@@ -160,6 +174,6 @@ export function ClientDetail({ id }: ClientDetailProps) {
           </CardContent>
         </Card>
       </section>
-    </div>
+    </section>
   );
 }

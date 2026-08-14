@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { $api } from "@/lib/api";
+import { $api, getWorkspaceHeader } from "@/lib/api";
 import { Link } from "@tanstack/react-router";
 import { Clock3, FolderKanban, TimerReset, Timer, Trash2 } from "lucide-react";
 import {
@@ -91,6 +91,11 @@ export function EntriesTable({
 }: EntriesTableProps) {
   const resolvedSize = Math.min(100, Math.max(1, size));
   const [selectedEntryIds, setSelectedEntryIds] = useState<number[]>([]);
+  const workspaceHeader = getWorkspaceHeader();
+
+  if (!workspaceHeader) {
+    return null;
+  }
 
   const { data, isLoading, isError } = $api.useQuery(
     "get",
@@ -102,6 +107,7 @@ export function EntriesTable({
           size: resolvedSize,
           ...(typeof projectId === "number" ? { project_id: projectId } : {}),
         },
+        header: workspaceHeader,
       },
     },
   );
@@ -110,7 +116,9 @@ export function EntriesTable({
       query: {
         page: 1,
         size: 100,
+        client_id: 0,
       },
+      header: workspaceHeader,
     },
     enabled: showProjectColumn,
   } as unknown as never);
@@ -177,6 +185,7 @@ export function EntriesTable({
           path: {
             id: entryId,
           },
+          header: workspaceHeader,
         },
       });
 
@@ -202,6 +211,9 @@ export function EntriesTable({
 
     try {
       await bulkDeleteTimeEntries({
+        params: {
+          header: workspaceHeader,
+        },
         body: {
           ids: visibleSelectedIds,
         },

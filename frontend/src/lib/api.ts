@@ -2,6 +2,7 @@ import type { paths } from "./api.d";
 import createFetchClient, { type Middleware } from "openapi-fetch";
 import createClient from "openapi-react-query";
 import { useAuthStore } from "@/features/auth";
+import { useWorkspaceStore } from "@/features/workspaces/store";
 import { QueryClient } from "@tanstack/react-query";
 import { redirect } from "@tanstack/react-router";
 
@@ -13,6 +14,18 @@ if (!BACKEND_URL) {
 
 let isRefreshing = false;
 let refreshPromise: Promise<boolean> | null = null;
+
+export function getWorkspaceHeader() {
+  const { activeWorkspace } = useWorkspaceStore.getState();
+
+  if (activeWorkspace === null || activeWorkspace === undefined) {
+    return null;
+  }
+
+  return {
+    "X-Workspace-Id": activeWorkspace,
+  } as const;
+}
 
 async function refreshAccessToken() {
   if (isRefreshing && refreshPromise) {
@@ -67,8 +80,23 @@ async function refreshAccessToken() {
 const middleware: Middleware = {
   async onRequest({ request }) {
     const { token, isAuthenticated } = useAuthStore.getState();
+    const { activeWorkspace } = useWorkspaceStore.getState();
+    const url = new URL(request.url);
+    const requiresWorkspace = [
+      "/api/v1/clients",
+      "/api/v1/projects",
+      "/api/v1/time-entries",
+    ].some(
+      (prefix) =>
+        url.pathname === prefix || url.pathname.startsWith(`${prefix}/`),
+    );
+
     if (token && isAuthenticated) {
       request.headers.set("Authorization", `Bearer ${token}`);
+    }
+
+    if (activeWorkspace && requiresWorkspace) {
+      request.headers.set("X-Workspace-Id", String(activeWorkspace));
     }
 
     return request;

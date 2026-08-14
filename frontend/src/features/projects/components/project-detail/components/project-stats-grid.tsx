@@ -8,26 +8,25 @@ type ProjectStatsGridProps = {
 export function ProjectStatsGrid({
   totalHoursLabel,
   weeklyHoursLabel,
-  entriesCount,
   averageEntryHoursLabel,
 }: ProjectStatsGridProps) {
   return (
-    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-      <article className="rounded-none border border-border/70 bg-card p-3">
-        <p className="text-xs text-muted-foreground">Celkem</p>
-        <p className="mt-1 text-xl font-semibold">{totalHoursLabel}</p>
+    <div className="grid sm:grid-cols-3">
+      <article className="rounded-none border py-12 px-5">
+        <p className="text-xs text-muted-foreground uppercase">Celkem</p>
+        <p className="mt-1 text-5xl font-black">{totalHoursLabel}</p>
       </article>
-      <article className="rounded-none border border-border/70 bg-card p-3">
-        <p className="text-xs text-muted-foreground">Tento tyden</p>
-        <p className="mt-1 text-xl font-semibold">{weeklyHoursLabel}</p>
+
+      <article className="rounded-none border bg-dotted py-12 px-5">
+        <p className="text-xs uppercase">Tento týden</p>
+        <p className="mt-1 text-5xl font-black">{weeklyHoursLabel}</p>
       </article>
-      <article className="rounded-none border border-border/70 bg-card p-3">
-        <p className="text-xs text-muted-foreground">Pocet zaznamu</p>
-        <p className="mt-1 text-xl font-semibold">{entriesCount}</p>
-      </article>
-      <article className="rounded-none border border-border/70 bg-card p-3">
-        <p className="text-xs text-muted-foreground">Prumer / zaznam</p>
-        <p className="mt-1 text-xl font-semibold">{averageEntryHoursLabel}</p>
+
+      <article className="rounded-none border py-12 px-5">
+        <p className="text-xs text-muted-foreground uppercase">
+          Průmer / zaznam
+        </p>
+        <p className="mt-1 text-5xl font-black">{averageEntryHoursLabel}</p>
       </article>
     </div>
   );

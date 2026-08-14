@@ -1,6 +1,3 @@
-import { useMemo, useState } from "react";
-
-import { $api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -10,87 +7,54 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-import { PaginationFooter } from "./components/pagination-footer";
-import { ProjectRow } from "./components/project-row";
+import { useWorkspaceStore } from "@/features/workspaces/store";
+import { $api } from "@/lib/api";
+import { useMemo, useState } from "react";
 import { StateRow } from "./components/state-row";
-import type { ProjectsResponse, ProjectsTableProps } from "./types";
+import { ProjectRow } from "./components/project-row";
 
-const PAGE_SIZE = 5;
-
-function getPageNumbers(page: number, totalPages: number) {
-  if (totalPages <= 5) {
-    return Array.from({ length: totalPages }, (_, index) => index + 1);
-  }
-
-  if (page <= 3) {
-    return [1, 2, 3, 4, 5];
-  }
-
-  if (page >= totalPages - 2) {
-    return [
-      totalPages - 4,
-      totalPages - 3,
-      totalPages - 2,
-      totalPages - 1,
-      totalPages,
-    ];
-  }
-
-  return [page - 2, page - 1, page, page + 1, page + 2];
+interface Props {
+  clientId: number | null;
+  hideHeader?: boolean;
+  title?: string;
+  description?: string;
+  compact?: boolean;
 }
 
-export function ProjectsTable({
-  clientId = null,
-  hideHeader = false,
-  title,
-  description,
-  compact = false,
-}: ProjectsTableProps) {
-  const queryKey = clientId ?? "all";
-  const [pageByFilter, setPageByFilter] = useState<Record<string, number>>({
-    all: 1,
-  });
+export function ProjectsTable(props: Props) {
+  const { clientId, hideHeader, title, description, compact } = props;
+  const { activeWorkspace } = useWorkspaceStore();
   const [selectedProjectIds, setSelectedProjectIds] = useState<number[]>([]);
 
-  const currentPage = pageByFilter[queryKey] ?? 1;
+  const workspaceHeader = { "X-Workspace-Id": activeWorkspace! };
+
+  const { data, isLoading, isError, isFetching, hasNextPage, fetchNextPage } =
+    $api.useInfiniteQuery(
+      "get",
+      "/api/v1/projects/",
+      {
+        params: {
+          query: { client_id: clientId! },
+          header: workspaceHeader,
+        },
+      },
+      {
+        pageParamName: "page",
+        initialPageParam: 1,
+        getNextPageParam: (last) =>
+          last.page >= last.pages ? undefined : last.page + 1,
+      },
+    );
+
+  const projects = useMemo(
+    () => data?.pages?.flatMap((p) => p.items ?? []) ?? [],
+    [data],
+  );
 
   const { mutateAsync: bulkDelete } = $api.useMutation(
     "delete",
     "/api/v1/projects/",
   );
-
-  const { data, isLoading, isError, isFetching } = $api.useQuery(
-    "get",
-    "/api/v1/projects/",
-    {
-      params: {
-        query: {
-          page: currentPage,
-          size: PAGE_SIZE,
-          ...(clientId !== null ? { client_id: clientId } : {}),
-        },
-      },
-    },
-  );
-
-  const response = data as ProjectsResponse | undefined;
-  const projects = response?.items ?? [];
-  const totalPages = Math.max(1, Number(response?.pages ?? 1));
-  const canGoPrevious = currentPage > 1;
-  const canGoNext = currentPage < totalPages;
-
-  const pageNumbers = useMemo(
-    () => getPageNumbers(currentPage, totalPages),
-    [currentPage, totalPages],
-  );
-
-  const handlePageChange = (nextPage: number) => {
-    setPageByFilter((prev) => ({
-      ...prev,
-      [queryKey]: nextPage,
-    }));
-  };
 
   const handleToggleProjectSelection = (
     projectId: number,
@@ -108,32 +72,30 @@ export function ProjectsTable({
   const handleToggleAllVisibleSelection = (checked: boolean) => {
     setSelectedProjectIds((prev) => {
       const next = new Set(prev);
-
       if (checked) {
-        projects.forEach((project) => next.add(project.id));
+        projects.forEach((p) => next.add(p.id));
       } else {
-        projects.forEach((project) => next.delete(project.id));
+        projects.forEach((p) => next.delete(p.id));
       }
-
       return Array.from(next);
     });
   };
 
   const areAllVisibleSelected =
     projects.length > 0 &&
-    projects.every((project) => selectedProjectIds.includes(project.id));
+    projects.every((p) => selectedProjectIds.includes(p.id));
 
   const hasSelection = selectedProjectIds.length > 0;
 
   const handleBulkDelete = async () => {
-    if (!hasSelection) {
-      return;
-    }
+    if (!hasSelection) return;
 
     await bulkDelete({
-      body: {
-        ids: selectedProjectIds,
+      params: {
+        query: { client_id: clientId },
+        header: workspaceHeader,
       },
+      body: { ids: selectedProjectIds },
     });
 
     setSelectedProjectIds([]);
@@ -175,12 +137,12 @@ export function ProjectsTable({
                   onCheckedChange={(checked) =>
                     handleToggleAllVisibleSelection(checked === true)
                   }
-                  aria-label="Vybrat všechny projekty na stránce"
+                  aria-label="Vybrat všechny načtené projekty"
                 />
               </TableHead>
               <TableHead>Projekt</TableHead>
               {!compact ? <TableHead>Klient</TableHead> : null}
-              <TableHead>Vlastnik</TableHead>
+              <TableHead>Vlastník</TableHead>
               {!compact ? <TableHead>ID</TableHead> : null}
             </TableRow>
           </TableHeader>
@@ -188,14 +150,14 @@ export function ProjectsTable({
             {isLoading ? (
               <StateRow
                 colSpan={compact ? 4 : 5}
-                message="Nacitam projekty..."
+                message="Načítám projekty..."
               />
             ) : null}
 
             {!isLoading && isError ? (
               <StateRow
                 colSpan={compact ? 4 : 5}
-                message="Projekty se nepodarilo nacist."
+                message="Projekty se nepodařilo načíst."
                 tone="danger"
               />
             ) : null}
@@ -203,7 +165,7 @@ export function ProjectsTable({
             {!isLoading && !isError && projects.length === 0 ? (
               <StateRow
                 colSpan={compact ? 4 : 5}
-                message="Zatim nemas zadne projekty."
+                message="Zatím nemáš žádné projekty."
               />
             ) : null}
 
@@ -222,16 +184,16 @@ export function ProjectsTable({
         </Table>
       </div>
 
-      <PaginationFooter
-        page={currentPage}
-        totalPages={totalPages}
-        isFetching={isFetching}
-        isLoading={isLoading}
-        canGoPrevious={canGoPrevious}
-        canGoNext={canGoNext}
-        pageNumbers={pageNumbers}
-        onPageChange={handlePageChange}
-      />
+      {hasNextPage ? (
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => fetchNextPage()}
+          disabled={isFetching}
+        >
+          {isFetching ? "Načítám..." : "Načíst další"}
+        </Button>
+      ) : null}
     </div>
   );
 }

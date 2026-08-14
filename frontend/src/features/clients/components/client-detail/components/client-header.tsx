@@ -1,31 +1,28 @@
 import { Button } from "@/components/ui/button";
 import { TimeEntryCreateDialog } from "@/features/time-entry/components/time-entry-create-dialog";
-import { ProjectUpdateDialog } from "../../project-update-dialog";
+
 import { PlayCircle } from "lucide-react";
 import type { components } from "@/lib/api.d";
 
-type ProjectHeaderProps = {
-  project: components["schemas"]["ProjectRead"];
+type ClientHeaderProps = {
+  client: components["schemas"]["ClientRead"];
 };
 
-export function ProjectHeader({ project }: ProjectHeaderProps) {
+export function ClientHeader({ client }: ClientHeaderProps) {
   return (
     <header className="flex items-center justify-between">
       <div>
-        <h2 className="text-muted-foreground text-xs uppercase">PROJEKT</h2>
-        <h1 className="text-3xl uppercase font-black">{project.name}</h1>
+        <h2 className="text-muted-foreground text-xs uppercase">Klient</h2>
+        <h1 className="text-3xl uppercase font-black">{client.name}</h1>
       </div>
       <div className="flex gap-2 items-center">
-        <ProjectUpdateDialog
-          trigger={<Button variant="outline">upravit projekt</Button>}
-          project={{
-            id: project.id,
-            name: project.name,
-            client_id: project.client?.id,
-            start_time: project.start_time,
-            end_time: project.end_time,
+        {/* <ClientUpdateDialog
+          trigger={<Button variant="outline">Upravit klienta</Button>}
+          client={{
+            id: client.id,
+            name: client.name,
           }}
-        />
+        /> */}
         <TimeEntryCreateDialog
           trigger={
             <Button

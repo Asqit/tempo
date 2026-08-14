@@ -1,11 +1,11 @@
 import { useMemo } from "react";
-import { $api } from "@/lib/api";
+import { $api, getWorkspaceHeader } from "@/lib/api";
 import { EntriesTable } from "@/features/time-entry/components/entries-table";
 
 import { ProjectHeader } from "./components/project-header";
 import { ProjectProgress } from "./components/project-progress";
 import { ProjectStatsGrid } from "./components/project-stats-grid";
-import { ProjectWeeklyChart } from "./components/project-weekly-chart";
+import { Separator } from "@/components/ui/separator";
 
 type ProjectDetailProps = {
   id: number;
@@ -195,6 +195,11 @@ function toLocalDateKey(date: Date): string {
 export function ProjectDetail({ id }: ProjectDetailProps) {
   const nowMs = useMemo(() => new Date().getTime(), []);
   const weekBounds = useMemo(() => getWeekBounds(), []);
+  const workspaceHeader = getWorkspaceHeader();
+
+  if (!workspaceHeader) {
+    return null;
+  }
 
   const {
     data: project,
@@ -205,38 +210,42 @@ export function ProjectDetail({ id }: ProjectDetailProps) {
       path: {
         id,
       },
+
+      header: workspaceHeader,
     },
+    enabled: false,
   });
 
-  const {
-    data: allTimeEntries,
-    isLoading: isAllEntriesLoading,
-    isError: isAllEntriesError,
-  } = $api.useQuery("get", "/api/v1/time-entries/", {
-    params: {
-      query: {
-        project_id: id,
-        page: 1,
-        size: 100,
+  const { data: allTimeEntries, isLoading: isAllEntriesLoading } =
+    $api.useQuery("get", "/api/v1/time-entries/", {
+      params: {
+        query: {
+          project_id: id,
+          page: 1,
+          size: 100,
+        },
+        header: workspaceHeader,
       },
-    },
-  });
+      enabled: false,
+    });
 
-  const {
-    data: weekTimeEntries,
-    isLoading: isWeekEntriesLoading,
-    isError: isWeekEntriesError,
-  } = $api.useQuery("get", "/api/v1/time-entries/", {
-    params: {
-      query: {
-        project_id: id,
-        start_time: weekBounds.start.toISOString(),
-        end_time: weekBounds.end.toISOString(),
-        page: 1,
-        size: 100,
+  const { data: weekTimeEntries } = $api.useQuery(
+    "get",
+    "/api/v1/time-entries/",
+    {
+      params: {
+        query: {
+          project_id: id,
+          start_time: weekBounds.start.toISOString(),
+          end_time: weekBounds.end.toISOString(),
+          page: 1,
+          size: 100,
+        },
+        header: workspaceHeader,
       },
+      enabled: false,
     },
-  });
+  );
 
   const projectData = useMemo(() => getProjectData(project), [project]);
   const allEntries = useMemo(
@@ -276,31 +285,6 @@ export function ProjectDetail({ id }: ProjectDetailProps) {
     [allEntries.length, totalHours],
   );
 
-  const weekChartData = useMemo<WeekBarPoint[]>(() => {
-    const dayLabels = ["Po", "Ut", "St", "Ct", "Pa", "So", "Ne"];
-
-    const buckets = dayLabels.map((label, index) => {
-      const date = new Date(weekBounds.start);
-      date.setDate(weekBounds.start.getDate() + index);
-      return {
-        key: toLocalDateKey(date),
-        label,
-        hours: 0,
-      } satisfies WeekBarPoint;
-    });
-
-    const byKey = new Map(buckets.map((point) => [point.key, point]));
-
-    for (const entry of weeklyEntries) {
-      addHoursByDay(byKey, entry, weekBounds.start, weekBounds.end, nowMs);
-    }
-
-    return buckets.map((bucket) => ({
-      ...bucket,
-      hours: Number(bucket.hours.toFixed(2)),
-    }));
-  }, [nowMs, weekBounds.end, weekBounds.start, weeklyEntries]);
-
   const progressPercent = (() => {
     if (!projectData?.startAt || !projectData.endAt) {
       return null;
@@ -328,18 +312,11 @@ export function ProjectDetail({ id }: ProjectDetailProps) {
     );
   }
 
-  const hasEntriesError = isAllEntriesError || isWeekEntriesError;
-
   return (
-    <section className="space-y-4">
-      <ProjectHeader
-        name={projectData.name}
-        clientName={projectData.clientName}
-      />
+    <section className="space-y-6">
+      <ProjectHeader project={project} />
 
-      {progressPercent !== null ? (
-        <ProjectProgress value={progressPercent} />
-      ) : null}
+      <Separator />
 
       <ProjectStatsGrid
         totalHoursLabel={formatHours(totalHours)}
@@ -348,14 +325,13 @@ export function ProjectDetail({ id }: ProjectDetailProps) {
         averageEntryHoursLabel={formatHours(averageEntryHours)}
       />
 
-      <ProjectWeeklyChart
-        weekStartLabel={weekBounds.start.toLocaleDateString("cs-CZ")}
-        weekEndLabel={weekBounds.end.toLocaleDateString("cs-CZ")}
-        data={weekChartData}
-        isLoading={isWeekEntriesLoading}
-        hasError={hasEntriesError}
-        formatHours={formatHours}
-      />
+      {progressPercent !== null ? (
+        <ProjectProgress
+          value={progressPercent}
+          startDate={projectData?.startAt ?? null}
+          endDate={projectData?.endAt ?? null}
+        />
+      ) : null}
 
       <div className="space-y-2">
         <h3 className="text-sm font-semibold">Poslední výkazy projektu</h3>

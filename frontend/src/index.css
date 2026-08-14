@@ -1,7 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/inter";
+
+@import "@fontsource-variable/hanken-grotesk/wght.css";
+@import "@fontsource-variable/chivo/wght.css";
+
+@source inline("grid-cols-{1..7} grid-rows-24");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -46,6 +50,7 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --font-sans: "Hanken Grotesk Variable", sans-serif;
   --font-mono: JetBrains Mono, ui-monospace, monospace;
   --font-serif: Noto Serif, ui-serif, serif;
   --radius: 0.75rem;
@@ -99,16 +104,16 @@
   --chart-4: oklch(0.6667 0.1462 147.9698);
   --chart-5: oklch(0.5677 0.1372 148.6279);
   --radius: 0.75rem;
-  --sidebar: oklch(0.9851 0 0);
+  --sidebar: oklch(0.92 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.8882 0.1981 125.5383);
   --sidebar-primary-foreground: oklch(0.2734 0.0743 130.6483);
-  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent: oklch(0.96 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.8711 0.0055 286.286);
+  --sidebar-border: oklch(0.82 0.0055 286.286);
   --sidebar-ring: oklch(0.8882 0.1981 125.5383);
   --destructive-foreground: oklch(1 0 0);
-  --font-sans: Alexandria, ui-sans-serif, sans-serif, system-ui;
+  --font-sans: "Hanken Grotesk Variable", sans-serif;
   --font-serif: Noto Serif, ui-serif, serif;
   --font-mono: JetBrains Mono, ui-monospace, monospace;
   --shadow-color: oklch(0 0 0);
@@ -159,17 +164,17 @@
   --chart-3: oklch(0.6298 0.1711 134.0963);
   --chart-4: oklch(0.6667 0.1462 147.9698);
   --chart-5: oklch(0.5677 0.1372 148.6279);
-  --sidebar: oklch(0.1684 0 0);
+  --sidebar: oklch(0.11 0 0);
   --sidebar-foreground: oklch(0.9851 0 0);
   --sidebar-primary: oklch(0.8882 0.1981 125.5383);
   --sidebar-primary-foreground: oklch(0.2734 0.0743 130.6483);
-  --sidebar-accent: oklch(0.3703 0.0119 285.8054);
+  --sidebar-accent: oklch(0.28 0.0119 285.8054);
   --sidebar-accent-foreground: oklch(0.9851 0 0);
-  --sidebar-border: oklch(0.3703 0.0119 285.8054);
+  --sidebar-border: oklch(0.28 0.0119 285.8054);
   --sidebar-ring: oklch(0.8882 0.1981 125.5383);
   --destructive-foreground: oklch(0.985 0 0);
   --radius: 0.75rem;
-  --font-sans: Alexandria, ui-sans-serif, sans-serif, system-ui;
+  --font-sans: "Hanken Grotesk Variable", sans-serif;
   --font-serif: Noto Serif, ui-serif, serif;
   --font-mono: JetBrains Mono, ui-monospace, monospace;
   --shadow-color: oklch(0 0 0);
@@ -224,5 +229,26 @@
   ::selection {
     background-color: color-mix(in oklch, var(--primary) 26%, transparent);
     color: var(--foreground);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Chivo Variable", sans-serif;
+  }
+}
+
+@layer components {
+  .bg-dotted {
+    background-image: radial-gradient(
+      circle,
+      currentColor 1px,
+      transparent 1px
+    );
+    background-size: 24px 24px;
+    background-color: color-mix(in oklch, var(--muted) 50%, transparent);
   }
 }

@@ -40,7 +40,7 @@ async def get_workspace(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
 ):
-    return await WorkspaceService.get_workspace(db, current_user.id, id)
+    return await WorkspaceService.get_workspace(db, current_user.id, workspace_id)
 
 
 @router.put("/{workspace_id}", response_model=WorkspaceRead)
@@ -50,7 +50,9 @@ async def update_workspace(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
 ):
-    return await WorkspaceService.update_workspace(db, current_user.id, id, body)
+    return await WorkspaceService.update_workspace(
+        db, current_user.id, workspace_id, body
+    )
 
 
 @router.delete("/{workspace_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -59,4 +61,4 @@ async def delete_workspace(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
 ):
-    return await WorkspaceService.delete_workspace(db, current_user.id, id)
+    return await WorkspaceService.delete_workspace(db, current_user.id, workspace_id)

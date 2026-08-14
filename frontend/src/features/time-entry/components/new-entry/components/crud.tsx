@@ -1,30 +1,34 @@
 import type { components } from "@/lib/api.d";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ClientPicker } from "@/features/clients/components/client-picker";
 import { ProjectPicker } from "@/features/projects/components/project-picker";
-import { $api } from "@/lib/api";
-import { Tag, User2 } from "lucide-react";
+import { $api, getWorkspaceHeader } from "@/lib/api";
+import { Pause, Play, Tag, User2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+
+type ActionType = "description" | "client" | "project";
 
 interface Props {
   id?: number | null;
+  callback(): Promise<void> | void;
+  state: "playing" | "stopped";
 }
 
 function formatElapsedTime(durationMs: number) {
   const totalSeconds = Math.max(0, Math.floor(durationMs / 1000));
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  return [h, m, s].map((v) => String(v).padStart(2, "0")).join(":");
 }
 
-export function TimerCRUD({ id }: Props) {
+export function TimerCRUD({ id, state, callback }: Props) {
   const hasId = id !== null && id !== undefined;
-  const queryId = id ?? 0;
+  const workspaceHeader = getWorkspaceHeader() ?? { "X-Workspace-Id": 0 };
   const [now, setNow] = useState(() => Date.now());
   const [clientId, setClientId] = useState<number | null>(null);
   const [projectId, setProjectId] = useState<number | null>(null);
@@ -34,62 +38,47 @@ export function TimerCRUD({ id }: Props) {
     "/api/v1/time-entries/{id}",
     {
       params: {
-        path: {
-          id: queryId,
-        },
+        path: { id: id ?? 0 },
+        header: workspaceHeader,
       },
-      enabled: hasId,
+      enabled: !!getWorkspaceHeader() && hasId,
     },
   );
+
   const { mutateAsync } = $api.useMutation("put", "/api/v1/time-entries/{id}");
 
   useEffect(() => {
-    if (!data?.start_time || data.end_time) {
-      return;
-    }
+    if (!data?.start_time || data.end_time) return;
 
-    const syncTimeout = window.setTimeout(() => {
-      setNow(Date.now());
-    }, 0);
-
-    const interval = window.setInterval(() => {
-      setNow(Date.now());
-    }, 1000);
+    const syncTimeout = window.setTimeout(() => setNow(Date.now()), 0);
+    const interval = window.setInterval(() => setNow(Date.now()), 1000);
 
     return () => {
       window.clearTimeout(syncTimeout);
       window.clearInterval(interval);
     };
-  }, [data?.end_time, data?.start_time]);
+  }, [data?.start_time, data?.end_time]);
 
-  type ActionType = "description" | "client" | "project";
   const handleUpdate = useCallback(
     async (type: ActionType, value: string | number) => {
-      if (!hasId) {
-        return;
+      if (!hasId) return;
+
+      const payload: components["schemas"]["TimeEntryUpdate"] = {};
+      switch (type) {
+        case "client":
+          payload.client_id = Number(value);
+          break;
+        case "description":
+          payload.description = String(value);
+          break;
+        case "project":
+          payload.project_id = Number(value);
+          break;
       }
 
       try {
-        const payload: components["schemas"]["TimeEntryUpdate"] = {};
-
-        switch (type) {
-          case "client":
-            payload.client_id = Number(value);
-            break;
-          case "description":
-            payload.description = String(value);
-            break;
-          case "project":
-            payload.project_id = Number(value);
-            break;
-        }
-
         await mutateAsync({
-          params: {
-            path: {
-              id,
-            },
-          },
+          params: { path: { id: id! }, header: workspaceHeader },
           body: payload,
         });
       } catch (error) {
@@ -98,11 +87,14 @@ export function TimerCRUD({ id }: Props) {
         });
       }
     },
-    [hasId, id, mutateAsync],
+    [hasId, id, mutateAsync, workspaceHeader],
   );
+
   const debouncedUpdate = useDebounceCallback(handleUpdate, 500);
 
   const isDisabled = !hasId || isLoading || isError;
+  const resolvedClientId =
+    clientId ?? (typeof data?.client_id === "number" ? data.client_id : null);
   const resolvedProjectId =
     projectId ??
     (typeof data?.project_id === "number" ? data.project_id : null);
@@ -112,67 +104,88 @@ export function TimerCRUD({ id }: Props) {
   const endTime = data?.end_time ? new Date(data.end_time).getTime() : null;
   const elapsedTimeMs = startTime === null ? 0 : (endTime ?? now) - startTime;
 
-  const handleClientChange = (nextClientId: number) => {
-    setClientId(nextClientId);
-    void handleUpdate("client", nextClientId);
-  };
-
-  const handleProjectChange = (nextProjectId: number) => {
-    setProjectId(nextProjectId);
-    void handleUpdate("project", nextProjectId);
-  };
-
   return (
     <div className="flex grow flex-wrap items-center gap-2 md:flex-nowrap">
-      <Input
-        disabled={isDisabled}
-        className="min-w-56 flex-1"
-        type="text"
-        placeholder="Zadejte popis úlohy"
-        defaultValue={data?.description ?? ""}
-        onChange={(e) => debouncedUpdate("description", e.target.value)}
-      />
-      <time
-        className="rounded-none border border-border/70 bg-background px-2.5 py-1.5 text-xs font-semibold tabular-nums text-foreground"
-        aria-label="Elapsed time"
-      >
-        {formatElapsedTime(elapsedTimeMs)}
-      </time>
-      <div className="flex items-center gap-1.5">
-        <ClientPicker
-          value={clientId}
-          onChange={handleClientChange}
-          disabled={isDisabled}
-          placeholder="Vyber klienta"
-          trigger={({ selected, disabled, placeholder }) => (
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-sm"
-              disabled={disabled}
-              aria-label={selected?.name ?? placeholder}
-            >
-              <User2 />
-            </Button>
+      <div className="flex-1">
+        <div>
+          {state === "playing" && (
+            <div className="flex items-center gap-2 text-xs text-primary">
+              <div className="size-2 bg-primary" /> AKTIVNÍ SESSION
+            </div>
           )}
-        />
-        <ProjectPicker
-          value={resolvedProjectId}
-          onChange={handleProjectChange}
-          disabled={isDisabled}
-          placeholder="Vyber projekt"
-          trigger={({ selected, disabled, placeholder }) => (
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-sm"
-              disabled={disabled}
-              aria-label={selected?.name ?? placeholder}
-            >
-              <Tag />
-            </Button>
+          <input
+            disabled={isDisabled}
+            className="min-w-56 flex-1 bg-transparent text-3xl font-black p-1 focus:outline-none focus:border-b border-primary"
+            type="text"
+            placeholder="Zadejte popis úlohy"
+            defaultValue={data?.description ?? ""}
+            onChange={(e) => debouncedUpdate("description", e.target.value)}
+          />
+        </div>
+        <div className="flex items-center gap-1.5">
+          <ClientPicker
+            value={resolvedClientId}
+            onChange={(nextId) => {
+              setClientId(nextId);
+              void handleUpdate("client", nextId);
+            }}
+            disabled={isDisabled}
+            placeholder="Vyber klienta"
+            trigger={({ selected, disabled, placeholder }) => (
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={disabled}
+                aria-label={selected?.name ?? placeholder}
+              >
+                <User2 /> {selected?.name ?? placeholder}
+              </Button>
+            )}
+          />
+          <Separator orientation="vertical" />
+          <ProjectPicker
+            value={resolvedProjectId}
+            onChange={(nextId) => {
+              setProjectId(nextId);
+              void handleUpdate("project", nextId);
+            }}
+            disabled={isDisabled}
+            placeholder="Vyber projekt"
+            trigger={({ selected, disabled, placeholder }) => (
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={disabled}
+                aria-label={selected?.name ?? placeholder}
+              >
+                <Tag /> {selected?.name ?? placeholder}
+              </Button>
+            )}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col">
+        <time
+          className={cn(
+            "text-3xl font-black tabular-nums",
+            state === "playing" && "text-primary",
           )}
-        />
+          aria-label="Elapsed time"
+        >
+          {formatElapsedTime(elapsedTimeMs)}
+        </time>
+        <Button
+          className="group shadow-sm transition-all"
+          onClick={() => callback()}
+        >
+          {state === "playing" ? (
+            <Pause className="group-hover:fill-current group-hover:stroke-none" />
+          ) : (
+            <Play className="ml-0.5 group-hover:fill-current group-hover:stroke-none" />
+          )}
+          {state === "playing" ? "STOP" : "START"}
+        </Button>
       </div>
     </div>
   );

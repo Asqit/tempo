@@ -15,89 +15,71 @@ from src.api.v1.time_entries.time_entries_schemas import (
     TimeEntryRead,
     TimeEntryUpdate,
 )
+from src.api.v1.workspace.workspace_models import Workspace
 
 
 class TimeEntryService:
     @staticmethod
     async def _validate_references(
         db: AsyncSession,
-        user_id: int,
+        workspace: Workspace,
         client_id: int | None,
         project_id: int | None,
     ) -> None:
-        """Validate client/project references.
+        """Validate client/project references inside the selected workspace."""
 
-        Allowed combinations:
-        - client=None, project=None
-        - client=<id>, project=None
-        - client=None, project=<id>
-        - client=<id>, project=<id> (project must belong to client)
-        """
-
-        # Nothing selected
         if client_id is None and project_id is None:
             return
 
-        # Client only
-        if project_id is None:
-            exists_ = await db.scalar(
+        if client_id is not None:
+            client_exists = await db.scalar(
                 select(
                     exists().where(
                         Client.id == client_id,
-                        Client.user_id == user_id,
+                        Client.workspace_id == workspace.id,
                     )
                 )
             )
-
-            if not exists_:
+            if not client_exists:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Client not found.",
+                    detail="Client not found in workspace.",
                 )
-            return
 
-        # Project only
-        if client_id is None:
-            exists_ = await db.scalar(
-                select(
-                    exists().where(
-                        Project.id == project_id,
-                        Project.user_id == user_id,
-                    )
-                )
-            )
-
-            if not exists_:
+        if project_id is not None:
+            project = await db.scalar(select(Project).where(Project.id == project_id))
+            if project is None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Project not found.",
                 )
-            return
 
-        # Client + Project
-        valid = await db.scalar(
-            select(
-                exists().where(
-                    Project.id == project_id,
-                    Project.client_id == client_id,
-                    Project.user_id == user_id,
+            if project.client_id is not None:
+                project_client = await db.scalar(
+                    select(Client).where(
+                        Client.id == project.client_id,
+                        Client.workspace_id == workspace.id,
+                    )
                 )
-            )
-        )
+                if project_client is None:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Project does not belong to this workspace.",
+                    )
 
-        if not valid:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid client/project combination.",
-            )
+            if client_id is not None and project.client_id != client_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Project does not belong to the selected client.",
+                )
 
     @staticmethod
     async def get_calendar_entries(
-        db: AsyncSession, user_id: int, start_time: datetime, end_time: datetime
+        db: AsyncSession, workspace: Workspace, start_time: datetime, end_time: datetime
     ):
         result = await db.execute(
             select(TimeEntry).where(
-                TimeEntry.user_id == user_id,
+                TimeEntry.workspace_id == workspace.id,
                 or_(
                     TimeEntry.end_time >= start_time,
                     TimeEntry.end_time.is_(None),
@@ -109,10 +91,10 @@ class TimeEntryService:
         return result.scalars().all()
 
     @staticmethod
-    async def get_last_entry(db: AsyncSession, user_id: int):
+    async def get_last_entry(db: AsyncSession, workspace: Workspace):
         row = await db.execute(
             select(TimeEntry)
-            .where(TimeEntry.user_id == user_id)
+            .where(TimeEntry.workspace_id == workspace.id)
             .order_by(TimeEntry.start_time.desc())
             .limit(1)
         )
@@ -124,10 +106,10 @@ class TimeEntryService:
         return entry
 
     @staticmethod
-    async def get_time_entry(db: AsyncSession, user_id: int, id: int):
+    async def get_time_entry(db: AsyncSession, workspace: Workspace, id: int):
         entry = await db.get(TimeEntry, id)
 
-        if entry is None or entry.user_id != user_id:
+        if entry is None or entry.workspace_id != workspace.id:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
         return entry
@@ -135,12 +117,12 @@ class TimeEntryService:
     @staticmethod
     async def get_all_time_entries(
         db: AsyncSession,
-        user_id: int,
+        workspace: Workspace,
         project_id: int | None = None,
         start_time: datetime | None = None,
         end_time: datetime | None = None,
     ) -> Page[TimeEntryRead]:
-        filters = [TimeEntry.user_id == user_id]
+        filters = [TimeEntry.workspace_id == workspace.id]
 
         if project_id is not None:
             filters.append(TimeEntry.project_id == project_id)
@@ -160,7 +142,7 @@ class TimeEntryService:
             select(TimeEntry)
             .where(*filters)
             .options(selectinload(TimeEntry.project))
-            .order_by(TimeEntry.created_at.desc())
+            .order_by(TimeEntry.start_time.desc())
         )
 
         return await paginate(db, stmt)
@@ -168,7 +150,7 @@ class TimeEntryService:
     @staticmethod
     async def create_time_entry(
         db: AsyncSession,
-        user_id: int,
+        workspace: Workspace,
         payload: TimeEntryCreate,
     ):
         start = payload.start_time or datetime.now(UTC)
@@ -181,7 +163,7 @@ class TimeEntryService:
         conflict = await db.scalar(
             select(
                 exists().where(
-                    TimeEntry.user_id == user_id,
+                    TimeEntry.workspace_id == workspace.id,
                     TimeEntry.start_time == start,
                 )
             )
@@ -192,13 +174,14 @@ class TimeEntryService:
 
         await TimeEntryService._validate_references(
             db,
-            user_id,
+            workspace,
             payload.client_id,
             payload.project_id,
         )
 
         entry = TimeEntry(
-            user_id=user_id,
+            workspace_id=workspace.id,
+            user_id=workspace.user_id,
             start_time=start,
             end_time=payload.end_time,
             description=payload.description,
@@ -215,11 +198,11 @@ class TimeEntryService:
     @staticmethod
     async def update_time_entry(
         db: AsyncSession,
-        user_id: int,
+        workspace: Workspace,
         id: int,
         payload: TimeEntryUpdate,
     ):
-        entry = await TimeEntryService.get_time_entry(db, user_id, id)
+        entry = await TimeEntryService.get_time_entry(db, workspace, id)
 
         if payload.end_time is not None and payload.end_time.tzinfo is None:
             payload.end_time = payload.end_time.replace(tzinfo=UTC)
@@ -238,7 +221,7 @@ class TimeEntryService:
 
         await TimeEntryService._validate_references(
             db,
-            user_id,
+            workspace,
             client_id,
             project_id,
         )
@@ -254,10 +237,10 @@ class TimeEntryService:
     @staticmethod
     async def delete_time_entry(
         db: AsyncSession,
-        user_id: int,
+        workspace: Workspace,
         id: int,
     ):
-        entry = await TimeEntryService.get_time_entry(db, user_id, id)
+        entry = await TimeEntryService.get_time_entry(db, workspace, id)
 
         await db.delete(entry)
         await db.commit()
@@ -267,12 +250,12 @@ class TimeEntryService:
     @staticmethod
     async def bulk_delete(
         db: AsyncSession,
-        user_id: int,
+        workspace: Workspace,
         ids: list[int],
     ):
         stmt = (
             delete(TimeEntry)
-            .where(TimeEntry.user_id == user_id)
+            .where(TimeEntry.workspace_id == workspace.id)
             .where(TimeEntry.id.in_(ids))
         )
 
