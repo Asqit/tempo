@@ -164,7 +164,7 @@
   --chart-3: oklch(0.6298 0.1711 134.0963);
   --chart-4: oklch(0.6667 0.1462 147.9698);
   --chart-5: oklch(0.5677 0.1372 148.6279);
-  --sidebar: oklch(0.11 0 0);
+  --sidebar: oklch(0.234 0 0);
   --sidebar-foreground: oklch(0.9851 0 0);
   --sidebar-primary: oklch(0.8882 0.1981 125.5383);
   --sidebar-primary-foreground: oklch(0.2734 0.0743 130.6483);
@@ -205,7 +205,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-sidebar text-foreground antialiased;
     background-image:
       radial-gradient(
         circle at 10% -10%,

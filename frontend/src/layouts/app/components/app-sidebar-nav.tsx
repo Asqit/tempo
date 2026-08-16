@@ -41,7 +41,7 @@ const navigation: SidebarNavConfig = [
     items: [
       {
         label: "Report",
-        path: "/app/report",
+        path: "/app/reports",
         icon: ClipboardClock,
       },
     ],
@@ -61,7 +61,7 @@ const navigation: SidebarNavConfig = [
       },
       {
         label: "Invoicing",
-        path: "/app/invoice",
+        path: "/app/invoices",
         icon: Receipt,
       },
     ],
@@ -112,7 +112,8 @@ function renderItem(item: SidebarMenuItemConfig) {
           render={
             <Link
               to={item.path}
-              className="group border-l-4 border-transparent transition-all [&.active]:border-primary [&.active]:bg-primary/10 [&.active]:text-primary"
+              className="group border-l-4 border-transparent transition-all [&.active]:border-primary [&.active]:bg-sidebar-accent
+              dark:[&.active]:bg-primary/10 dark:[&.active]:text-primary"
               activeOptions={{ exact: true }}
             />
           }

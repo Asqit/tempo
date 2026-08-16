@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
@@ -24,6 +24,12 @@ class TimeEntry(Base):
     end_time: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
         default=None,
+    )
+
+    billable: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
     )
 
     workspace: Mapped[Workspace] = relationship(back_populates="time_entries")

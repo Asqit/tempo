@@ -5,12 +5,13 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
+// TODO: fill-out SEO details
 export const Route = createRootRoute({
   component: RootComponent,
   head: () => ({
     meta: [
       {
-        title: "Tempo - váš pomocník s trackováním práce",
+        title: "Tempo ",
       },
     ],
   }),

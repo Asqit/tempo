@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, String, UniqueConstraint
+from sqlalchemy import ForeignKey, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy.orm.base import Mapped
 
@@ -10,6 +11,7 @@ if TYPE_CHECKING:
     from src.api.v1.projects.projects_models import Project
     from src.api.v1.time_entries.time_entires_models import TimeEntry
     from src.api.v1.workspace.workspace_models import Workspace
+
 from src.core.database import Base
 
 
@@ -19,6 +21,10 @@ class Client(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(30))
+    hourly_rate: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
+    currency: Mapped[str] = mapped_column(
+        String(3), default="czk", server_default="czk"
+    )
 
     # belong to a workspace (DB-level ON DELETE CASCADE)
     workspace_id: Mapped[int] = mapped_column(

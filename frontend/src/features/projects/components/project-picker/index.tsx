@@ -117,7 +117,7 @@ export function ProjectPicker({
           options.map((option) => (
             <DropdownMenuItem
               key={option.id}
-              onSelect={() => onChange(option.id)}
+              onClick={() => onChange(option.id)}
               className="justify-between"
             >
               <span className="truncate">{option.name}</span>

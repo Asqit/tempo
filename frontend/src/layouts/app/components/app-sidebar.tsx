@@ -25,17 +25,19 @@ export function AppSidebar() {
   return (
     <Sidebar className="border-none">
       <SidebarHeader>
-        <Brand />
+        <div className="flex items-center gap-1">
+          <ModeToggle />
+          <Brand />
+        </div>
+
+        <WorkspaceSelector />
       </SidebarHeader>
 
       <SidebarContent>
         <AppSidebarNav />
-
-        <ModeToggle />
       </SidebarContent>
 
       <SidebarFooter>
-        <WorkspaceSelector />
         <SidebarAccount />
       </SidebarFooter>
       <SidebarRail />

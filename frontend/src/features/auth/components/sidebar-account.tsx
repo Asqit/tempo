@@ -16,8 +16,8 @@ import { toast } from "sonner";
 export function SidebarAccount() {
   const { user } = useAuthStore.getState();
   const { logout } = useAuthStore.getState();
-  const navigate = useNavigate();
   const { mutateAsync } = $api.useMutation("delete", "/api/v1/auth/logout");
+  const navigate = useNavigate();
 
   if (!user) {
     return null;
@@ -58,12 +58,7 @@ export function SidebarAccount() {
               <ChevronsUpDown className="ml-auto size-4 shrink-0" />
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56"
-            align="end"
-            sideOffset={4}
-            side="top"
-          >
+          <DropdownMenuContent align="end" sideOffset={4} side="top">
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={handleLogout}>
                 Odhlásit se

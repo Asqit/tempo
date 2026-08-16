@@ -106,6 +106,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/clients/justice-search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search Client Company */
+        get: operations["search_client_company_api_v1_clients_justice_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/clients/": {
         parameters: {
             query?: never;
@@ -306,6 +323,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reports/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Live Report */
+        get: operations["get_live_report_api_v1_reports__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -338,6 +372,10 @@ export interface components {
         ClientCreate: {
             /** Name */
             name: string;
+            /** Hourly Rate */
+            hourly_rate: number | string | null;
+            /** Currency */
+            currency: string | null;
         };
         /** ClientRead */
         ClientRead: {
@@ -345,6 +383,10 @@ export interface components {
             id: number;
             /** Name */
             name: string;
+            /** Hourly Rate */
+            hourly_rate: string | null;
+            /** Currency */
+            currency: string;
             /**
              * Created At
              * Format: date-time
@@ -362,6 +404,10 @@ export interface components {
             id: number;
             /** Name */
             name: string;
+            /** Hourly Rate */
+            hourly_rate: string | null;
+            /** Currency */
+            currency: string;
             /**
              * Created At
              * Format: date-time
@@ -377,6 +423,10 @@ export interface components {
         ClientUpdate: {
             /** Name */
             name?: string | null;
+            /** Hourly Rate */
+            hourly_rate: number | string | null;
+            /** Currency */
+            currency: string | null;
         };
         /** DbStat */
         DbStat: {
@@ -538,6 +588,11 @@ export interface components {
             project_id?: number | null;
             /** Client Id */
             client_id?: number | null;
+            /**
+             * Billable
+             * @default false
+             */
+            billable: boolean | null;
         };
         /** TimeEntryRead */
         TimeEntryRead: {
@@ -562,6 +617,8 @@ export interface components {
             user_id: number;
             client: components["schemas"]["ClientRead"] | null;
             project: components["schemas"]["ProjectShallow"] | null;
+            /** Billable */
+            billable: boolean;
         };
         /** TimeEntrySummary */
         TimeEntrySummary: {
@@ -579,6 +636,8 @@ export interface components {
             /** Workspace Id */
             workspace_id: number;
             project: components["schemas"]["ProjectShallow"] | null;
+            /** Billable */
+            billable: boolean;
         };
         /** TimeEntryUpdate */
         TimeEntryUpdate: {
@@ -592,6 +651,11 @@ export interface components {
             project_id?: number | null;
             /** Client Id */
             client_id?: number | null;
+            /**
+             * Billable
+             * @default false
+             */
+            billable: boolean | null;
         };
         /** Token */
         Token: {
@@ -833,6 +897,37 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_client_company_api_v1_clients_justice_search_get: {
+        parameters: {
+            query: {
+                query: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
             };
             /** @description Validation Error */
             422: {
@@ -1239,6 +1334,7 @@ export interface operations {
                 project_id?: number | null;
                 start_time?: string | null;
                 end_time?: string | null;
+                billable?: boolean | null;
                 /** @description Page number */
                 page?: number;
                 /** @description Page size */
@@ -1656,6 +1752,43 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_live_report_api_v1_reports__get: {
+        parameters: {
+            query: {
+                period_start: string;
+                period_end: string;
+                client_id?: number | null;
+                project_id?: number | null;
+                billable?: boolean | null;
+            };
+            header: {
+                "X-Workspace-Id": number;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimeEntryRead"][];
+                };
             };
             /** @description Validation Error */
             422: {

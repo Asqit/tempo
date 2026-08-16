@@ -1,14 +1,19 @@
 from datetime import datetime
+from decimal import Decimal
 
 from pydantic import BaseModel, Field
 
 
 class ClientCreate(BaseModel):
     name: str = Field(min_length=3)
+    hourly_rate: Decimal | None
+    currency: str | None
 
 
 class ClientUpdate(BaseModel):
     name: str | None = Field(default=None)
+    hourly_rate: Decimal | None
+    currency: str | None
 
 
 # ------------------ READ
@@ -21,6 +26,8 @@ class DBClientBase(BaseModel):
 class ClientRead(DBClientBase):
     id: int
     name: str
+    hourly_rate: Decimal | None
+    currency: str
     created_at: datetime
     updated_at: datetime
 
@@ -28,5 +35,7 @@ class ClientRead(DBClientBase):
 class ClientShallow(DBClientBase):
     id: int
     name: str
+    hourly_rate: Decimal | None
+    currency: str
     created_at: datetime
     updated_at: datetime

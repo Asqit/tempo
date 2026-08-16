@@ -133,7 +133,7 @@ export function ClientPicker({
           page,
           size: 10,
         },
-        header: workspaceHeader ?? { "X-Workspace-Id": 0 },
+        header: workspaceHeader,
       },
       enabled: !!workspaceHeader,
     },
@@ -227,7 +227,7 @@ export function ClientPicker({
           options.map((option) => (
             <DropdownMenuItem
               key={option.id}
-              onSelect={() => handleSelect(option.id)}
+              onClick={() => handleSelect(option.id)}
               className="justify-between"
             >
               <span className="truncate">{option.name}</span>

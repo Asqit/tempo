@@ -13,12 +13,14 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import {
   addDays,
   differenceInCalendarDays,
+  endOfDay,
   endOfWeek,
   format,
   formatDuration,
   getHours,
   getMinutes,
   intervalToDuration,
+  startOfDay,
   startOfWeek,
   subDays,
 } from "date-fns";
@@ -39,6 +41,50 @@ const RANGE_LABELS: Record<RangeSelector, string> = {
 };
 
 const CELL_HEIGHT = 48;
+const TIME_COL_WIDTH = "3rem";
+
+type RawSegment = { entry: any; day: number; rowStart: number; rowEnd: number };
+type Segment = RawSegment & { col: number; totalCols: number };
+
+function computeLayout(raw: RawSegment[]): Segment[] {
+  const byDay = new Map<number, RawSegment[]>();
+  for (const seg of raw) {
+    if (!byDay.has(seg.day)) byDay.set(seg.day, []);
+    byDay.get(seg.day)!.push(seg);
+  }
+
+  const result: Segment[] = [];
+
+  for (const daySegs of byDay.values()) {
+    const sorted = [...daySegs].sort((a, b) => a.rowStart - b.rowStart);
+    const colEnds: number[] = [];
+
+    const withCol = sorted.map((seg) => {
+      let col = colEnds.findIndex((end) => end <= seg.rowStart);
+      if (col === -1) {
+        col = colEnds.length;
+        colEnds.push(seg.rowEnd);
+      } else {
+        colEnds[col] = seg.rowEnd;
+      }
+      return { ...seg, col };
+    });
+
+    result.push(
+      ...withCol.map((seg) => {
+        const overlapping = withCol.filter(
+          (o) => o.rowStart < seg.rowEnd && o.rowEnd > seg.rowStart,
+        );
+        return {
+          ...seg,
+          totalCols: Math.max(...overlapping.map((o) => o.col)) + 1,
+        };
+      }),
+    );
+  }
+
+  return result;
+}
 
 export function TimeEntryCalendar() {
   const workspaceHeader = getWorkspaceHeader();
@@ -60,22 +106,20 @@ export function TimeEntryCalendar() {
     enabled: !!workspaceHeader,
   });
 
-  // Scroll na 7:00 při mountu
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = 7 * CELL_HEIGHT;
-    }
+    if (scrollRef.current) scrollRef.current.scrollTop = 7 * CELL_HEIGHT;
   }, []);
 
-  useEffect(() => {
-    match(range)
+  const applyRange = (r: RangeSelector) => {
+    setRange(r);
+    match(r)
       .with("today", () => {
-        setStartDate(new Date());
-        setEndDate(new Date());
+        setStartDate(startOfDay(new Date()));
+        setEndDate(endOfDay(new Date()));
       })
       .with("yesterday", () => {
-        setStartDate(subDays(new Date(), 1));
-        setEndDate(subDays(new Date(), 1));
+        setStartDate(startOfDay(subDays(new Date(), 1)));
+        setEndDate(endOfDay(subDays(new Date(), 1)));
       })
       .with("this-week", () => {
         setStartDate(startOfWeek(new Date()));
@@ -87,13 +131,14 @@ export function TimeEntryCalendar() {
       })
       .with("custom", () => {})
       .exhaustive();
-  }, [range]);
+  };
 
   const days = 1 + differenceInCalendarDays(endDate, startDate);
 
   const segments = useMemo(() => {
     if (!data) return [];
-    return data.flatMap((entry) => {
+
+    const raw = data.flatMap((entry) => {
       const entryStart = new Date(entry.start_time);
       const entryEnd = new Date(entry.end_time ?? new Date().toISOString());
       const startDay = differenceInCalendarDays(entryStart, startDate);
@@ -112,6 +157,8 @@ export function TimeEntryCalendar() {
         return { entry, day, rowStart, rowEnd };
       }).filter((s) => s.day >= 0 && s.day < days);
     });
+
+    return computeLayout(raw);
   }, [data, startDate, days]);
 
   if (!workspaceHeader) return null;
@@ -122,11 +169,12 @@ export function TimeEntryCalendar() {
     setRange("custom");
   };
 
-  const colStyle = { gridTemplateColumns: `3rem repeat(${days}, 1fr)` };
+  const colStyle = {
+    gridTemplateColumns: `${TIME_COL_WIDTH} repeat(${days}, 1fr)`,
+  };
 
   return (
     <div className="flex flex-col border overflow-hidden">
-      {/* Toolbar */}
       <div className="flex items-center justify-between px-3 py-2 border-b bg-card">
         <div className="flex items-center gap-1">
           <Button
@@ -138,22 +186,22 @@ export function TimeEntryCalendar() {
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger
-              render={<Button variant="outline" className="min-w-sm" />}
+              render={<Button variant="outline" className="min-w-36" />}
             >
               {RANGE_LABELS[range]}
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuGroup>
-                <DropdownMenuItem onSelect={() => setRange("today")}>
+                <DropdownMenuItem onSelect={() => applyRange("today")}>
                   Dnes
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setRange("yesterday")}>
+                <DropdownMenuItem onSelect={() => applyRange("yesterday")}>
                   Včera
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setRange("this-week")}>
+                <DropdownMenuItem onSelect={() => applyRange("this-week")}>
                   Tento týden
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setRange("last-week")}>
+                <DropdownMenuItem onSelect={() => applyRange("last-week")}>
                   Minulý týden
                 </DropdownMenuItem>
               </DropdownMenuGroup>
@@ -191,7 +239,6 @@ export function TimeEntryCalendar() {
         </span>
       </div>
 
-      {/* Day headers */}
       <div
         className="grid sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b"
         style={colStyle}
@@ -204,14 +251,13 @@ export function TimeEntryCalendar() {
         ))}
       </div>
 
-      {/* Scrollable area */}
       <div
         ref={scrollRef}
         className="overflow-y-auto relative"
         style={{ maxHeight: "550px" }}
       >
         <div className="relative">
-          {/* Grid */}
+          {/* Background grid */}
           <div className="grid" style={colStyle}>
             {Array.from({ length: 24 }).map((_, hour) => (
               <>
@@ -233,59 +279,67 @@ export function TimeEntryCalendar() {
             ))}
           </div>
 
-          {/* Entry overlay */}
+          {/* Per-day overlay s overlap podporou */}
           <div
-            className="absolute inset-0 grid pointer-events-none"
-            style={{
-              ...colStyle,
-              gridTemplateRows: `repeat(24, ${CELL_HEIGHT}px)`,
-            }}
+            className="absolute inset-0 flex pointer-events-none"
+            style={{ paddingLeft: TIME_COL_WIDTH }}
           >
-            {segments.map(({ entry, day, rowStart, rowEnd }) => {
-              const projectName = entry.project?.name ?? "Bez projektu";
-              const userName = "Neznámý uživatel";
-              const { fg, bg } = generateColorFromString(projectName);
+            {Array.from({ length: days }).map((_, dayIndex) => (
+              <div
+                key={dayIndex}
+                className="relative flex-1"
+                style={{ height: 24 * CELL_HEIGHT }}
+              >
+                {segments
+                  .filter((s) => s.day === dayIndex)
+                  .map(({ entry, rowStart, rowEnd, col, totalCols }) => {
+                    const projectName = entry.project?.name ?? "Bez projektu";
+                    const { fg, bg } = generateColorFromString(projectName);
+                    const duration = intervalToDuration({
+                      start: entry.start_time,
+                      end: entry.end_time ?? new Date().toISOString(),
+                    });
 
-              const duration = intervalToDuration({
-                start: entry.start_time,
-                end: entry.end_time ?? new Date().toISOString(),
-              });
-
-              return (
-                <TimeEntryUpdateDialog
-                  key={`${entry.id}-${day}`}
-                  entry={{
-                    id: entry.id,
-                    description: entry.description,
-                    project_id: entry?.project?.id,
-                    start_time: entry.start_time,
-                    end_time: entry.end_time,
-                  }}
-                  onUpdated={() => {
-                    // případně invalidate/refetch calendar query
-                  }}
-                >
-                  <div
-                    className="text-xs p-1.5 m-0.5 rounded overflow-hidden pointer-events-auto cursor-pointer hover:brightness-110 transition-all"
-                    style={{
-                      gridColumn: day + 2,
-                      gridRow: `${rowStart} / ${rowEnd}`,
-                      background: bg,
-                      color: fg,
-                      borderLeft: `3px solid ${fg}`,
-                    }}
-                  >
-                    <p className="font-bold truncate">{projectName}</p>
-                    <p className="opacity-75 truncate">{userName}</p>
-                    <time className="tabular-nums opacity-60">
-                      {formatDuration(duration, {
-                        format: ["hours", "minutes"],
-                      })}
-                    </time>
-                  </div>
-                </TimeEntryUpdateDialog>
-              );
-            })}
+                    return (
+                      <TimeEntryUpdateDialog
+                        key={`${entry.id}-${dayIndex}`}
+                        entry={{
+                          id: entry.id,
+                          description: entry.description,
+                          project_id: entry?.project?.id,
+                          start_time: entry.start_time,
+                          end_time: entry.end_time,
+                        }}
+                        onUpdated={() => {}}
+                      >
+                        <div
+                          className="absolute text-xs p-1.5 rounded overflow-hidden pointer-events-auto cursor-pointer hover:brightness-110 transition-all"
+                          style={{
+                            top: (rowStart - 1) * CELL_HEIGHT,
+                            height: (rowEnd - rowStart) * CELL_HEIGHT,
+                            left: `${(col / totalCols) * 100}%`,
+                            width: `${(1 / totalCols) * 100}%`,
+                            background: bg,
+                            color: fg,
+                            borderLeft: `3px solid ${fg}`,
+                            boxSizing: "border-box",
+                          }}
+                        >
+                          <p className="font-bold truncate">{projectName}</p>
+                          <p className="opacity-75 truncate">
+                            {entry.user?.name ?? "Neznámý uživatel"}
+                          </p>
+                          <time className="tabular-nums opacity-60">
+                            {formatDuration(duration, {
+                              format: ["hours", "minutes"],
+                            })}
+                          </time>
+                        </div>
+                      </TimeEntryUpdateDialog>
+                    );
+                  })}
+              </div>
+            ))}
           </div>
         </div>
       </div>

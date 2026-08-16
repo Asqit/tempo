@@ -12,6 +12,7 @@ class TimeEntryCreate(BaseModel):
     description: str | None = Field(default=None)
     project_id: int | None = Field(default=None)
     client_id: int | None = Field(default=None)
+    billable: bool | None = Field(default=False)
 
 
 class TimeEntryBulkDelete(BaseModel):
@@ -24,6 +25,7 @@ class TimeEntryUpdate(BaseModel):
     description: str | None = Field(default=None)
     project_id: int | None = Field(default=None)
     client_id: int | None = Field(default=None)
+    billable: bool | None = Field(default=False)
 
 
 # ------------------- READ
@@ -44,6 +46,7 @@ class TimeEntryRead(DBTimeEntryBase):
     user_id: int
     client: ClientRead | None
     project: ProjectShallow | None
+    billable: bool
 
 
 class TimeEntrySummary(DBTimeEntryBase):
@@ -53,3 +56,4 @@ class TimeEntrySummary(DBTimeEntryBase):
     end_time: datetime | None
     workspace_id: int
     project: ProjectShallow | None
+    billable: bool

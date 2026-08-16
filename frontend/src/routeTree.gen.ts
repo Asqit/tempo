@@ -18,8 +18,10 @@ import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppClientsIndexRouteImport } from './routes/app/clients/index'
 import { Route as AppClientsIdRouteImport } from './routes/app/clients/$id'
 import { Route as AppClientsNewRouteImport } from './routes/app/clients/new'
+import { Route as AppInvoicesIndexRouteImport } from './routes/app/invoices/index'
 import { Route as AppProjectsIndexRouteImport } from './routes/app/projects/index'
 import { Route as AppProjectsIdRouteImport } from './routes/app/projects/$id'
+import { Route as AppReportsIndexRouteImport } from './routes/app/reports/index'
 
 const PublicRouteRoute = PublicRouteRouteImport.update({
   id: '/_public',
@@ -65,6 +67,11 @@ const AppClientsNewRoute = AppClientsNewRouteImport.update({
   path: '/clients/new',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppInvoicesIndexRoute = AppInvoicesIndexRouteImport.update({
+  id: '/invoices/',
+  path: '/invoices/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppProjectsIndexRoute = AppProjectsIndexRouteImport.update({
   id: '/projects/',
   path: '/projects/',
@@ -73,6 +80,11 @@ const AppProjectsIndexRoute = AppProjectsIndexRouteImport.update({
 const AppProjectsIdRoute = AppProjectsIdRouteImport.update({
   id: '/projects/$id',
   path: '/projects/$id',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppReportsIndexRoute = AppReportsIndexRouteImport.update({
+  id: '/reports/',
+  path: '/reports/',
   getParentRoute: () => AppRouteRoute,
 } as any)
 
@@ -86,7 +98,9 @@ export interface FileRoutesByFullPath {
   '/app/clients/new': typeof AppClientsNewRoute
   '/app/projects/$id': typeof AppProjectsIdRoute
   '/app/clients/': typeof AppClientsIndexRoute
+  '/app/invoices/': typeof AppInvoicesIndexRoute
   '/app/projects/': typeof AppProjectsIndexRoute
+  '/app/reports/': typeof AppReportsIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof PublicLoginRoute
@@ -97,7 +111,9 @@ export interface FileRoutesByTo {
   '/app/clients/new': typeof AppClientsNewRoute
   '/app/projects/$id': typeof AppProjectsIdRoute
   '/app/clients': typeof AppClientsIndexRoute
+  '/app/invoices': typeof AppInvoicesIndexRoute
   '/app/projects': typeof AppProjectsIndexRoute
+  '/app/reports': typeof AppReportsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -111,7 +127,9 @@ export interface FileRoutesById {
   '/app/clients/new': typeof AppClientsNewRoute
   '/app/projects/$id': typeof AppProjectsIdRoute
   '/app/clients/': typeof AppClientsIndexRoute
+  '/app/invoices/': typeof AppInvoicesIndexRoute
   '/app/projects/': typeof AppProjectsIndexRoute
+  '/app/reports/': typeof AppReportsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -125,7 +143,9 @@ export interface FileRouteTypes {
     | '/app/clients/new'
     | '/app/projects/$id'
     | '/app/clients/'
+    | '/app/invoices/'
     | '/app/projects/'
+    | '/app/reports/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -136,7 +156,9 @@ export interface FileRouteTypes {
     | '/app/clients/new'
     | '/app/projects/$id'
     | '/app/clients'
+    | '/app/invoices'
     | '/app/projects'
+    | '/app/reports'
   id:
     | '__root__'
     | '/_public'
@@ -149,7 +171,9 @@ export interface FileRouteTypes {
     | '/app/clients/new'
     | '/app/projects/$id'
     | '/app/clients/'
+    | '/app/invoices/'
     | '/app/projects/'
+    | '/app/reports/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -222,6 +246,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppClientsNewRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/invoices/': {
+      id: '/app/invoices/'
+      path: '/invoices'
+      fullPath: '/app/invoices/'
+      preLoaderRoute: typeof AppInvoicesIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/projects/': {
       id: '/app/projects/'
       path: '/projects'
@@ -234,6 +265,13 @@ declare module '@tanstack/react-router' {
       path: '/projects/$id'
       fullPath: '/app/projects/$id'
       preLoaderRoute: typeof AppProjectsIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/reports/': {
+      id: '/app/reports/'
+      path: '/reports'
+      fullPath: '/app/reports/'
+      preLoaderRoute: typeof AppReportsIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
   }
@@ -261,7 +299,9 @@ interface AppRouteRouteChildren {
   AppClientsNewRoute: typeof AppClientsNewRoute
   AppProjectsIdRoute: typeof AppProjectsIdRoute
   AppClientsIndexRoute: typeof AppClientsIndexRoute
+  AppInvoicesIndexRoute: typeof AppInvoicesIndexRoute
   AppProjectsIndexRoute: typeof AppProjectsIndexRoute
+  AppReportsIndexRoute: typeof AppReportsIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
@@ -270,7 +310,9 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppClientsNewRoute: AppClientsNewRoute,
   AppProjectsIdRoute: AppProjectsIdRoute,
   AppClientsIndexRoute: AppClientsIndexRoute,
+  AppInvoicesIndexRoute: AppInvoicesIndexRoute,
   AppProjectsIndexRoute: AppProjectsIndexRoute,
+  AppReportsIndexRoute: AppReportsIndexRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(

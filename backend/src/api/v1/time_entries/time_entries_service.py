@@ -121,11 +121,15 @@ class TimeEntryService:
         project_id: int | None = None,
         start_time: datetime | None = None,
         end_time: datetime | None = None,
+        billable: bool | None = None,
     ) -> Page[TimeEntryRead]:
         filters = [TimeEntry.workspace_id == workspace.id]
 
         if project_id is not None:
             filters.append(TimeEntry.project_id == project_id)
+
+        if billable is not None:
+            filters.append(TimeEntry.billable == billable)
 
         if start_time is not None:
             filters.append(

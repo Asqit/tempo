@@ -38,26 +38,46 @@ function RouteComponent() {
     },
   );
 
-  const totalDuration = useMemo(() => {
-    if (isLoading) return "00h:00m";
-    const totalMinutes = (data ?? []).reduce((acc, entry) => {
-      if (!entry.end_time) return acc; // skip running entries
-      console.log(entry);
-      return (
-        acc +
-        differenceInMinutes(
+  const { total, billable } = useMemo(() => {
+    if (isLoading) {
+      return {
+        total: "00h:00m",
+        billable: "00h:00m",
+      };
+    }
+
+    const { totalMinutes, billableMinutes } = (data ?? []).reduce(
+      (acc, entry) => {
+        if (!entry.end_time) return acc;
+
+        const minutes = differenceInMinutes(
           parseISO(entry.end_time),
           parseISO(entry.start_time),
-        )
-      );
-    }, 0);
+        );
 
-    const h = Math.floor(totalMinutes / 60);
-    const m = totalMinutes % 60;
+        acc.totalMinutes += minutes;
 
-    return `${h}h:${String(m).padStart(2, "0")}m`;
+        if (entry.billable) {
+          acc.billableMinutes += minutes;
+        }
+
+        return acc;
+      },
+      { totalMinutes: 0, billableMinutes: 0 },
+    );
+
+    const formatDuration = (minutes: number) => {
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+
+      return `${h}h:${String(m).padStart(2, "0")}m`;
+    };
+
+    return {
+      total: formatDuration(totalMinutes),
+      billable: formatDuration(billableMinutes),
+    };
   }, [data, isLoading]);
-
   const greeting = useMemo(() => {
     const hour = getHours(new Date());
     if (hour >= 5 && hour < 12) return "Dobré ráno.";
@@ -78,16 +98,13 @@ function RouteComponent() {
           <ul className="flex gap-2 items-center">
             <li className="flex flex-col items-end border-r pr-2">
               <span className="text-xs text-muted-foreground">TENTO TÝDEN</span>
-              <time className="text-primary text-2xl font-black">
-                {totalDuration}
-              </time>
+              <time className="text-primary text-2xl font-black">{total}</time>
             </li>
-            {/*
-             <li className="flex flex-col items-end">
+
+            <li className="flex flex-col items-end">
               <span className="text-xs text-muted-foreground">ZPOPLATNĚNÉ</span>
-              <time className="text-2xl font-black">38h 20m</time>
+              <time className="text-2xl font-black">{billable}</time>
             </li>
-           */}
           </ul>
         </div>
       </header>

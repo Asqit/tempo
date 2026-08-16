@@ -41,13 +41,15 @@ class ProjectsService:
     async def get_projects(
         db: AsyncSession, workspace: Workspace, client_id: int | None
     ) -> Page[ProjectRead]:
-        filters = []
+        filters = [Client.workspace_id == workspace.id]
+
         if client_id is not None:
             filters.append(Project.client_id == client_id)
 
         return await paginate(
             db,
             select(Project)
+            .join(Project.client)
             .where(*filters)
             .options(selectinload(Project.client))
             .order_by(Project.created_at),
@@ -55,21 +57,15 @@ class ProjectsService:
 
     @staticmethod
     async def get_project(db: AsyncSession, workspace: Workspace, project_id: int):
-
-        result = await db.execute(
+        project = await db.scalar(
             select(Project)
-            .where(Project.id == project_id)
+            .join(Project.client)
+            .where(Project.id == project_id, Client.workspace_id == workspace.id)
             .options(selectinload(Project.client))
         )
 
-        project = result.scalar_one_or_none()
         if project is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
-        # check whenever client is within workspace
-        _ = await ProjectsService._get_client_in_workspace(
-            db, workspace, project.client_id
-        )
 
         return project
 
