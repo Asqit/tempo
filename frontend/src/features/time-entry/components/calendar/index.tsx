@@ -27,7 +27,7 @@ import {
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { match } from "ts-pattern";
 import { generateColorFromString } from "@/lib/utils";
-import { TimeEntryUpdateDialog } from "../time-entry-update-dialog";
+import { EntryPopover } from "./components/entry-popover";
 
 type RangeSelector =
   "today" | "yesterday" | "this-week" | "last-week" | "custom";
@@ -192,16 +192,16 @@ export function TimeEntryCalendar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuGroup>
-                <DropdownMenuItem onSelect={() => applyRange("today")}>
+                <DropdownMenuItem onClick={() => applyRange("today")}>
                   Dnes
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => applyRange("yesterday")}>
+                <DropdownMenuItem onClick={() => applyRange("yesterday")}>
                   Včera
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => applyRange("this-week")}>
+                <DropdownMenuItem onClick={() => applyRange("this-week")}>
                   Tento týden
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => applyRange("last-week")}>
+                <DropdownMenuItem onClick={() => applyRange("last-week")}>
                   Minulý týden
                 </DropdownMenuItem>
               </DropdownMenuGroup>
@@ -301,16 +301,9 @@ export function TimeEntryCalendar() {
                     });
 
                     return (
-                      <TimeEntryUpdateDialog
+                      <EntryPopover
                         key={`${entry.id}-${dayIndex}`}
-                        entry={{
-                          id: entry.id,
-                          description: entry.description,
-                          project_id: entry?.project?.id,
-                          start_time: entry.start_time,
-                          end_time: entry.end_time,
-                        }}
-                        onUpdated={() => {}}
+                        entry={entry}
                       >
                         <div
                           className="absolute text-xs p-1.5 rounded overflow-hidden pointer-events-auto cursor-pointer hover:brightness-110 transition-all"
@@ -335,7 +328,7 @@ export function TimeEntryCalendar() {
                             })}
                           </time>
                         </div>
-                      </TimeEntryUpdateDialog>
+                      </EntryPopover>
                     );
                   })}
               </div>

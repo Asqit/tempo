@@ -1,20 +1,11 @@
 import * as React from "react";
 import { HeadContent, Outlet, createRootRoute } from "@tanstack/react-router";
 import { TanStackDevtools } from "@tanstack/react-devtools";
-
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
-// TODO: fill-out SEO details
 export const Route = createRootRoute({
   component: RootComponent,
-  head: () => ({
-    meta: [
-      {
-        title: "Tempo ",
-      },
-    ],
-  }),
 });
 
 function RootComponent() {

@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import {
+  ChevronRight,
   ClipboardClock,
   FolderKanban,
   LayoutDashboard,
@@ -8,6 +9,11 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -27,42 +33,60 @@ import type {
 
 const navigation: SidebarNavConfig = [
   {
-    title: "Tracking",
+    title: "Workspace",
     items: [
       {
-        label: "Home",
+        label: "Přehled",
         path: "/app",
         icon: LayoutDashboard,
       },
     ],
   },
   {
-    title: "Data Analysis",
+    title: "Data",
     items: [
       {
-        label: "Report",
-        path: "/app/reports",
+        label: "Reporty",
         icon: ClipboardClock,
+        subItems: [
+          {
+            label: "nový report",
+            path: "/app/reports",
+          },
+          {
+            label: "uložené",
+            path: "/app/reports/saved",
+          },
+        ],
       },
     ],
   },
   {
-    title: "Workspace",
+    title: "Správa",
     items: [
       {
-        label: "Clients",
+        label: "Klienti",
         path: "/app/clients",
         icon: Users,
       },
       {
-        label: "Projects",
+        label: "Projekty",
         path: "/app/projects",
         icon: FolderKanban,
       },
       {
-        label: "Invoicing",
-        path: "/app/invoices",
+        label: "Fakturace",
         icon: Receipt,
+        subItems: [
+          {
+            label: "Vydané faktury",
+            path: "/app/invoices/",
+          },
+          {
+            label: "Nová faktura",
+            path: "/app/invoices/new",
+          },
+        ],
       },
     ],
   },
@@ -91,7 +115,7 @@ function renderSubItems(subItems: SidebarMenuSubItemConfig[]) {
             render={
               <Link
                 to={subItem.path}
-                className="group border-l-4 border-transparent transition-all [&.active]:border-primary [&.active]:bg-primary/10 [&.active]:text-primary"
+                className="group transition-all [&.active]:bg-sidebar-accent dark:[&.active]:bg-primary/10 dark:[&.active]:text-primary"
                 activeOptions={{ exact: true }}
               />
             }
@@ -124,14 +148,18 @@ function renderItem(item: SidebarMenuItemConfig) {
       </SidebarMenuItem>
     );
   }
+
   return (
-    <SidebarMenuItem key={item.label}>
-      <SidebarMenuButton>
-        <NavIcon icon={item.icon} />
-        <span>{item.label}</span>
-      </SidebarMenuButton>
-      {renderSubItems(item.subItems)}
-    </SidebarMenuItem>
+    <Collapsible key={item.label} defaultOpen className="group/collapsible">
+      <SidebarMenuItem>
+        <SidebarMenuButton render={<CollapsibleTrigger />}>
+          <NavIcon icon={item.icon} />
+          <span>{item.label}</span>
+          <ChevronRight className="ml-auto transition-transform group-data-open/collapsible:rotate-180" />
+        </SidebarMenuButton>
+        <CollapsibleContent>{renderSubItems(item.subItems)}</CollapsibleContent>
+      </SidebarMenuItem>
+    </Collapsible>
   );
 }
 

@@ -9,6 +9,10 @@ import { routeTree } from "./routeTree.gen";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/api";
 import { ThemeProvider } from "./components/ui/theme-provider";
+import { setDefaultOptions } from "date-fns";
+import { cs } from "date-fns/locale";
+
+setDefaultOptions({ locale: cs });
 
 const router = createRouter({
   routeTree,

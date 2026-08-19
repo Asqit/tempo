@@ -61,7 +61,7 @@ export function WorkspaceSelector() {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-56 justify-between"
+            className="justify-between w-full"
           />
         }
       >

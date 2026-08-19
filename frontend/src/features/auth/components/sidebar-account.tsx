@@ -3,6 +3,7 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
@@ -12,6 +13,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { ColorAvatar } from "@/components/share/color-avatar";
 import { $api } from "@/lib/api";
 import { toast } from "sonner";
+import { WorkspaceSelector } from "@/features/workspaces/components/workspace-selector";
 
 export function SidebarAccount() {
   const { user } = useAuthStore.getState();
@@ -58,7 +60,17 @@ export function SidebarAccount() {
               <ChevronsUpDown className="ml-auto size-4 shrink-0" />
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" sideOffset={4} side="top">
+          <DropdownMenuContent
+            align="end"
+            sideOffset={4}
+            side="top"
+            className={"space-y-4"}
+          >
+            <DropdownMenuGroup>
+              <WorkspaceSelector />
+            </DropdownMenuGroup>
+
+            <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={handleLogout}>
                 Odhlásit se

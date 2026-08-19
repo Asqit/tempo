@@ -1,20 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { components } from "@/lib/api.d";
 import { cn } from "@/lib/utils";
 import { Clock, Wallet, TrendingUp } from "lucide-react";
 
-interface TimeEntry {
-  id: number;
-  start_time: string;
-  end_time: string | null;
-  billable: boolean;
-  rate?: number | null; // hourly rate in CZK — assumed, viz poznámka níž
-}
-
 interface Props {
-  entries: TimeEntry[];
+  entries: Array<components["schemas"]["TimeEntryRead"]>;
 }
 
-function durationHours(entry: TimeEntry): number {
+function durationHours(entry: components["schemas"]["TimeEntryRead"]): number {
   if (!entry.end_time) return 0;
   const ms =
     new Date(entry.end_time).getTime() - new Date(entry.start_time).getTime();
@@ -42,7 +35,7 @@ export function ReportStats({ entries }: Props) {
   );
 
   const totalEarned = billableEntries.reduce(
-    (sum, e) => sum + durationHours(e) * (e.rate ?? 0),
+    (sum, e) => sum + durationHours(e) * Number(e.client?.hourly_rate ?? 0),
     0,
   );
 

@@ -1,17 +1,17 @@
 import { Link } from "@tanstack/react-router";
-import { Clock } from "lucide-react";
 
 export function Brand() {
   return (
-    <Link to="/">
-      <div className="flex items-center gap-3 px-2.5 py-2">
-        <div className="flex size-8 items-center justify-center rounded-none bg-primary/90 text-black shadow-sm">
-          <Clock className="size-6 fill-black stroke-primary" />
-        </div>
-        <h1 className="select-none -skew-x-12 uppercase text-2xl font-extrabold tracking-tight text-sidebar-foreground">
-          Tempo
-        </h1>
-      </div>
+    <Link to="/" className="group/brand inline-flex">
+      <h1 className="flex select-none items-center gap-1 text-2xl font-extrabold tracking-tight text-sidebar-foreground">
+        <span className="flex w-[22px] flex-col items-end justify-center gap-[4px]">
+          <span className="h-[2px] translate-x-[1px] w-[8px] -skew-x-12 bg-primary group-hover/brand:animate-[tempo-wind_600ms_ease-out]" />
+          <span className="h-[2px] translate-x-[2px] w-[18px] -skew-x-12 bg-primary group-hover/brand:animate-[tempo-wind_600ms_ease-out_80ms]" />
+          <span className="h-[2px] w-[11px] -skew-x-12 bg-primary group-hover/brand:animate-[tempo-wind_600ms_ease-out_160ms]" />
+        </span>
+
+        <span className="-skew-x-12 uppercase">Tempo</span>
+      </h1>
     </Link>
   );
 }

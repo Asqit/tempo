@@ -6,10 +6,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { SidebarAccount } from "@/features/auth/components/sidebar-account";
-
 import { AppSidebarNav } from "./app-sidebar-nav";
 import { Brand } from "@/components/share/brand";
-import { ModeToggle } from "@/components/ui/mode-toggle";
 import { WorkspaceSelector } from "@/features/workspaces/components/workspace-selector";
 import { useWorkspaceStore } from "@/features/workspaces/store";
 import { WorkspaceOverview } from "@/features/workspaces/components/workspace-overview";
@@ -24,13 +22,8 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="border-none">
-      <SidebarHeader>
-        <div className="flex items-center gap-1">
-          <ModeToggle />
-          <Brand />
-        </div>
-
-        <WorkspaceSelector />
+      <SidebarHeader className="p-4 border-b">
+        <Brand />
       </SidebarHeader>
 
       <SidebarContent>

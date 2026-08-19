@@ -35,6 +35,7 @@ interface Props {
   setEndTime(d: string): void;
   setClientId(id: number): void;
   setProjectId(id: number): void;
+  setBillable(b: boolean): void;
   clientId?: number;
   projectId?: number;
 }
@@ -71,6 +72,7 @@ export function ReportsToolbar(props: Props) {
     setEndTime,
     setClientId,
     setProjectId,
+    setBillable,
     clientId,
     projectId,
   } = props;

@@ -105,7 +105,7 @@ export function TimerCRUD({ id, state, callback }: Props) {
   const elapsedTimeMs = startTime === null ? 0 : (endTime ?? now) - startTime;
 
   return (
-    <div className="flex grow flex-wrap items-center gap-2 md:flex-nowrap">
+    <div className="flex grow flex-wrap items-center gap-2 md:flex-nowrap animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
       <div className="flex-1">
         <div>
           {state === "playing" && (

@@ -106,6 +106,9 @@ class ClientsService:
         if payload.name is not None:
             client.name = payload.name
 
+        if payload.hourly_rate is not None:
+            client.hourly_rate = payload.hourly_rate
+
         await db.commit()
         await db.refresh(client)
 

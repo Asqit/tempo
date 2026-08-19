@@ -1,21 +1,21 @@
-import { CalendarDays, Clock3, FolderKanban } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import {
+  CalendarDays,
+  CircleDollarSign,
+  FolderKanban,
+  Hash,
+} from "lucide-react";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { $api, getWorkspaceHeader } from "@/lib/api";
 import { ProjectsTable } from "@/features/projects/components/projects-table";
 import { ClientHeader } from "./components/client-header";
-import { cn } from "@/lib/utils";
 
 type ClientDetailProps = {
   id: number;
 };
 
 function formatDate(value: string | null | undefined) {
-  if (!value) {
-    return "—";
-  }
+  if (!value) return "—";
 
   return new Intl.DateTimeFormat("cs-CZ", {
     dateStyle: "medium",
@@ -23,9 +23,7 @@ function formatDate(value: string | null | undefined) {
 }
 
 function formatDateTime(value: string | null | undefined) {
-  if (!value) {
-    return "—";
-  }
+  if (!value) return "—";
 
   return new Intl.DateTimeFormat("cs-CZ", {
     dateStyle: "medium",
@@ -45,9 +43,7 @@ export function ClientDetail({ id }: ClientDetailProps) {
     "/api/v1/clients/{id}",
     {
       params: {
-        path: {
-          id,
-        },
+        path: { id },
         header: workspaceHeader,
       },
     },
@@ -74,9 +70,7 @@ export function ClientDetail({ id }: ClientDetailProps) {
     },
   );
 
-  if (!workspaceHeader) {
-    return null;
-  }
+  if (!workspaceHeader) return null;
 
   if (isLoading) {
     return <ClientDetailSkeleton />;
@@ -96,174 +90,198 @@ export function ClientDetail({ id }: ClientDetailProps) {
   }
 
   return (
-    <section className="space-y-6">
-      {/* Header */}
+    <section className="space-y-8">
       <ClientHeader client={client} />
 
-      <Separator />
-
-      {/* Summary */}
-      <div className="grid md:grid-cols-3">
-        <SummaryCard
-          label="Projects"
-          value={projects?.total ?? "—"}
-          description="Associated projects"
+      <div className="grid sm:grid-cols-3">
+        <OverviewCard
           icon={FolderKanban}
+          label="Projekty"
+          value={projects?.total ?? "—"}
+          description="Aktivní projekty klienta"
         />
 
-        <SummaryCard
-          label="Created"
-          value={formatDate(client.created_at)}
-          description="Client created"
+        <OverviewCard
+          icon={CircleDollarSign}
+          label="Hodinová sazba"
+          value={
+            client.hourly_rate
+              ? `${client.hourly_rate.toLocaleString("cs-CZ")} Kč`
+              : "—"
+          }
+          description={
+            client.hourly_rate
+              ? "Za odpracovanou hodinu"
+              : "Sazba není nastavena"
+          }
+        />
+
+        <OverviewCard
           icon={CalendarDays}
-          className="text-primary"
-        />
-
-        <SummaryCard
-          label="Last updated"
-          value={formatDate(client.updated_at)}
-          description={formatDateTime(client.updated_at)}
-          icon={Clock3}
+          label="Spolupráce od"
+          value={formatDate(client.created_at)}
+          description={`Aktualizováno ${formatDate(client.updated_at)}`}
         />
       </div>
 
-      {/* Main content */}
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <Card className="overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between border-b">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <section className="min-w-0">
+          <div className="mb-4 flex items-end justify-between gap-4">
             <div>
-              <h2 className="font-heading text-sm font-bold uppercase tracking-wide">
-                Associated projects
-              </h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Projects associated with {client.name}
+              <div className="flex items-center gap-2">
+                <h2 className="font-heading text-lg font-bold tracking-tight">
+                  Projekty
+                </h2>
+
+                {projects?.total !== undefined && (
+                  <span className="bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                    {projects.total}
+                  </span>
+                )}
+              </div>
+
+              <p className="mt-1 text-sm text-muted-foreground">
+                Projekty a práce spojené s tímto klientem.
               </p>
             </div>
+          </div>
 
-            <Button variant="ghost" size="sm">
-              View all
-            </Button>
-          </CardHeader>
-
-          <CardContent className="p-0">
+          <div className="overflow-hidden">
             <ProjectsTable clientId={id} />
-          </CardContent>
-        </Card>
+          </div>
+        </section>
 
-        <div className="space-y-6">
-          <Card>
-            <CardHeader className="border-b">
-              <h2 className="font-heading text-xs font-bold uppercase tracking-wide">
-                Client details
-              </h2>
-            </CardHeader>
+        <aside className="space-y-4">
+          <div className=" border bg-card">
+            <div className="flex items-center justify-between border-b px-5 py-4">
+              <div>
+                <h3 className="font-heading text-sm font-semibold">
+                  Informace
+                </h3>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Základní údaje klienta
+                </p>
+              </div>
+            </div>
 
-            <CardContent className="space-y-5 pt-5">
-              <DetailField
+            <div className="divide-y">
+              <InfoRow
+                icon={Hash}
                 label="Client ID"
                 value={`CL-${String(client.id).padStart(4, "0")}`}
                 mono
               />
 
-              <DetailField
-                label="Created"
+              <InfoRow
+                icon={CircleDollarSign}
+                label="Hodinová sazba"
+                value={
+                  client.hourly_rate
+                    ? `${client.hourly_rate.toLocaleString("cs-CZ")} Kč/h`
+                    : "Nenastaveno"
+                }
+              />
+
+              <InfoRow
+                icon={CalendarDays}
+                label="Vytvořeno"
                 value={formatDateTime(client.created_at)}
               />
 
-              <DetailField
-                label="Last updated"
+              <InfoRow
+                icon={CalendarDays}
+                label="Poslední změna"
                 value={formatDateTime(client.updated_at)}
               />
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="border-b">
-              <h2 className="font-heading text-xs font-bold uppercase tracking-wide">
-                Activity
-              </h2>
-            </CardHeader>
+          <div className=" bg-muted/50 p-5">
+            <p className="text-xs font-medium text-muted-foreground">TIP</p>
 
-            <CardContent className="pt-5">
-              <div className="flex items-center gap-3">
-                <div className="flex size-8 items-center justify-center rounded-md bg-primary/10 text-primary">
-                  <Clock3 className="size-4" />
-                </div>
-
-                <div className="min-w-0">
-                  <p className="text-sm font-medium">Last updated</p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {formatDateTime(client.updated_at)}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            <p className="mt-2 text-sm leading-relaxed">
+              Projekty můžeš použít pro oddělení jednotlivých zakázek, produktů
+              nebo pracovních oblastí tohoto klienta.
+            </p>
+          </div>
+        </aside>
       </div>
     </section>
   );
 }
 
-type SummaryCardProps = {
+type OverviewCardProps = {
+  icon: React.ElementType;
   label: string;
   value: string | number;
   description: string;
-  icon: React.ComponentType<{ className?: string }>;
-  className?: string;
 };
 
-function SummaryCard({
+function OverviewCard({
+  icon: Icon,
   label,
   value,
   description,
-  icon: Icon,
-  className,
-}: SummaryCardProps) {
+}: OverviewCardProps) {
   return (
-    <Card className="p-0!">
-      <CardContent className={cn("relative p-5", className)}>
-        <Icon className="absolute right-5 top-5 size-4 text-muted-foreground" />
+    <div className="group border p-5 transition-colors">
+      <div className="flex items-start justify-between">
+        <div className="flex size-9 items-center justify-center  bg-muted">
+          <Icon className="size-4 text-muted-foreground" />
+        </div>
+      </div>
 
-        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground!">
-          {label}
-        </p>
+      <div className="mt-5">
+        <p className="text-xs font-medium text-muted-foreground">{label}</p>
 
-        <p className="mt-3 truncate font-heading text-5xl font-black tracking-tight">
+        <p className="mt-1 truncate font-heading text-2xl font-bold tracking-tight">
           {value}
         </p>
 
-        <p className="mt-2 text-xs text-muted-foreground!">{description}</p>
-      </CardContent>
-    </Card>
+        <p className="mt-1 truncate text-xs text-muted-foreground">
+          {description}
+        </p>
+      </div>
+    </div>
   );
 }
 
-type DetailFieldProps = {
+type InfoRowProps = {
+  icon: React.ElementType;
   label: string;
-  value: string;
+  value: React.ReactNode;
   mono?: boolean;
 };
 
-function DetailField({ label, value, mono = false }: DetailFieldProps) {
+function InfoRow({ icon: Icon, label, value, mono = false }: InfoRowProps) {
   return (
-    <div>
-      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-        {label}
-      </p>
+    <div className="flex items-center gap-3 px-5 py-4">
+      <div className="flex size-8 shrink-0 items-center justify-center  bg-muted">
+        <Icon className="size-3.5 text-muted-foreground" />
+      </div>
 
-      <p
-        className={mono ? "mt-1 font-mono text-sm" : "mt-1 text-sm font-medium"}
-      >
-        {value}
-      </p>
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+          {label}
+        </p>
+
+        <p
+          className={
+            mono
+              ? "mt-0.5 truncate font-mono text-xs"
+              : "mt-0.5 truncate text-sm font-medium"
+          }
+        >
+          {value}
+        </p>
+      </div>
     </div>
   );
 }
 
 function ClientDetailSkeleton() {
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <header className="space-y-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -281,50 +299,63 @@ function ClientDetailSkeleton() {
         <Skeleton className="h-12 w-72" />
       </header>
 
-      <Separator />
-
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-3">
         {Array.from({ length: 3 }).map((_, index) => (
-          <Card key={index}>
-            <CardContent className="p-5">
-              <Skeleton className="h-3 w-20" />
-              <Skeleton className="mt-4 h-8 w-32" />
-              <Skeleton className="mt-3 h-3 w-28" />
-            </CardContent>
-          </Card>
+          <div key={index} className=" border p-5">
+            <Skeleton className="size-9 " />
+            <Skeleton className="mt-5 h-3 w-20" />
+            <Skeleton className="mt-2 h-7 w-32" />
+            <Skeleton className="mt-2 h-3 w-36" />
+          </div>
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <Card>
-          <CardHeader className="border-b">
-            <Skeleton className="h-4 w-36" />
-            <Skeleton className="mt-2 h-3 w-52" />
-          </CardHeader>
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <section>
+          <div className="mb-4 flex items-end justify-between">
+            <div>
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="mt-2 h-4 w-64" />
+            </div>
 
-          <CardContent className="p-6">
-            <div className="space-y-4">
+            <Skeleton className="h-8 w-24" />
+          </div>
+
+          <div className="overflow-hidden  border">
+            <div className="border-b p-5">
+              <Skeleton className="h-4 w-40" />
+            </div>
+
+            <div className="space-y-3 p-5">
               {Array.from({ length: 4 }).map((_, index) => (
                 <Skeleton key={index} className="h-10 w-full" />
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </section>
 
-        <Card>
-          <CardHeader className="border-b">
-            <Skeleton className="h-3 w-28" />
-          </CardHeader>
+        <aside className="space-y-4">
+          <div className=" border">
+            <div className="border-b p-5">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="mt-2 h-3 w-36" />
+            </div>
 
-          <CardContent className="space-y-5 pt-5">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index}>
-                <Skeleton className="h-3 w-16" />
-                <Skeleton className="mt-2 h-4 w-32" />
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+            <div className="divide-y">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="flex gap-3 p-5">
+                  <Skeleton className="size-8 " />
+                  <div className="flex-1">
+                    <Skeleton className="h-3 w-20" />
+                    <Skeleton className="mt-2 h-4 w-28" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Skeleton className="h-28 w-full " />
+        </aside>
       </div>
     </section>
   );

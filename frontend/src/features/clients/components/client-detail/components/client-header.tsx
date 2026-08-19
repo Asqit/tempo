@@ -3,6 +3,7 @@ import { TimeEntryCreateDialog } from "@/features/time-entry/components/time-ent
 
 import { PlayCircle } from "lucide-react";
 import type { components } from "@/lib/api.d";
+import { ClientUpdateDialog } from "../../client-update-dialog";
 
 type ClientHeaderProps = {
   client: components["schemas"]["ClientRead"];
@@ -18,13 +19,10 @@ export function ClientHeader({ client }: ClientHeaderProps) {
         <h1 className="text-3xl uppercase font-black">{client.name}</h1>
       </div>
       <div className="flex gap-2 items-center">
-        {/* <ClientUpdateDialog
+        <ClientUpdateDialog
           trigger={<Button variant="outline">Upravit klienta</Button>}
-          client={{
-            id: client.id,
-            name: client.name,
-          }}
-        /> */}
+          client={client}
+        />
         <TimeEntryCreateDialog
           trigger={
             <Button

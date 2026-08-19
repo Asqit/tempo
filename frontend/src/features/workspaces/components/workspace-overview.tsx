@@ -161,8 +161,9 @@ export function WorkspaceOverview() {
       "/api/v1/workspaces",
       {},
       {
+        pageParamName: "page",
         getNextPageParam: (l) => (l.page >= l.pages ? undefined : l.page + 1),
-        initialPageParam: 0,
+        initialPageParam: 1,
       },
     );
 

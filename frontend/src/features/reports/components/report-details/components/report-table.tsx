@@ -82,7 +82,9 @@ export function ReportTable({ entries }: Props) {
                 {dayEntries.map((entry) => {
                   const minutes = durationMinutes(entry);
                   const { fg, bg } = generateColorFromString(
-                    entry?.client?.name ?? entry?.project?.name,
+                    entry?.client?.name ??
+                      entry?.project?.name ??
+                      entry.description,
                   );
                   return (
                     <TableRow key={entry.id}>

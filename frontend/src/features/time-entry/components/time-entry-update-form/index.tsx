@@ -6,12 +6,14 @@ import { Input } from "@/components/ui/input";
 import { ClientPicker } from "@/features/clients/components/client-picker";
 import { ProjectPicker } from "@/features/projects/components/project-picker";
 import { $api, getWorkspaceHeader } from "@/lib/api";
+import { Switch } from "@/components/ui/switch";
 
 type TimeEntryUpdateFormProps = {
   id: number;
   initialDescription: string | null;
   initialProjectId: number | null;
   initialStartTime: string;
+  initialBillable: boolean | null;
   initialEndTime: string | null;
   onUpdated?: () => void;
 };
@@ -70,8 +72,10 @@ export function TimeEntryUpdateForm({
   initialProjectId,
   initialStartTime,
   initialEndTime,
+  initialBillable,
   onUpdated,
 }: TimeEntryUpdateFormProps) {
+  const [billable, setBillable] = useState<boolean>(initialBillable ?? false);
   const [description, setDescription] = useState(initialDescription ?? "");
   const [projectId, setProjectId] = useState<number | null>(initialProjectId);
   const [clientId, setClientId] = useState<number | null>(null);
@@ -142,6 +146,7 @@ export function TimeEntryUpdateForm({
           client_id: clientId,
           start_time: nextStartTime,
           end_time: nextEndTime,
+          billable: false,
         },
       });
 
@@ -188,6 +193,8 @@ export function TimeEntryUpdateForm({
         onChange={(event) => setEndTime(event.target.value)}
         disabled={isPending}
       />
+
+      <Switch checked={billable} onCheckedChange={(b) => setBillable(b)} />
 
       <div className="flex justify-end">
         <Button type="submit" disabled={isPending}>

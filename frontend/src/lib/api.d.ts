@@ -330,11 +330,47 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get Static Reports */
+        get: operations["get_static_reports_api_v1_reports__get"];
+        put?: never;
+        /** Save Live Report */
+        post: operations["save_live_report_api_v1_reports__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/live": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
         /** Get Live Report */
-        get: operations["get_live_report_api_v1_reports__get"];
+        get: operations["get_live_report_api_v1_reports_live_get"];
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Single Static Report */
+        get: operations["get_single_static_report_api_v1_reports__id__get"];
+        put?: never;
+        post?: never;
+        /** Delete Static Report */
+        delete: operations["delete_static_report_api_v1_reports__id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -428,6 +464,29 @@ export interface components {
             /** Currency */
             currency: string | null;
         };
+        /** CreateReport */
+        CreateReport: {
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /**
+             * Period Start
+             * Format: date-time
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date-time
+             */
+            period_end: string;
+            /** Client Id */
+            client_id?: number | null;
+            /** Project Id */
+            project_id?: number | null;
+            /** Billable */
+            billable?: boolean | null;
+        };
         /** DbStat */
         DbStat: {
             /**
@@ -472,6 +531,19 @@ export interface components {
         Page_ProjectRead_: {
             /** Items */
             items: components["schemas"]["ProjectRead"][];
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Size */
+            size: number;
+            /** Pages */
+            pages: number;
+        };
+        /** Page[ReportRead] */
+        Page_ReportRead_: {
+            /** Items */
+            items: components["schemas"]["ReportRead"][];
             /** Total */
             total: number;
             /** Page */
@@ -570,6 +642,67 @@ export interface components {
             start_time?: string | null;
             /** End Time */
             end_time?: string | null;
+        };
+        /** ReportClientSnapshot */
+        ReportClientSnapshot: {
+            /** Name */
+            name: string;
+            /** Hourly Rate */
+            hourly_rate: string | null;
+            /** Currency */
+            currency: string;
+        };
+        /** ReportEntrySnapshot */
+        ReportEntrySnapshot: {
+            /** Id */
+            id: number;
+            /** Report Id */
+            report_id: number;
+            /** Time Entry Id */
+            time_entry_id: number | null;
+            /** Duration Minutes */
+            duration_minutes: number;
+            /** Description */
+            description: string;
+            /**
+             * Logged At
+             * Format: date-time
+             */
+            logged_at: string;
+            /** Client Name */
+            client_name: string | null;
+            /** Project Name */
+            project_name: string | null;
+        };
+        /** ReportProjectSnapshot */
+        ReportProjectSnapshot: {
+            /** Name */
+            name: string;
+        };
+        /** ReportRead */
+        ReportRead: {
+            /** Id */
+            id: number;
+            /**
+             * Period Start
+             * Format: date-time
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date-time
+             */
+            period_end: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Workspace Id */
+            workspace_id: number;
+            client_snapshot: components["schemas"]["ReportClientSnapshot"] | null;
+            project_snapshot: components["schemas"]["ReportProjectSnapshot"] | null;
+            /** Snapshots */
+            snapshots: components["schemas"]["ReportEntrySnapshot"][];
         };
         /** TimeEntryBulkDelete */
         TimeEntryBulkDelete: {
@@ -1764,7 +1897,78 @@ export interface operations {
             };
         };
     };
-    get_live_report_api_v1_reports__get: {
+    get_static_reports_api_v1_reports__get: {
+        parameters: {
+            query?: {
+                /** @description Page number */
+                page?: number;
+                /** @description Page size */
+                size?: number;
+            };
+            header: {
+                "X-Workspace-Id": number;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_ReportRead_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_live_report_api_v1_reports__post: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateReport"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_live_report_api_v1_reports_live_get: {
         parameters: {
             query: {
                 period_start: string;
@@ -1789,6 +1993,70 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["TimeEntryRead"][];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_single_static_report_api_v1_reports__id__get: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_static_report_api_v1_reports__id__delete: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

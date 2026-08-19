@@ -22,6 +22,8 @@ import { Route as AppInvoicesIndexRouteImport } from './routes/app/invoices/inde
 import { Route as AppProjectsIndexRouteImport } from './routes/app/projects/index'
 import { Route as AppProjectsIdRouteImport } from './routes/app/projects/$id'
 import { Route as AppReportsIndexRouteImport } from './routes/app/reports/index'
+import { Route as AppReportsSavedIndexRouteImport } from './routes/app/reports/saved/index'
+import { Route as AppReportsSavedIdRouteImport } from './routes/app/reports/saved/$id'
 
 const PublicRouteRoute = PublicRouteRouteImport.update({
   id: '/_public',
@@ -87,6 +89,16 @@ const AppReportsIndexRoute = AppReportsIndexRouteImport.update({
   path: '/reports/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppReportsSavedIndexRoute = AppReportsSavedIndexRouteImport.update({
+  id: '/reports/saved/',
+  path: '/reports/saved/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppReportsSavedIdRoute = AppReportsSavedIdRouteImport.update({
+  id: '/reports/saved/$id',
+  path: '/reports/saved/$id',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
@@ -101,6 +113,8 @@ export interface FileRoutesByFullPath {
   '/app/invoices/': typeof AppInvoicesIndexRoute
   '/app/projects/': typeof AppProjectsIndexRoute
   '/app/reports/': typeof AppReportsIndexRoute
+  '/app/reports/saved/$id': typeof AppReportsSavedIdRoute
+  '/app/reports/saved/': typeof AppReportsSavedIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof PublicLoginRoute
@@ -114,6 +128,8 @@ export interface FileRoutesByTo {
   '/app/invoices': typeof AppInvoicesIndexRoute
   '/app/projects': typeof AppProjectsIndexRoute
   '/app/reports': typeof AppReportsIndexRoute
+  '/app/reports/saved/$id': typeof AppReportsSavedIdRoute
+  '/app/reports/saved': typeof AppReportsSavedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -130,6 +146,8 @@ export interface FileRoutesById {
   '/app/invoices/': typeof AppInvoicesIndexRoute
   '/app/projects/': typeof AppProjectsIndexRoute
   '/app/reports/': typeof AppReportsIndexRoute
+  '/app/reports/saved/$id': typeof AppReportsSavedIdRoute
+  '/app/reports/saved/': typeof AppReportsSavedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -146,6 +164,8 @@ export interface FileRouteTypes {
     | '/app/invoices/'
     | '/app/projects/'
     | '/app/reports/'
+    | '/app/reports/saved/$id'
+    | '/app/reports/saved/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -159,6 +179,8 @@ export interface FileRouteTypes {
     | '/app/invoices'
     | '/app/projects'
     | '/app/reports'
+    | '/app/reports/saved/$id'
+    | '/app/reports/saved'
   id:
     | '__root__'
     | '/_public'
@@ -174,6 +196,8 @@ export interface FileRouteTypes {
     | '/app/invoices/'
     | '/app/projects/'
     | '/app/reports/'
+    | '/app/reports/saved/$id'
+    | '/app/reports/saved/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -274,6 +298,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReportsIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/reports/saved/': {
+      id: '/app/reports/saved/'
+      path: '/reports/saved'
+      fullPath: '/app/reports/saved/'
+      preLoaderRoute: typeof AppReportsSavedIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/reports/saved/$id': {
+      id: '/app/reports/saved/$id'
+      path: '/reports/saved/$id'
+      fullPath: '/app/reports/saved/$id'
+      preLoaderRoute: typeof AppReportsSavedIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
   }
 }
 
@@ -302,6 +340,8 @@ interface AppRouteRouteChildren {
   AppInvoicesIndexRoute: typeof AppInvoicesIndexRoute
   AppProjectsIndexRoute: typeof AppProjectsIndexRoute
   AppReportsIndexRoute: typeof AppReportsIndexRoute
+  AppReportsSavedIdRoute: typeof AppReportsSavedIdRoute
+  AppReportsSavedIndexRoute: typeof AppReportsSavedIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
@@ -313,6 +353,8 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppInvoicesIndexRoute: AppInvoicesIndexRoute,
   AppProjectsIndexRoute: AppProjectsIndexRoute,
   AppReportsIndexRoute: AppReportsIndexRoute,
+  AppReportsSavedIdRoute: AppReportsSavedIdRoute,
+  AppReportsSavedIndexRoute: AppReportsSavedIndexRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(

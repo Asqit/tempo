@@ -107,6 +107,7 @@ export function NewEntry() {
       )}
     >
       <TimerCRUD
+        key={id ?? 0} // Reset animation when ID changes
         id={id}
         state={id === null ? "stopped" : "playing"}
         callback={id === null ? handleCreateEntry : handleStopEntry}
