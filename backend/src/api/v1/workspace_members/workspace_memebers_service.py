@@ -1,0 +1,2 @@
+class WorkspaceMembersService:
+  pass

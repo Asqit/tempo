@@ -22,7 +22,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="border-none">
-      <SidebarHeader className="p-4 border-b">
+      <SidebarHeader className="pt-4 pl-4">
         <Brand />
       </SidebarHeader>
 

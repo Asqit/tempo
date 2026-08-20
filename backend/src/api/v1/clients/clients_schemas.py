@@ -6,8 +6,8 @@ from pydantic import BaseModel, Field
 
 class ClientCreate(BaseModel):
     name: str = Field(min_length=3)
-    hourly_rate: Decimal | None
-    currency: str | None
+    hourly_rate: Decimal | None = Field(default=None)
+    currency: str | None = Field(default=None)
 
 
 class ClientUpdate(BaseModel):

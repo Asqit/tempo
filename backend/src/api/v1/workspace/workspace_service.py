@@ -9,6 +9,10 @@ from src.api.v1.workspace.workspace_schemas import WorkspaceCreate, WorkspaceUpd
 
 class WorkspaceService:
     @staticmethod
+    async def share_workspace(db: AsyncSession, user_id: int, workspace: Workspace):
+        pass
+
+    @staticmethod
     async def list_workspaces(db: AsyncSession, user_id: int):
         return await paginate(db, select(Workspace).where(Workspace.user_id == user_id))
 

@@ -1,6 +1,17 @@
 import type { components } from "@/lib/api.d";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { format } from "date-fns";
+import { cs } from "date-fns/locale";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
+import { Inbox } from "lucide-react";
 
 interface Props {
   reports: Array<components["schemas"]["ReportRead"]>;
@@ -13,51 +24,120 @@ function fmtMinutes(mins: number) {
 }
 
 export function ReportsList({ reports }: Props) {
-  if (!reports.length)
-    return <p className="text-sm text-muted-foreground">No reports yet.</p>;
+  const navigate = useNavigate();
+
+  if (!reports.length) {
+    return (
+      <Card className="border">
+        <CardContent className="flex flex-col items-center justify-center gap-2 py-16 text-center">
+          <Inbox className="h-8 w-8 text-muted-foreground" strokeWidth={1.5} />
+          <p className="font-medium">Žádné reporty</p>
+          <p className="text-sm text-muted-foreground">
+            Zatím jste neuložili žádný report.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <ul className="space-y-2">
-      {reports.map((report) => {
-        const totalMins = report.snapshots.reduce(
-          (acc, s) => acc + s.duration_minutes,
-          0,
-        );
+    <Card className="border">
+      <CardContent className="px-0">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead>Název</TableHead>
+              <TableHead>Klient</TableHead>
+              <TableHead>Projekt</TableHead>
+              <TableHead>Období</TableHead>
+              <TableHead className="text-center">Záznamy</TableHead>
+              <TableHead className="text-right">Doba trvání</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {reports.map((report) => {
+              const totalMins = report.snapshots.reduce(
+                (acc, s) => acc + s.duration_minutes,
+                0,
+              );
 
-        return (
-          <li key={report.id}>
-            <Link
-              to="/app/reports/saved/$id"
-              params={{ id: report.id }}
-              className="block border bg-card p-4 hover:bg-accent transition-colors"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <h2 className="font-medium truncate">{report.name}</h2>
-                  {report.description && (
-                    <p className="text-sm text-muted-foreground truncate mt-0.5">
-                      {report.description}
-                    </p>
-                  )}
-                </div>
-                <div className="text-right shrink-0">
-                  <p className="font-medium tabular-nums">
+              return (
+                <TableRow
+                  key={report.id}
+                  tabIndex={0}
+                  role="link"
+                  onClick={() =>
+                    navigate({
+                      to: "/app/reports/saved/$id",
+                      params: { id: report.id },
+                    })
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      navigate({
+                        to: "/app/reports/saved/$id",
+                        params: { id: report.id },
+                      });
+                    }
+                  }}
+                  className="cursor-pointer focus-visible:bg-accent focus-visible:outline-none"
+                >
+                  <TableCell className="max-w-xs">
+                    <div className="font-medium truncate">{report.name}</div>
+                    {report.description && (
+                      <div className="text-sm text-muted-foreground truncate">
+                        {report.description}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {report.client_snapshot ? (
+                      <span className="inline-flex items-center gap-1.5">
+                        {report.client_snapshot.name}
+                        {report.client_snapshot.hourly_rate && (
+                          <span className="text-xs text-muted-foreground">
+                            ({report.client_snapshot.hourly_rate}{" "}
+                            {report.client_snapshot.currency}/h)
+                          </span>
+                        )}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {report.project_snapshot?.name ?? (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <time>
+                        {format(new Date(report.period_start), "d. M. yyyy", {
+                          locale: cs,
+                        })}
+                      </time>
+                      <span>→</span>
+                      <time>
+                        {format(new Date(report.period_end), "d. M. yyyy", {
+                          locale: cs,
+                        })}
+                      </time>
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-center tabular-nums text-muted-foreground">
+                    {report.snapshots.length}
+                  </TableCell>
+                  <TableCell className="text-right font-medium tabular-nums">
                     {fmtMinutes(totalMins)}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {report.snapshots.length} entries
-                  </p>
-                </div>
-              </div>
-              <div className="mt-2 flex gap-1.5 text-xs text-muted-foreground">
-                <time>{format(report.period_start, "dd.MM.yyyy")}</time>
-                <span>→</span>
-                <time>{format(report.period_end, "dd.MM.yyyy")}</time>
-              </div>
-            </Link>
-          </li>
-        );
-      })}
-    </ul>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }

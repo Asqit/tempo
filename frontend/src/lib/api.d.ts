@@ -426,9 +426,9 @@ export interface components {
             /** Name */
             name: string;
             /** Hourly Rate */
-            hourly_rate: number | string | null;
+            hourly_rate?: number | string | null;
             /** Currency */
-            currency: string | null;
+            currency?: string | null;
         };
         /** ClientRead */
         ClientRead: {

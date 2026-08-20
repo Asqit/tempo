@@ -64,7 +64,15 @@ export function ReportStats({ entries }: Props) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3">
       {stats.map((stat, idx) => (
-        <Card key={stat.label} className={cn(idx % 2 == 0 && "bg-dotted")}>
+        <Card
+          key={stat.label}
+          className={cn(
+            "rounded-none",
+            idx % 2 == 0 && "bg-dotted",
+            idx == 0 && "rounded-t md:rounded-tr-none md:rounded-l",
+            idx == 2 && "rounded-b md:rounded-bl-none md:rounded-r",
+          )}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium ">{stat.label}</CardTitle>
             <stat.icon className="h-4 w-4 " />

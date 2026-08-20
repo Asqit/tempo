@@ -9,7 +9,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
-
+import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -191,6 +191,11 @@ export function SidebarAccount() {
                 </div>
                 <Settings className="size-3.5 opacity-60" />
               </button>
+              <div className="flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-sm">
+                <span className="text-muted-foreground">Vzhled</span>
+                <ModeToggle />
+              </div>
+
               <button
                 type="button"
                 onClick={handleLogout}
