@@ -20,8 +20,13 @@ router = APIRouter(prefix="/reports", tags=["Reports"])
 async def get_static_reports(
     db: Annotated[AsyncSession, Depends(get_db)],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
+    client_id: int | None = None,
+    project_id: int | None = None,
+    query: str | None = None,
 ):
-    return await ReportsService.get_static_reports(db, workspace)
+    return await ReportsService.get_static_reports(
+        db, workspace, client_id, project_id, query
+    )
 
 
 @router.get("/live", response_model=list[TimeEntryRead])
@@ -55,6 +60,15 @@ async def save_live_report(
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
 ):
     return await ReportsService.save_live_report(db, workspace, body)
+
+
+@router.put("/{id}/share", response_model=ReportRead)
+async def share_static_report(
+    id: int,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    workspace: Annotated[Workspace, Depends(get_current_workspace)],
+):
+    return await ReportsService.share_static_report(db, workspace, id)
 
 
 @router.delete("/{id}", status_code=HTTP_204_NO_CONTENT)

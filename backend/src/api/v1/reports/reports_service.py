@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from fastapi import HTTPException, status
@@ -25,6 +26,15 @@ class ReportsService:
     )
 
     @staticmethod
+    async def share_static_report(db: AsyncSession, workspace: Workspace, id: int):
+        report = await ReportsService.get_single_static_report(db, workspace, id)
+        link = uuid.uuid4()
+        report.uuid = link
+        await db.commit()
+        await db.refresh(report)
+        return report
+
+    @staticmethod
     async def get_single_static_report(db: AsyncSession, workspace: Workspace, id: int):
         report = await db.scalar(
             select(Report)
@@ -36,7 +46,26 @@ class ReportsService:
         return report
 
     @staticmethod
-    async def get_static_reports(db: AsyncSession, workspace: Workspace):
+    async def get_static_reports(
+        db: AsyncSession,
+        workspace: Workspace,
+        client_id: int | None,
+        project_id: int | None,
+        query: str | None,
+    ):
+        filters = [Report.id == id, Report.workspace_id == workspace.id]
+        if project_id is not None:
+            filters.append(Report.project_id == project_id)
+        if client_id is not None:
+            filters.append(Report.client_id == client_id)
+        if query:
+            filters.append(
+                or_(
+                    Report.name.ilike(f"%{query}%"),
+                    Report.description.ilike(f"%{query}%"),
+                )
+            )
+
         return await paginate(
             db,
             select(Report)

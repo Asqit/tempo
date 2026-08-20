@@ -11,9 +11,15 @@ function ClientDetailPage() {
 
   if (!Number.isFinite(numericId)) {
     return (
-      <p className="text-sm text-destructive">Tohle není validní ID klienta.</p>
+      <p className="text-sm text-destructive animate-in fade-in slide-in-from-bottom-2 duration-500">
+        Tohle není validní ID klienta.
+      </p>
     );
   }
 
-  return <ClientDetail id={numericId} />;
+  return (
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <ClientDetail id={numericId} />
+    </div>
+  );
 }

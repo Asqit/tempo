@@ -9,12 +9,16 @@ export const Route = createFileRoute("/app/clients/")({
 
 function ClientsPage() {
   return (
-    <div className="space-y-6">
-      <header className="mb-4 flex items-center justify-between gap-4">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <header className="mb-4 flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500 delay-100">
         <div>
-          <h2 className="text-muted-foreground text-xs">CRM</h2>
-          <h1 className="text-3xl font-black uppercase">Klienti</h1>
-          <p className="text-muted-foreground text-sm">
+          <h2 className="text-muted-foreground text-xs animate-in fade-in slide-in-from-right-3 duration-300 delay-150">
+            CRM
+          </h2>
+          <h1 className="text-3xl font-black uppercase animate-in fade-in slide-in-from-left-3 duration-300 delay-150">
+            Klienti
+          </h1>
+          <p className="text-muted-foreground text-sm animate-in fade-in slide-in-from-top-4 duration-500 delay-75">
             Spravujte své klientské portfólio na jednom místě.
           </p>
         </div>

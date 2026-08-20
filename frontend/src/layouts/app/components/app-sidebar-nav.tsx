@@ -150,7 +150,7 @@ function renderItem(item: SidebarMenuItemConfig) {
   }
 
   return (
-    <Collapsible key={item.label} defaultOpen className="group/collapsible">
+    <Collapsible key={item.label} className="group/collapsible">
       <SidebarMenuItem>
         <SidebarMenuButton render={<CollapsibleTrigger />}>
           <NavIcon icon={item.icon} />

@@ -22,6 +22,10 @@ import { Route as AppInvoicesIndexRouteImport } from './routes/app/invoices/inde
 import { Route as AppProjectsIndexRouteImport } from './routes/app/projects/index'
 import { Route as AppProjectsIdRouteImport } from './routes/app/projects/$id'
 import { Route as AppReportsIndexRouteImport } from './routes/app/reports/index'
+import { Route as AppSettingsAccountRouteImport } from './routes/app/settings/account'
+import { Route as AppSettingsWorkspaceRouteImport } from './routes/app/settings/workspace'
+import { Route as AppWorkspacesIndexRouteImport } from './routes/app/workspaces/index'
+import { Route as AppWorkspacesIdRouteImport } from './routes/app/workspaces/$id'
 import { Route as AppReportsSavedIndexRouteImport } from './routes/app/reports/saved/index'
 import { Route as AppReportsSavedIdRouteImport } from './routes/app/reports/saved/$id'
 
@@ -89,6 +93,26 @@ const AppReportsIndexRoute = AppReportsIndexRouteImport.update({
   path: '/reports/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppSettingsAccountRoute = AppSettingsAccountRouteImport.update({
+  id: '/settings/account',
+  path: '/settings/account',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppSettingsWorkspaceRoute = AppSettingsWorkspaceRouteImport.update({
+  id: '/settings/workspace',
+  path: '/settings/workspace',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppWorkspacesIndexRoute = AppWorkspacesIndexRouteImport.update({
+  id: '/workspaces/',
+  path: '/workspaces/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppWorkspacesIdRoute = AppWorkspacesIdRouteImport.update({
+  id: '/workspaces/$id',
+  path: '/workspaces/$id',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppReportsSavedIndexRoute = AppReportsSavedIndexRouteImport.update({
   id: '/reports/saved/',
   path: '/reports/saved/',
@@ -109,10 +133,14 @@ export interface FileRoutesByFullPath {
   '/app/clients/$id': typeof AppClientsIdRoute
   '/app/clients/new': typeof AppClientsNewRoute
   '/app/projects/$id': typeof AppProjectsIdRoute
+  '/app/settings/account': typeof AppSettingsAccountRoute
+  '/app/settings/workspace': typeof AppSettingsWorkspaceRoute
+  '/app/workspaces/$id': typeof AppWorkspacesIdRoute
   '/app/clients/': typeof AppClientsIndexRoute
   '/app/invoices/': typeof AppInvoicesIndexRoute
   '/app/projects/': typeof AppProjectsIndexRoute
   '/app/reports/': typeof AppReportsIndexRoute
+  '/app/workspaces/': typeof AppWorkspacesIndexRoute
   '/app/reports/saved/$id': typeof AppReportsSavedIdRoute
   '/app/reports/saved/': typeof AppReportsSavedIndexRoute
 }
@@ -124,10 +152,14 @@ export interface FileRoutesByTo {
   '/app/clients/$id': typeof AppClientsIdRoute
   '/app/clients/new': typeof AppClientsNewRoute
   '/app/projects/$id': typeof AppProjectsIdRoute
+  '/app/settings/account': typeof AppSettingsAccountRoute
+  '/app/settings/workspace': typeof AppSettingsWorkspaceRoute
+  '/app/workspaces/$id': typeof AppWorkspacesIdRoute
   '/app/clients': typeof AppClientsIndexRoute
   '/app/invoices': typeof AppInvoicesIndexRoute
   '/app/projects': typeof AppProjectsIndexRoute
   '/app/reports': typeof AppReportsIndexRoute
+  '/app/workspaces': typeof AppWorkspacesIndexRoute
   '/app/reports/saved/$id': typeof AppReportsSavedIdRoute
   '/app/reports/saved': typeof AppReportsSavedIndexRoute
 }
@@ -142,10 +174,14 @@ export interface FileRoutesById {
   '/app/clients/$id': typeof AppClientsIdRoute
   '/app/clients/new': typeof AppClientsNewRoute
   '/app/projects/$id': typeof AppProjectsIdRoute
+  '/app/settings/account': typeof AppSettingsAccountRoute
+  '/app/settings/workspace': typeof AppSettingsWorkspaceRoute
+  '/app/workspaces/$id': typeof AppWorkspacesIdRoute
   '/app/clients/': typeof AppClientsIndexRoute
   '/app/invoices/': typeof AppInvoicesIndexRoute
   '/app/projects/': typeof AppProjectsIndexRoute
   '/app/reports/': typeof AppReportsIndexRoute
+  '/app/workspaces/': typeof AppWorkspacesIndexRoute
   '/app/reports/saved/$id': typeof AppReportsSavedIdRoute
   '/app/reports/saved/': typeof AppReportsSavedIndexRoute
 }
@@ -160,10 +196,14 @@ export interface FileRouteTypes {
     | '/app/clients/$id'
     | '/app/clients/new'
     | '/app/projects/$id'
+    | '/app/settings/account'
+    | '/app/settings/workspace'
+    | '/app/workspaces/$id'
     | '/app/clients/'
     | '/app/invoices/'
     | '/app/projects/'
     | '/app/reports/'
+    | '/app/workspaces/'
     | '/app/reports/saved/$id'
     | '/app/reports/saved/'
   fileRoutesByTo: FileRoutesByTo
@@ -175,10 +215,14 @@ export interface FileRouteTypes {
     | '/app/clients/$id'
     | '/app/clients/new'
     | '/app/projects/$id'
+    | '/app/settings/account'
+    | '/app/settings/workspace'
+    | '/app/workspaces/$id'
     | '/app/clients'
     | '/app/invoices'
     | '/app/projects'
     | '/app/reports'
+    | '/app/workspaces'
     | '/app/reports/saved/$id'
     | '/app/reports/saved'
   id:
@@ -192,10 +236,14 @@ export interface FileRouteTypes {
     | '/app/clients/$id'
     | '/app/clients/new'
     | '/app/projects/$id'
+    | '/app/settings/account'
+    | '/app/settings/workspace'
+    | '/app/workspaces/$id'
     | '/app/clients/'
     | '/app/invoices/'
     | '/app/projects/'
     | '/app/reports/'
+    | '/app/workspaces/'
     | '/app/reports/saved/$id'
     | '/app/reports/saved/'
   fileRoutesById: FileRoutesById
@@ -298,6 +346,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReportsIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/settings/account': {
+      id: '/app/settings/account'
+      path: '/settings/account'
+      fullPath: '/app/settings/account'
+      preLoaderRoute: typeof AppSettingsAccountRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/settings/workspace': {
+      id: '/app/settings/workspace'
+      path: '/settings/workspace'
+      fullPath: '/app/settings/workspace'
+      preLoaderRoute: typeof AppSettingsWorkspaceRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/workspaces/': {
+      id: '/app/workspaces/'
+      path: '/workspaces'
+      fullPath: '/app/workspaces/'
+      preLoaderRoute: typeof AppWorkspacesIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/workspaces/$id': {
+      id: '/app/workspaces/$id'
+      path: '/workspaces/$id'
+      fullPath: '/app/workspaces/$id'
+      preLoaderRoute: typeof AppWorkspacesIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/reports/saved/': {
       id: '/app/reports/saved/'
       path: '/reports/saved'
@@ -336,10 +412,14 @@ interface AppRouteRouteChildren {
   AppClientsIdRoute: typeof AppClientsIdRoute
   AppClientsNewRoute: typeof AppClientsNewRoute
   AppProjectsIdRoute: typeof AppProjectsIdRoute
+  AppSettingsAccountRoute: typeof AppSettingsAccountRoute
+  AppSettingsWorkspaceRoute: typeof AppSettingsWorkspaceRoute
+  AppWorkspacesIdRoute: typeof AppWorkspacesIdRoute
   AppClientsIndexRoute: typeof AppClientsIndexRoute
   AppInvoicesIndexRoute: typeof AppInvoicesIndexRoute
   AppProjectsIndexRoute: typeof AppProjectsIndexRoute
   AppReportsIndexRoute: typeof AppReportsIndexRoute
+  AppWorkspacesIndexRoute: typeof AppWorkspacesIndexRoute
   AppReportsSavedIdRoute: typeof AppReportsSavedIdRoute
   AppReportsSavedIndexRoute: typeof AppReportsSavedIndexRoute
 }
@@ -349,10 +429,14 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppClientsIdRoute: AppClientsIdRoute,
   AppClientsNewRoute: AppClientsNewRoute,
   AppProjectsIdRoute: AppProjectsIdRoute,
+  AppSettingsAccountRoute: AppSettingsAccountRoute,
+  AppSettingsWorkspaceRoute: AppSettingsWorkspaceRoute,
+  AppWorkspacesIdRoute: AppWorkspacesIdRoute,
   AppClientsIndexRoute: AppClientsIndexRoute,
   AppInvoicesIndexRoute: AppInvoicesIndexRoute,
   AppProjectsIndexRoute: AppProjectsIndexRoute,
   AppReportsIndexRoute: AppReportsIndexRoute,
+  AppWorkspacesIndexRoute: AppWorkspacesIndexRoute,
   AppReportsSavedIdRoute: AppReportsSavedIdRoute,
   AppReportsSavedIndexRoute: AppReportsSavedIndexRoute,
 }

@@ -1,7 +1,5 @@
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Building2 } from "lucide-react";
 import { useState } from "react";
-
-import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -18,37 +16,22 @@ import {
 import { $api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
-
 import { useWorkspaceStore } from "../store";
 
 export function WorkspaceSelector() {
   const { activeWorkspace, setWorkspace, reset } = useWorkspaceStore();
-
   const [open, setOpen] = useState(false);
-
   const queryClient = useQueryClient();
-
   const { data, isLoading } = $api.useQuery("get", "/api/v1/workspaces", {
-    params: {
-      query: {
-        size: 100,
-      },
-    },
+    params: { query: { size: 100 } },
   });
-
   const workspaces = data?.items ?? [];
-
-  const activeWorkspaceName =
-    workspaces.find((workspace) => workspace.id === activeWorkspace)?.name ??
-    "All workspaces";
+  const active = workspaces.find((w) => w.id === activeWorkspace);
+  const activeWorkspaceName = active?.name ?? "All workspaces";
 
   const handleWorkspaceChange = (id: number | null) => {
-    if (id === null) {
-      reset();
-    } else {
-      setWorkspace(id);
-    }
-
+    if (id === null) reset();
+    else setWorkspace(id);
     setOpen(false);
     queryClient.invalidateQueries();
   };
@@ -57,28 +40,33 @@ export function WorkspaceSelector() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         render={
-          <Button
-            variant="outline"
+          <button
+            type="button"
             role="combobox"
             aria-expanded={open}
-            className="justify-between w-full"
+            className="flex h-10 w-full items-center gap-2 rounded-md border border-sidebar-border/70 bg-sidebar-accent/35 px-2 text-left hover:bg-sidebar-accent data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           />
         }
       >
-        <div>
-          <span className="text-muted-foreground">Workspace:</span>
-          <span className="truncate"> {activeWorkspaceName}</span>
+        <div className="flex size-6 shrink-0 items-center justify-center bg-primary/10 text-primary">
+          <Building2 className="size-3.5" />
         </div>
-        <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+        <div className="grid min-w-0 flex-1 text-left leading-tight">
+          <span className="truncate text-[11px] uppercase tracking-wide text-muted-foreground">
+            Workspace
+          </span>
+          <span className="truncate text-sm font-medium">
+            {activeWorkspaceName}
+          </span>
+        </div>
+        <ChevronsUpDown className="size-4 shrink-0 opacity-50" />
       </PopoverTrigger>
 
-      <PopoverContent className="w-56 p-0" align="start">
+      <PopoverContent className="w-64 p-0" align="start">
         <Command>
           <CommandInput placeholder="Search workspaces..." />
-
           <CommandList>
             <CommandEmpty>No workspace found.</CommandEmpty>
-
             <CommandGroup>
               <CommandItem
                 value="all workspaces"
@@ -92,7 +80,6 @@ export function WorkspaceSelector() {
                 />
                 All workspaces
               </CommandItem>
-
               {isLoading ? (
                 <CommandItem disabled>Loading workspaces...</CommandItem>
               ) : (

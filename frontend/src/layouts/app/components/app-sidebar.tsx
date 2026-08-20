@@ -8,9 +8,9 @@ import {
 import { SidebarAccount } from "@/features/auth/components/sidebar-account";
 import { AppSidebarNav } from "./app-sidebar-nav";
 import { Brand } from "@/components/share/brand";
-import { WorkspaceSelector } from "@/features/workspaces/components/workspace-selector";
 import { useWorkspaceStore } from "@/features/workspaces/store";
 import { WorkspaceOverview } from "@/features/workspaces/components/workspace-overview";
+import { SidebarTimer } from "@/features/time-entry/components/sidebar-timer";
 
 export function AppSidebar() {
   const { activeWorkspace } = useWorkspaceStore();
@@ -31,6 +31,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
+        <SidebarTimer />
         <SidebarAccount />
       </SidebarFooter>
       <SidebarRail />
