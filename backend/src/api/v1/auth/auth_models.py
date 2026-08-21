@@ -5,7 +5,8 @@ from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.api.v1.workspace.workspace_models import Workspace, WorkspaceMembers
+from src.api.v1.workspace.workspace_models import Workspace
+from src.api.v1.workspace_members.workspace_members_models import WorkspaceMembers
 from src.core.database import Base
 
 
@@ -41,4 +42,6 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan"
     )
 
-    workspace_accesses: Mapped[list[WorkspaceMembers]] = relationship(back_populates="user", lazy="selectin")
+    workspace_accesses: Mapped[list[WorkspaceMembers]] = relationship(
+        back_populates="user", lazy="selectin"
+    )

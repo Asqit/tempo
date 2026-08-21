@@ -1,9 +1,11 @@
-from backend.src.core.database import Base
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import String, JSON, ForeignKey, func, Enum
+import enum
 from datetime import datetime
 
-import enum
+from sqlalchemy import JSON, DateTime, Enum, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column
+
+from src.core.database import Base
+
 
 class NotificationType(str, enum.Enum):
     WORKSPACE_INVITE = "workspace_invite"
@@ -16,4 +18,6 @@ class Notification(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     type: Mapped[NotificationType] = mapped_column(Enum(NotificationType))
     payload: Mapped[dict] = mapped_column(JSON)
-    read_at: Mapped[datetime | None]
+    read_at: Mapped[datetime | None] = mapped_column(
+        DateTime, nullable=True, default=None
+    )

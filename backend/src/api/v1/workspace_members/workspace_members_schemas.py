@@ -1,18 +1,14 @@
 import enum
-from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from src.api.v1.auth.auth_schemas import UserRead
-from src.api.v1.clients.clients_schemas import ClientShallow
-from src.api.v1.time_entries.time_entries_schemas import TimeEntryRead
 
 
 class WorkspaceRole(str, enum.Enum):
     OWNER = "owner"
     ADMIN = "admin"
     MEMBER = "member"
-
 
 
 class WorkspaceMemberCreate(BaseModel):
@@ -22,6 +18,7 @@ class WorkspaceMemberCreate(BaseModel):
 
 class WorkspaceMemberUpdate(BaseModel):
     role: WorkspaceRole
+
 
 class DBWorkspaceBase(BaseModel):
     model_config = {"from_attributes": True}
