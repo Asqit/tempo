@@ -92,7 +92,7 @@ export function SidebarAccount() {
             render={
               <button
                 type="button"
-                className="flex h-9 w-full items-center gap-1.5 border border-sidebar-border/70 bg-sidebar-accent/35 px-2 text-left text-sm font-medium hover:bg-sidebar-accent data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                className="flex h-9 rounded-md w-full items-center gap-1.5 border border-sidebar-border/70 bg-sidebar-accent/35 px-2 text-left text-sm font-medium hover:bg-sidebar-accent data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               />
             }
           >

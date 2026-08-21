@@ -26,6 +26,7 @@ import {
 import { ClientPicker } from "@/features/clients/components/client-picker";
 import { ProjectPicker } from "@/features/projects/components/project-picker";
 import type { DateRange } from "react-day-picker";
+import { cs } from "date-fns/locale";
 
 type Preset =
   "this_week" | "last_week" | "this_month" | "last_month" | "custom";
@@ -145,6 +146,7 @@ export function ReportsToolbar(props: Props) {
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
+            locale={cs}
             mode="range"
             selected={range}
             onSelect={handleCustomSelect}

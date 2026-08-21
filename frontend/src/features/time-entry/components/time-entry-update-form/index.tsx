@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ClientPicker } from "@/features/clients/components/client-picker";
 import { ProjectPicker } from "@/features/projects/components/project-picker";
+import { DatePicker } from "@/components/share/date-picker";
 import { $api, getWorkspaceHeader } from "@/lib/api";
 import { Switch } from "@/components/ui/switch";
 
@@ -17,38 +18,6 @@ type TimeEntryUpdateFormProps = {
   initialEndTime: string | null;
   onUpdated?: () => void;
 };
-
-function toDateTimeLocalInput(value: string | null): string {
-  if (!value) {
-    return "";
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
-function fromDateTimeLocalInput(value: string): string | null {
-  if (!value) {
-    return null;
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-
-  return date.toISOString();
-}
 
 function getProjectClientId(data: unknown): number | null {
   if (!data || typeof data !== "object") {
@@ -79,10 +48,10 @@ export function TimeEntryUpdateForm({
   const [description, setDescription] = useState(initialDescription ?? "");
   const [projectId, setProjectId] = useState<number | null>(initialProjectId);
   const [clientId, setClientId] = useState<number | null>(null);
-  const [startTime, setStartTime] = useState(
-    toDateTimeLocalInput(initialStartTime),
+  const [startTime, setStartTime] = useState<Date>(new Date(initialStartTime));
+  const [endTime, setEndTime] = useState<Date | null>(
+    initialEndTime ? new Date(initialEndTime) : null,
   );
-  const [endTime, setEndTime] = useState(toDateTimeLocalInput(initialEndTime));
   const workspaceHeader = getWorkspaceHeader();
 
   const { data: projectData } = $api.useQuery("get", "/api/v1/projects/{id}", {
@@ -120,14 +89,12 @@ export function TimeEntryUpdateForm({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const nextStartTime = fromDateTimeLocalInput(startTime);
-    if (!nextStartTime) {
+    if (!startTime || Number.isNaN(startTime.getTime())) {
       toast.error("Start je povinný a musí být platný.");
       return;
     }
 
-    const nextEndTime = endTime ? fromDateTimeLocalInput(endTime) : null;
-    if (endTime && !nextEndTime) {
+    if (endTime && Number.isNaN(endTime.getTime())) {
       toast.error("Konec musí být platný datum a čas.");
       return;
     }
@@ -144,8 +111,8 @@ export function TimeEntryUpdateForm({
           description: description.trim() || null,
           project_id: projectId,
           client_id: clientId,
-          start_time: nextStartTime,
-          end_time: nextEndTime,
+          start_time: startTime.toISOString(),
+          end_time: endTime ? endTime.toISOString() : null,
           billable: false,
         },
       });
@@ -180,18 +147,18 @@ export function TimeEntryUpdateForm({
         placeholder="Vyber klienta"
       />
 
-      <Input
-        type="datetime-local"
+      <DatePicker
         value={startTime}
-        onChange={(event) => setStartTime(event.target.value)}
-        disabled={isPending}
+        setValue={setStartTime}
+        withTime
+        label="Začátek"
       />
 
-      <Input
-        type="datetime-local"
-        value={endTime}
-        onChange={(event) => setEndTime(event.target.value)}
-        disabled={isPending}
+      <DatePicker
+        value={endTime ?? new Date()}
+        setValue={setEndTime}
+        withTime
+        label="Konec"
       />
 
       <Switch checked={billable} onCheckedChange={(b) => setBillable(b)} />

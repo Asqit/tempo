@@ -28,6 +28,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { match } from "ts-pattern";
 import { generateColorFromString } from "@/lib/utils";
 import { EntryPopover } from "./components/entry-popover";
+import { DatePicker } from "@/components/share/date-picker";
 
 type RangeSelector =
   "today" | "yesterday" | "this-week" | "last-week" | "custom";
@@ -190,7 +191,7 @@ export function TimeEntryCalendar() {
             >
               {RANGE_LABELS[range]}
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent className={"w-fit"}>
               <DropdownMenuGroup>
                 <DropdownMenuItem onClick={() => applyRange("today")}>
                   Dnes
@@ -210,19 +211,17 @@ export function TimeEntryCalendar() {
                   Vlastní rozsah
                 </DropdownMenuLabel>
                 <div className="flex gap-1 px-2 pb-2">
-                  <Input
-                    type="date"
-                    defaultValue={format(startDate, "yyyy-MM-dd")}
-                    onChange={(e) => {
-                      setStartDate(new Date(e.currentTarget.value));
+                  <DatePicker
+                    value={startDate}
+                    setValue={(d) => {
+                      setStartDate(d);
                       setRange("custom");
                     }}
                   />
-                  <Input
-                    type="date"
-                    defaultValue={format(endDate, "yyyy-MM-dd")}
-                    onChange={(e) => {
-                      setEndDate(new Date(e.currentTarget.value));
+                  <DatePicker
+                    value={endDate}
+                    setValue={(d) => {
+                      setEndDate(d);
                       setRange("custom");
                     }}
                   />
