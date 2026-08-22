@@ -1,6 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from pydantic import BaseModel, Field
 
-from src.api.v1.auth.auth_helpers import Token
+if TYPE_CHECKING:
+    from src.api.v1.auth.auth_helpers import Token
 
 
 class UserCreate(BaseModel):

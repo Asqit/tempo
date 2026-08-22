@@ -29,7 +29,6 @@ class DBWorkspaceBase(BaseModel):
 class WorkspaceRead(DBWorkspaceBase):
     id: int
     name: str
-    user: UserRead
     members: list[WorkspaceMemberRead]
     clients: list[ClientShallow]
     time_entries: list[TimeEntryRead]

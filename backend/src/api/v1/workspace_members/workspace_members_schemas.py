@@ -5,8 +5,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
-if TYPE_CHECKING:
-    from src.api.v1.auth.auth_schemas import UserRead
+from src.api.v1.auth.auth_schemas import UserRead
 
 
 class WorkspaceRole(str, enum.Enum):
