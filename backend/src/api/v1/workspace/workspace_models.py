@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 class Workspace(Base):
     __tablename__ = "workspaces"
-    __table_args__: tuple = (UniqueConstraint("user_id", "name"),)
+    __table_args__ = (UniqueConstraint("user_id", "name"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(32))

@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 import enum
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
-from src.api.v1.auth.auth_schemas import UserRead
+if TYPE_CHECKING:
+    from src.api.v1.auth.auth_schemas import UserRead
 
 
 class WorkspaceRole(str, enum.Enum):

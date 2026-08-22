@@ -857,6 +857,15 @@ export interface components {
             /** Name */
             name: string;
         };
+        /** WorkspaceMemberRead */
+        WorkspaceMemberRead: {
+            /** Id */
+            id: number;
+            /** User Id */
+            user_id: number;
+            user: components["schemas"]["UserRead"];
+            role: components["schemas"]["WorkspaceRole"];
+        };
         /** WorkspaceRead */
         WorkspaceRead: {
             /** Id */
@@ -864,6 +873,8 @@ export interface components {
             /** Name */
             name: string;
             user: components["schemas"]["UserRead"];
+            /** Members */
+            members: components["schemas"]["WorkspaceMemberRead"][];
             /** Clients */
             clients: components["schemas"]["ClientShallow"][];
             /** Time Entries */
@@ -879,6 +890,11 @@ export interface components {
              */
             updated_at: string;
         };
+        /**
+         * WorkspaceRole
+         * @enum {string}
+         */
+        WorkspaceRole: "owner" | "admin" | "member";
         /** WorkspaceUpdate */
         WorkspaceUpdate: {
             /** Name */

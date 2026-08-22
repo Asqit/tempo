@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, String, UniqueConstraint
+from sqlalchemy import Enum, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from src.api.v1.workspace_members.workspace_members_schemas import WorkspaceRole
 
 if TYPE_CHECKING:
     from src.api.v1.auth.auth_models import User
@@ -29,4 +31,11 @@ class WorkspaceMembers(Base):
         back_populates="members", lazy="selectin"
     )
 
-    role: Mapped[str] = mapped_column(String(32), default="member")
+    role: Mapped[WorkspaceRole] = mapped_column(
+        Enum(
+            WorkspaceRole,
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
+        ),
+        default=WorkspaceRole.MEMBER,
+        nullable=False,
+    )

@@ -5,13 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.workspace.workspace_models import Workspace
 from src.api.v1.workspace.workspace_schemas import WorkspaceCreate, WorkspaceUpdate
+from src.api.v1.workspace_members.workspace_members_models import WorkspaceMembers
 
 
 class WorkspaceService:
-    @staticmethod
-    async def share_workspace(db: AsyncSession, user_id: int, workspace: Workspace):
-        pass
-
     @staticmethod
     async def list_workspaces(db: AsyncSession, user_id: int):
         return await paginate(db, select(Workspace).where(Workspace.user_id == user_id))
@@ -31,22 +28,42 @@ class WorkspaceService:
         return workspace
 
     @staticmethod
-    async def create_workspace(db: AsyncSession, user_id: int, body: WorkspaceCreate):
+    async def create_workspace(
+        db: AsyncSession,
+        user_id: int,
+        body: WorkspaceCreate,
+    ):
         result = await db.execute(
             select(
                 exists().where(
-                    Workspace.user_id == user_id, Workspace.name == body.name
+                    Workspace.user_id == user_id,
+                    Workspace.name == body.name,
                 )
             )
         )
-        conflicts = result.scalar_one()
-        if conflicts:
+
+        if result.scalar_one():
             raise HTTPException(status_code=status.HTTP_409_CONFLICT)
 
-        workspace = Workspace(name=body.name, user_id=user_id)
+        workspace = Workspace(
+            name=body.name,
+            user_id=user_id,
+        )
+
         db.add(workspace)
+        await db.flush()
+
+        owner = WorkspaceMembers(
+            user_id=user_id,
+            role="owner",
+            workspace_id=workspace.id,
+        )
+
+        db.add(owner)
+
         await db.commit()
         await db.refresh(workspace)
+
         return workspace
 
     @staticmethod
