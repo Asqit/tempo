@@ -20,4 +20,7 @@
 
 ## Status
 
-⚠️ **No UI components currently use border-radius variables.** The CSS variables are defined but not referenced anywhere in the component library.
+The shared primitives use the radius scale indirectly through Tailwind classes such as
+`rounded-lg`, `rounded-xl`, and `rounded-full`. Feature-level screens also contain a
+separate sharp-corner dialect (`rounded-none`) that should be removed or made intentional
+before extending the UI.

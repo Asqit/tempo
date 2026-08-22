@@ -8,6 +8,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
@@ -27,7 +28,7 @@ export function WorkspaceSelector() {
   });
   const workspaces = data?.items ?? [];
   const active = workspaces.find((w) => w.id === activeWorkspace);
-  const activeWorkspaceName = active?.name ?? "All workspaces";
+  const activeWorkspaceName = active?.name ?? "Všechny workspace";
 
   const handleWorkspaceChange = (id: number | null) => {
     if (id === null) reset();
@@ -40,19 +41,20 @@ export function WorkspaceSelector() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         render={
-          <button
+          <Button
             type="button"
             role="combobox"
             aria-expanded={open}
-            className="flex h-10 w-full items-center gap-2 rounded-md border border-sidebar-border/70 bg-sidebar-accent/35 px-2 text-left hover:bg-sidebar-accent data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            variant="ghost"
+            className="h-10 w-full justify-start gap-2 rounded-lg border border-sidebar-border/70 bg-sidebar-accent/35 px-2 text-left hover:bg-sidebar-accent data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           />
         }
       >
-        <div className="flex size-6 shrink-0 items-center justify-center bg-primary/10 text-primary">
+        <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
           <Building2 className="size-3.5" />
         </div>
         <div className="grid min-w-0 flex-1 text-left leading-tight">
-          <span className="truncate text-[11px] uppercase tracking-wide text-muted-foreground">
+          <span className="truncate text-[11px] tracking-wide text-muted-foreground">
             Workspace
           </span>
           <span className="truncate text-sm font-medium">
@@ -64,9 +66,9 @@ export function WorkspaceSelector() {
 
       <PopoverContent className="w-64 p-0" align="start">
         <Command>
-          <CommandInput placeholder="Search workspaces..." />
+          <CommandInput placeholder="Hledat workspace..." />
           <CommandList>
-            <CommandEmpty>No workspace found.</CommandEmpty>
+            <CommandEmpty>Žádný workspace nenalezen.</CommandEmpty>
             <CommandGroup>
               <CommandItem
                 value="all workspaces"
@@ -78,10 +80,10 @@ export function WorkspaceSelector() {
                     activeWorkspace === null ? "opacity-100" : "opacity-0",
                   )}
                 />
-                All workspaces
+                Všechny workspace
               </CommandItem>
               {isLoading ? (
-                <CommandItem disabled>Loading workspaces...</CommandItem>
+                <CommandItem disabled>Načítám workspace...</CommandItem>
               ) : (
                 workspaces.map((workspace) => (
                   <CommandItem

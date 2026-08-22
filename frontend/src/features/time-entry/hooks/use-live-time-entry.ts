@@ -21,6 +21,7 @@ export function useLiveTimeEntry() {
 
   const isPlaying = id !== null;
   const entry = isPlaying ? data : null; // metadata jen když opravdu běží
+  const currentBillable = data?.billable ?? null;
 
   useEffect(() => {
     if (hydratedFromLastEntry.current || isLoading) return;
@@ -31,7 +32,6 @@ export function useLiveTimeEntry() {
   // živý tikající čas
   useEffect(() => {
     if (!isPlaying || !entry?.start_time) {
-      setElapsed(0);
       return;
     }
     const startedAt = new Date(entry.start_time).getTime();
@@ -67,6 +67,7 @@ export function useLiveTimeEntry() {
           project_id: null,
           start_time: new Date().toISOString(),
           end_time: null,
+          billable: false,
         },
       });
       setId(created.id);
@@ -80,20 +81,23 @@ export function useLiveTimeEntry() {
     try {
       await updateTimeEntry({
         params: { path: { id }, header: workspaceHeader },
-        body: { end_time: new Date().toISOString() },
+        body: {
+          end_time: new Date().toISOString(),
+          billable: currentBillable,
+        },
       });
       setId(null);
     } catch {
       toast.error("Could not stop time entry");
     }
-  }, [id, updateTimeEntry, workspaceHeader]);
+  }, [currentBillable, id, updateTimeEntry, workspaceHeader]);
 
   return {
     id,
     entry,
     isPlaying,
     isLoading,
-    elapsed,
+    elapsed: isPlaying ? elapsed : 0,
     start,
     stop,
   };

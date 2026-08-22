@@ -240,7 +240,7 @@ export function EntriesTable({
   return (
     <div className="space-y-2">
       {showSelection ? (
-        <div className="flex items-center justify-between rounded-none border border-border/70 bg-card px-3 py-2">
+        <div className="flex items-center justify-between rounded-lg border border-border/70 bg-card px-3 py-2">
           <p className="text-xs text-muted-foreground">
             {selectedCount > 0
               ? `Vybrano: ${selectedCount}`
@@ -259,7 +259,7 @@ export function EntriesTable({
         </div>
       ) : null}
 
-      <div className="overflow-hidden rounded-none border border-border/70 bg-card">
+      <div className="overflow-hidden rounded-xl border border-border/70 bg-card">
         <Table>
           <TableHeader>
             <TableRow>
@@ -377,7 +377,7 @@ export function EntriesTable({
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="inline-flex items-center gap-2 rounded-none border border-border/70 bg-muted/25 px-2 py-1 font-mono text-xs tabular-nums text-foreground">
+                      <div className="inline-flex items-center gap-2 rounded-md border border-border/70 bg-muted/25 px-2 py-1 font-mono text-xs tabular-nums text-foreground">
                         <Timer className="size-3.5 text-muted-foreground" />
                         {formatDuration(entry.start_time, entry.end_time)}
                       </div>
@@ -386,8 +386,8 @@ export function EntriesTable({
                       <span
                         className={
                           entry.end_time === null
-                            ? "inline-flex items-center rounded-none bg-primary/15 px-2 py-0.5 text-xs font-semibold text-primary"
-                            : "inline-flex items-center rounded-none bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground"
+                            ? "inline-flex items-center rounded-full bg-primary/15 px-2 py-0.5 text-xs font-semibold text-primary"
+                            : "inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground"
                         }
                       >
                         {entry.end_time === null ? "Běží" : "Ukončeno"}
@@ -403,6 +403,7 @@ export function EntriesTable({
                               project_id: entry.project_id,
                               start_time: entry.start_time,
                               end_time: entry.end_time,
+                              billable: entry.billable,
                             }}
                             onUpdated={() => {
                               void invalidateEntries();

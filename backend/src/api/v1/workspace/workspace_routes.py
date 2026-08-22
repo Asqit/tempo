@@ -38,9 +38,9 @@ async def list_workspaces(
 async def get_workspace(
     workspace_id: int,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)],
+    _: Annotated[User, Depends(get_current_user)],
 ):
-    return await WorkspaceService.get_workspace(db, current_user.id, workspace_id)
+    return await WorkspaceService.get_workspace(db, workspace_id)
 
 
 @router.put("/{workspace_id}", response_model=WorkspaceRead)

@@ -7,6 +7,7 @@ import {
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { $api, getWorkspaceHeader } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import { ProjectsTable } from "@/features/projects/components/projects-table";
 import { ClientHeader } from "./components/client-header";
 
@@ -95,6 +96,7 @@ export function ClientDetail({ id }: ClientDetailProps) {
 
       <div className="grid sm:grid-cols-3">
         <OverviewCard
+          index={0}
           icon={FolderKanban}
           label="Projekty"
           value={projects?.total ?? "—"}
@@ -102,6 +104,7 @@ export function ClientDetail({ id }: ClientDetailProps) {
         />
 
         <OverviewCard
+          index={1}
           icon={CircleDollarSign}
           label="Hodinová sazba"
           value={
@@ -117,6 +120,7 @@ export function ClientDetail({ id }: ClientDetailProps) {
         />
 
         <OverviewCard
+          index={2}
           icon={CalendarDays}
           label="Spolupráce od"
           value={formatDate(client.created_at)}
@@ -146,13 +150,11 @@ export function ClientDetail({ id }: ClientDetailProps) {
             </div>
           </div>
 
-          <div className="overflow-hidden">
-            <ProjectsTable clientId={id} />
-          </div>
+          <ProjectsTable clientId={id} />
         </section>
 
         <aside className="space-y-4">
-          <div className=" border bg-card">
+          <div className="overflow-hidden rounded-xl border border-border/70 bg-card">
             <div className="flex items-center justify-between border-b px-5 py-4">
               <div>
                 <h3 className="font-heading text-sm font-semibold">
@@ -196,7 +198,7 @@ export function ClientDetail({ id }: ClientDetailProps) {
             </div>
           </div>
 
-          <div className=" bg-muted/50 p-5">
+          <div className="rounded-xl border border-border/70 bg-muted/50 p-5">
             <p className="text-xs font-medium text-muted-foreground">TIP</p>
 
             <p className="mt-2 text-sm leading-relaxed">
@@ -211,6 +213,7 @@ export function ClientDetail({ id }: ClientDetailProps) {
 }
 
 type OverviewCardProps = {
+  index: number;
   icon: React.ElementType;
   label: string;
   value: string | number;
@@ -218,15 +221,22 @@ type OverviewCardProps = {
 };
 
 function OverviewCard({
+  index,
   icon: Icon,
   label,
   value,
   description,
 }: OverviewCardProps) {
   return (
-    <div className="group border p-5 transition-colors">
+    <div
+      className={cn(
+        "group rounded-none border border-border/70 bg-card p-5 transition-colors",
+        index === 0 && "rounded-t-xl sm:rounded-tr-none sm:rounded-l-xl",
+        index === 2 && "rounded-b-xl sm:rounded-bl-none sm:rounded-r-xl",
+      )}
+    >
       <div className="flex items-start justify-between">
-        <div className="flex size-9 items-center justify-center  bg-muted">
+        <div className="flex size-9 items-center justify-center rounded-lg bg-muted">
           <Icon className="size-4 text-muted-foreground" />
         </div>
       </div>
@@ -256,7 +266,7 @@ type InfoRowProps = {
 function InfoRow({ icon: Icon, label, value, mono = false }: InfoRowProps) {
   return (
     <div className="flex items-center gap-3 px-5 py-4">
-      <div className="flex size-8 shrink-0 items-center justify-center  bg-muted">
+      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted">
         <Icon className="size-3.5 text-muted-foreground" />
       </div>
 
@@ -299,10 +309,19 @@ function ClientDetailSkeleton() {
         <Skeleton className="h-12 w-72" />
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid sm:grid-cols-3">
         {Array.from({ length: 3 }).map((_, index) => (
-          <div key={index} className=" border p-5">
-            <Skeleton className="size-9 " />
+          <div
+            key={index}
+            className={cn(
+              "rounded-none border border-border/70 bg-card p-5",
+              index === 0 &&
+                "rounded-t-xl sm:rounded-tr-none sm:rounded-l-xl",
+              index === 2 &&
+                "rounded-b-xl sm:rounded-bl-none sm:rounded-r-xl",
+            )}
+          >
+            <Skeleton className="size-9 rounded-lg" />
             <Skeleton className="mt-5 h-3 w-20" />
             <Skeleton className="mt-2 h-7 w-32" />
             <Skeleton className="mt-2 h-3 w-36" />
@@ -321,7 +340,7 @@ function ClientDetailSkeleton() {
             <Skeleton className="h-8 w-24" />
           </div>
 
-          <div className="overflow-hidden  border">
+          <div className="overflow-hidden rounded-xl border border-border/70 bg-card">
             <div className="border-b p-5">
               <Skeleton className="h-4 w-40" />
             </div>
@@ -335,7 +354,7 @@ function ClientDetailSkeleton() {
         </section>
 
         <aside className="space-y-4">
-          <div className=" border">
+          <div className="overflow-hidden rounded-xl border border-border/70 bg-card">
             <div className="border-b p-5">
               <Skeleton className="h-4 w-24" />
               <Skeleton className="mt-2 h-3 w-36" />
@@ -344,7 +363,7 @@ function ClientDetailSkeleton() {
             <div className="divide-y">
               {Array.from({ length: 4 }).map((_, index) => (
                 <div key={index} className="flex gap-3 p-5">
-                  <Skeleton className="size-8 " />
+                  <Skeleton className="size-8 rounded-lg" />
                   <div className="flex-1">
                     <Skeleton className="h-3 w-20" />
                     <Skeleton className="mt-2 h-4 w-28" />
@@ -354,7 +373,7 @@ function ClientDetailSkeleton() {
             </div>
           </div>
 
-          <Skeleton className="h-28 w-full " />
+          <Skeleton className="h-28 w-full rounded-xl" />
         </aside>
       </div>
     </section>

@@ -6,7 +6,6 @@ import {
   ChevronsUpDown,
   LogOut,
   Settings,
-  UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { ModeToggle } from "@/components/ui/mode-toggle";
@@ -30,6 +29,7 @@ import { useAuthStore } from "@/features/auth";
 import { useWorkspaceStore } from "@/features/workspaces/store";
 import { $api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { WorkspaceShare } from "@/features/workspaces/components/workspace-share";
 
 export function SidebarAccount() {
   const { user, logout } = useAuthStore.getState();
@@ -50,7 +50,7 @@ export function SidebarAccount() {
 
   const workspaces = data?.items ?? [];
   const active = workspaces.find((w) => w.id === activeWorkspace);
-  const activeWorkspaceName = active?.name ?? "Všechny workspaces";
+  const activeWorkspaceName = active?.name ?? "Všechny workspace";
 
   const handleWorkspaceChange = (id: number | null) => {
     if (id === null) reset();
@@ -64,7 +64,7 @@ export function SidebarAccount() {
       await logoutMutation({ params: { cookie: { refresh_token: null } } });
       logout();
       navigate({ to: "/" });
-    } catch (_) {
+    } catch {
       toast.error("Nešlo se odhlásit");
     }
   };
@@ -72,11 +72,6 @@ export function SidebarAccount() {
   const goToWorkspaceSettings = () => {
     setOpen(false);
     navigate({ to: "/app/settings/workspace" });
-  };
-
-  const goToInvite = () => {
-    setOpen(false);
-    toast.info("Pozvání členů zatím není hotové 🚧");
   };
 
   const goToAccountSettings = () => {
@@ -92,7 +87,7 @@ export function SidebarAccount() {
             render={
               <button
                 type="button"
-                className="flex h-9 rounded-md w-full items-center gap-1.5 border border-sidebar-border/70 bg-sidebar-accent/35 px-2 text-left text-sm font-medium hover:bg-sidebar-accent data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                className="flex h-9 w-full items-center gap-1.5 rounded-lg border border-sidebar-border/70 bg-sidebar-accent/35 px-2 text-left text-sm font-medium outline-none transition-colors hover:bg-sidebar-accent focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               />
             }
           >
@@ -122,10 +117,7 @@ export function SidebarAccount() {
                 <Settings className="size-3.5" />
                 Nastavení
               </Button>
-              <Button size="sm" variant="outline" onClick={goToInvite}>
-                <UserPlus className="size-3.5" />
-                Pozvat
-              </Button>
+              <WorkspaceShare />
             </div>
 
             <div className="border-t" />
@@ -135,7 +127,7 @@ export function SidebarAccount() {
               <CommandInput placeholder="Hledat workspace..." />
               <CommandList>
                 <CommandEmpty>Žádný workspace nenalezen.</CommandEmpty>
-                <CommandGroup heading="Workspaces">
+                <CommandGroup heading="Workspace">
                   <CommandItem
                     value="all workspaces"
                     onSelect={() => handleWorkspaceChange(null)}
@@ -180,7 +172,7 @@ export function SidebarAccount() {
               <button
                 type="button"
                 onClick={goToAccountSettings}
-                className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
+                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring/50"
               >
                 <ColorAvatar name={user.name} className="size-6" />
                 <div className="min-w-0 flex-1 text-left leading-tight">
@@ -199,7 +191,7 @@ export function SidebarAccount() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-red-600 hover:bg-red-50"
+                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-destructive outline-none hover:bg-destructive/10 focus-visible:ring-2 focus-visible:ring-ring/50"
               >
                 <LogOut className="size-3.5" />
                 Odhlásit se

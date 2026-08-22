@@ -4,7 +4,7 @@ import { ClientPicker } from "@/features/clients/components/client-picker";
 import { ProjectPicker } from "@/features/projects/components/project-picker";
 import { $api, getWorkspaceHeader } from "@/lib/api";
 import { Pause, Play, Tag, User2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
@@ -28,7 +28,10 @@ function formatElapsedTime(durationMs: number) {
 
 export function TimerCRUD({ id, state, callback }: Props) {
   const hasId = id !== null && id !== undefined;
-  const workspaceHeader = getWorkspaceHeader() ?? { "X-Workspace-Id": 0 };
+  const workspaceHeader = useMemo(
+    () => getWorkspaceHeader() ?? { "X-Workspace-Id": 0 },
+    [],
+  );
   const [now, setNow] = useState(() => Date.now());
   const [clientId, setClientId] = useState<number | null>(null);
   const [projectId, setProjectId] = useState<number | null>(null);
@@ -46,6 +49,7 @@ export function TimerCRUD({ id, state, callback }: Props) {
   );
 
   const { mutateAsync } = $api.useMutation("put", "/api/v1/time-entries/{id}");
+  const currentBillable = data?.billable ?? null;
 
   useEffect(() => {
     if (!data?.start_time || data.end_time) return;
@@ -63,7 +67,9 @@ export function TimerCRUD({ id, state, callback }: Props) {
     async (type: ActionType, value: string | number) => {
       if (!hasId) return;
 
-      const payload: components["schemas"]["TimeEntryUpdate"] = {};
+      const payload: components["schemas"]["TimeEntryUpdate"] = {
+        billable: currentBillable,
+      };
       switch (type) {
         case "client":
           payload.client_id = Number(value);
@@ -87,7 +93,7 @@ export function TimerCRUD({ id, state, callback }: Props) {
         });
       }
     },
-    [hasId, id, mutateAsync, workspaceHeader],
+    [currentBillable, hasId, id, mutateAsync, workspaceHeader],
   );
 
   const debouncedUpdate = useDebounceCallback(handleUpdate, 500);
@@ -110,12 +116,16 @@ export function TimerCRUD({ id, state, callback }: Props) {
         <div>
           {state === "playing" && (
             <div className="flex items-center gap-2 text-xs text-primary">
-              <div className="size-2 bg-primary" /> AKTIVNÍ SESSION
+              <div className="size-2 rounded-full bg-primary" /> AKTIVNÍ MĚŘENÍ
             </div>
           )}
+          <label htmlFor="active-time-entry-description" className="sr-only">
+            Popis úkolu
+          </label>
           <input
+            id="active-time-entry-description"
             disabled={isDisabled}
-            className="min-w-56 flex-1 bg-transparent text-3xl font-black p-1 focus:outline-none focus:border-b border-primary"
+            className="min-w-56 flex-1 rounded-md bg-transparent px-2 py-1 text-3xl font-black outline-none transition-colors placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-ring"
             type="text"
             placeholder="Zadejte popis úlohy"
             defaultValue={data?.description ?? ""}
@@ -171,7 +181,7 @@ export function TimerCRUD({ id, state, callback }: Props) {
             "text-3xl font-black tabular-nums",
             state === "playing" && "text-primary",
           )}
-          aria-label="Elapsed time"
+          aria-label="Uplynulý čas"
         >
           {formatElapsedTime(elapsedTimeMs)}
         </time>
@@ -184,7 +194,7 @@ export function TimerCRUD({ id, state, callback }: Props) {
           ) : (
             <Play className="ml-0.5 group-hover:fill-current group-hover:stroke-none" />
           )}
-          {state === "playing" ? "STOP" : "START"}
+          {state === "playing" ? "Zastavit" : "Spustit"}
         </Button>
       </div>
     </div>

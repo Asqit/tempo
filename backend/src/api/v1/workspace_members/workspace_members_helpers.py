@@ -31,13 +31,17 @@ async def get_member(db: AsyncSession, workspace_id: int, user_id: int):
     return result.scalar_one_or_none()
 
 
-async def require_workspace_role(
-    min_role: WorkspaceRole,
-    workspace_id: int,
-    user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
-):
-    member = await get_member(db, workspace_id, user.id)
-    if not member or not has_permission(member.role, min_role):
-        raise HTTPException(403, "Not enough permissions")
-    return member
+def require_role(min_role: WorkspaceRole):
+    """Factory: returns a FastAPI dependency enforcing min_role in a workspace."""
+
+    async def dependency(
+        workspace_id: int,
+        user: Annotated[User, Depends(get_current_user)],
+        db: Annotated[AsyncSession, Depends(get_db)],
+    ) -> WorkspaceMembers:
+        member = await get_member(db, workspace_id, user.id)
+        if not member or not has_permission(member.role, min_role):
+            raise HTTPException(403, "Not enough permissions")
+        return member
+
+    return dependency

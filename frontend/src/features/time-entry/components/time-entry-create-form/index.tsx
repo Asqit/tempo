@@ -74,6 +74,7 @@ export function TimeEntryCreateForm({ onCreated }: TimeEntryCreateFormProps) {
           client_id: clientId,
           start_time: nextStartTime,
           end_time: nextEndTime,
+          billable: false,
         },
       });
 

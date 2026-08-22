@@ -78,7 +78,7 @@ export function ClientCreateDialog({
   });
 
   const dialogContent = (
-    <DialogContent className="rounded-none border-border/80 sm:max-w-md">
+    <DialogContent className="border-border/80 sm:max-w-md">
       <DialogHeader>
         <DialogTitle>Nový klient</DialogTitle>
         <DialogDescription>

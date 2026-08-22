@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { $api, getWorkspaceHeader } from "@/lib/api";
 import { ClientPicker } from "@/features/clients/components/client-picker";
+import { DatePicker } from "@/components/share/date-picker";
 
 function toDateTimeLocalInput(value: string | null): string {
   if (!value) {
@@ -134,17 +135,15 @@ export function ProjectUpdateForm({
         disabled={isPending}
         placeholder="Vyber klienta"
       />
-      <Input
-        type="datetime-local"
-        value={startTime}
-        onChange={(event) => setStartTime(event.target.value)}
-        disabled={isPending}
+      <DatePicker
+        value={new Date(startTime)}
+        setValue={(d) => setStartTime(d.toISOString())}
+        withTime
       />
-      <Input
-        type="datetime-local"
-        value={endTime}
-        onChange={(event) => setEndTime(event.target.value)}
-        disabled={isPending}
+      <DatePicker
+        value={new Date(endTime)}
+        setValue={(d) => setEndTime(d.toISOString())}
+        withTime
       />
       <div className="flex justify-end">
         <Button type="submit" disabled={isPending}>

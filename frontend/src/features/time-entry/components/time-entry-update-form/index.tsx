@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,12 @@ import { ProjectPicker } from "@/features/projects/components/project-picker";
 import { DatePicker } from "@/components/share/date-picker";
 import { $api, getWorkspaceHeader } from "@/lib/api";
 import { Switch } from "@/components/ui/switch";
+import {
+  Field,
+  FieldContent,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 
 type TimeEntryUpdateFormProps = {
   id: number;
@@ -72,14 +78,8 @@ export function TimeEntryUpdateForm({
     [projectData],
   );
 
-  useEffect(() => {
-    if (projectId === null) {
-      setClientId(null);
-      return;
-    }
-
-    setClientId(projectClientId);
-  }, [projectClientId, projectId]);
+  const resolvedClientId =
+    projectId === null ? null : projectClientId ?? clientId;
 
   const { mutateAsync, isPending } = $api.useMutation(
     "put",
@@ -110,10 +110,10 @@ export function TimeEntryUpdateForm({
         body: {
           description: description.trim() || null,
           project_id: projectId,
-          client_id: clientId,
+          client_id: resolvedClientId,
           start_time: startTime.toISOString(),
           end_time: endTime ? endTime.toISOString() : null,
-          billable: false,
+          billable,
         },
       });
 
@@ -125,43 +125,89 @@ export function TimeEntryUpdateForm({
   };
 
   return (
-    <form className="grid gap-3" onSubmit={handleSubmit}>
-      <Input
-        value={description}
-        onChange={(event) => setDescription(event.target.value)}
-        placeholder="Popis výkazu"
-        disabled={isPending}
-      />
+    <form className="grid gap-4" onSubmit={handleSubmit}>
+      <FieldGroup>
+        <Field>
+          <FieldLabel htmlFor="time-entry-description">Popis výkazu</FieldLabel>
+          <FieldContent>
+            <Input
+              id="time-entry-description"
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              placeholder="Např. návrh úvodní stránky"
+              disabled={isPending}
+            />
+          </FieldContent>
+        </Field>
 
-      <ProjectPicker
-        value={projectId}
-        onChange={setProjectId}
-        disabled={isPending}
-        placeholder="Vyber projekt"
-      />
+        <Field>
+          <FieldLabel htmlFor="time-entry-project">Projekt</FieldLabel>
+          <FieldContent>
+            <ProjectPicker
+              id="time-entry-project"
+              value={projectId}
+              onChange={(nextProjectId) => {
+                setProjectId(nextProjectId);
+                setClientId(null);
+              }}
+              disabled={isPending}
+              placeholder="Vyber projekt"
+            />
+          </FieldContent>
+        </Field>
 
-      <ClientPicker
-        value={clientId}
-        onChange={setClientId}
-        disabled={isPending}
-        placeholder="Vyber klienta"
-      />
+        <Field>
+          <FieldLabel htmlFor="time-entry-client">Klient</FieldLabel>
+          <FieldContent>
+            <ClientPicker
+              id="time-entry-client"
+              value={resolvedClientId}
+              onChange={setClientId}
+              disabled={isPending}
+              placeholder="Vyber klienta"
+            />
+          </FieldContent>
+        </Field>
 
-      <DatePicker
-        value={startTime}
-        setValue={setStartTime}
-        withTime
-        label="Začátek"
-      />
+        <Field>
+          <FieldLabel htmlFor="time-entry-start">Začátek</FieldLabel>
+          <FieldContent>
+            <DatePicker
+              id="time-entry-start"
+              value={startTime}
+              setValue={setStartTime}
+              withTime
+            />
+          </FieldContent>
+        </Field>
 
-      <DatePicker
-        value={endTime ?? new Date()}
-        setValue={setEndTime}
-        withTime
-        label="Konec"
-      />
+        <Field>
+          <FieldLabel htmlFor="time-entry-end">Konec</FieldLabel>
+          <FieldContent>
+            <DatePicker
+              id="time-entry-end"
+              value={endTime ?? new Date()}
+              setValue={setEndTime}
+              withTime
+            />
+          </FieldContent>
+        </Field>
 
-      <Switch checked={billable} onCheckedChange={(b) => setBillable(b)} />
+        <Field
+          orientation="horizontal"
+          className="items-center justify-between rounded-lg border px-3 py-2.5"
+        >
+          <FieldContent>
+            <FieldLabel htmlFor="time-entry-billable">Zpoplatnit výkaz</FieldLabel>
+          </FieldContent>
+          <Switch
+            id="time-entry-billable"
+            checked={billable}
+            onCheckedChange={setBillable}
+            disabled={isPending}
+          />
+        </Field>
+      </FieldGroup>
 
       <div className="flex justify-end">
         <Button type="submit" disabled={isPending}>

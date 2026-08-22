@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import secrets
 from datetime import UTC, datetime, timedelta
 from hashlib import sha256
@@ -9,11 +7,11 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from pwdlib import PasswordHash
-from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from src.api.v1.auth.auth_models import User
+from src.api.v1.auth.auth_schemas import Token, TokenData
 from src.core.config import app_config
 from src.core.database import get_db
 
@@ -23,15 +21,6 @@ ALGORITHM = "HS256"
 ACCESS_EXPIRY = 30
 
 oauth2_schema = OAuth2PasswordBearer(tokenUrl="auth")
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenData(BaseModel):
-    email: str
 
 
 def hash256_token(token: str) -> str:

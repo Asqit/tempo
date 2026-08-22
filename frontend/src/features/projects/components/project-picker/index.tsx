@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, type ReactElement } from "react";
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,14 @@ type ProjectPickerProps = {
   onChange: (nextValue: number) => void;
   disabled?: boolean;
   placeholder?: string;
+  id?: string;
+  trigger?: (props: {
+    selected: ProjectOption | null;
+    disabled: boolean;
+    isLoading: boolean;
+    placeholder: string;
+    id?: string;
+  }) => ReactElement;
 };
 
 function normalizeProjects(data: unknown): ProjectOption[] {
@@ -61,6 +69,8 @@ export function ProjectPicker({
   onChange,
   disabled = false,
   placeholder = "Vyber projekt",
+  id,
+  trigger,
 }: ProjectPickerProps) {
   const workspaceHeader = getWorkspaceHeader();
 
@@ -92,24 +102,39 @@ export function ProjectPicker({
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button
-            type="button"
-            variant="outline"
-            disabled={isDisabled}
-            className="min-w-48 justify-between"
-          />
+          trigger ? (
+            trigger({
+              selected,
+              disabled: isDisabled,
+              isLoading,
+              placeholder,
+              id,
+            })
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              id={id}
+              disabled={isDisabled}
+              className="min-w-48 justify-between"
+            />
+          )
         }
       >
-        <span className="truncate">
-          {selected?.name ??
-            (isLoading
-              ? "Načítám projekty..."
-              : options.length
-                ? placeholder
-                : "Projekty nenalezeny")}
-        </span>
+        {!trigger ? (
+          <>
+            <span className="truncate">
+              {selected?.name ??
+                (isLoading
+                  ? "Načítám projekty..."
+                  : options.length
+                    ? placeholder
+                    : "Projekty nenalezeny")}
+            </span>
 
-        <ChevronsUpDownIcon className="size-4" />
+            <ChevronsUpDownIcon className="size-4" />
+          </>
+        ) : null}
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-64">

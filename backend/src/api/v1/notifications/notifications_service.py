@@ -1,12 +1,23 @@
+from fastapi_pagination import paginate
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.api.v1.notifications.notifications_models import Notification
+
+
 class NotificationsService:
-  @staticmethod
-  async def get_notifications():
-    pass
+    @staticmethod
+    async def get_notifications(db: AsyncSession, user_id: int, unread: bool = False):
+        filters = [Notification.user_id == user_id]
+        if unread:
+            filters.append(Notification.read_at == None)
 
-  @staticmethod
-  async def read_notification():
-    pass
+        return await paginate(db, select(Notification).where(*filters))
 
-  @staticmethod
-  async def create_notification():
-    pass
+    @staticmethod
+    async def read_notification():
+        pass
+
+    @staticmethod
+    async def create_notification():
+        pass

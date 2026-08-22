@@ -4,8 +4,8 @@ import { ProjectsTable } from "@/features/projects/components/projects-table";
 import { ProjectCreate } from "@/features/projects/components/project-create";
 import { ClientPicker } from "@/features/clients/components/client-picker";
 import { createFileRoute } from "@tanstack/react-router";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/share/page-header";
 
 export const Route = createFileRoute("/app/projects/")({
   component: ProjectsPage,
@@ -15,17 +15,14 @@ function ProjectsPage() {
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
 
   return (
-    <div className="space-y-6">
-      <header className="flex items-center justify-between">
-        <div>
-          <h2 className="text-muted-foreground text-xs uppercase">dodávka</h2>
-          <h1 className="text-3xl uppercase font-black">Projekty</h1>
-        </div>
-        <ProjectCreate />
-      </header>
-      <Separator />
-      <main>
-        <div className="flex flex-col gap-3 rounded-none border border-border/70 bg-muted/25 p-3 md:flex-row md:items-center md:justify-between">
+    <div className="space-y-6 animate-in fade-in duration-300 ease-out fill-mode-both">
+      <PageHeader
+        eyebrow="Dodávka"
+        title="Projekty"
+        actions={<ProjectCreate />}
+      />
+      <main className="animate-in fade-in slide-in-from-bottom-2 duration-500 ease-out delay-100 fill-mode-both">
+        <div className="flex flex-col gap-3 rounded-lg border border-border/70 bg-muted/25 p-3 md:flex-row md:items-center md:justify-between">
           <div className="space-y-1">
             <p className="text-sm font-medium text-foreground">
               Filtrovat podle klienta

@@ -20,6 +20,7 @@ type TimeEntryUpdateDialogProps = {
     project_id: number | null;
     start_time: string;
     end_time: string | null;
+    billable: boolean;
   };
   onUpdated?: () => void;
   children?: ReactNode;
@@ -64,6 +65,7 @@ export function TimeEntryUpdateDialog({
           initialProjectId={entry.project_id}
           initialStartTime={entry.start_time}
           initialEndTime={entry.end_time}
+          initialBillable={entry.billable}
           onUpdated={handleUpdated}
         />
       </DialogContent>

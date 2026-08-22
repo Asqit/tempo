@@ -13,8 +13,9 @@ export function ClientHeader({ client }: ClientHeaderProps) {
   return (
     <header className="flex items-center justify-between">
       <div>
-        <div className="flex items-center gap-2 uppercase text-xs bg-primary/10 dark:text-primary border border-primary p-1 w-fit mb-3">
-          <div className="size-2 bg-primary" /> <span>Vybraný klient</span>
+        <div className="mb-3 flex w-fit items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-2 py-1 text-xs uppercase text-primary">
+          <div className="size-2 rounded-full bg-primary" />
+          <span>Vybraný klient</span>
         </div>
         <h1 className="text-3xl uppercase font-black">{client.name}</h1>
       </div>

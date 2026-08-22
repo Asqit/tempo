@@ -1,8 +1,8 @@
-import { Separator } from "@/components/ui/separator";
 import { SavedReportDetails } from "@/features/reports/components/saved-report-details";
 import { useWorkspaceStore } from "@/features/workspaces/store";
 import { $api } from "@/lib/api";
 import { createFileRoute } from "@tanstack/react-router";
+import { PageHeader } from "@/components/share/page-header";
 
 export const Route = createFileRoute("/app/reports/saved/$id")({
   component: RouteComponent,
@@ -35,17 +35,18 @@ function RouteComponent() {
   if (isLoading) return null;
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h2 className="text-muted-foreground text-xs uppercase">
-          Uložený report
-        </h2>
-        <h1 className="text-3xl font-black uppercase">
-          Report <span className="text-primary">{data.name}</span>
-        </h1>
-      </header>
-      <Separator />
-      <SavedReportDetails report={data} data={data.snapshots} />
+    <div className="space-y-6 animate-in fade-in duration-300 ease-out fill-mode-both">
+      <PageHeader
+        eyebrow="Uložený report"
+        title={
+          <>
+            Report <span className="text-primary">{data.name}</span>
+          </>
+        }
+      />
+      <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 ease-out delay-100 fill-mode-both">
+        <SavedReportDetails report={data} data={data.snapshots} />
+      </div>
     </div>
   );
 }

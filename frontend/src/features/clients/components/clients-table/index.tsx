@@ -82,7 +82,7 @@ export function ClientsTable() {
 
   return (
     <div className="space-y-3">
-      <div className="overflow-hidden rounded-none border border-border/70 bg-card">
+      <div className="overflow-hidden rounded-xl border border-border/70 bg-card">
         <Table>
           <TableHeader>
             <TableRow>

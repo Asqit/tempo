@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { ReportDetail } from "@/features/reports/components/report-details/";
 import { ReportsToolbar } from "@/features/reports/components/reports-toolbar";
 import { useWorkspaceStore } from "@/features/workspaces/store";
+import { PageHeader } from "@/components/share/page-header";
 import { $api } from "@/lib/api";
 import { createFileRoute } from "@tanstack/react-router";
 import { Save } from "lucide-react";
@@ -62,27 +62,26 @@ function RouteComponent() {
   };
 
   return (
-    <div className="space-y-6">
-      <header className="mb-4 flex items-center justify-between">
-        <div>
-          <h2 className="text-muted-foreground text-xs uppercase">Správa</h2>
-          <h1 className="text-3xl font-black uppercase">Reporty</h1>
-        </div>
-        <div>
+    <div className="space-y-6 animate-in fade-in duration-300 ease-out fill-mode-both">
+      <PageHeader
+        eyebrow="Správa"
+        title="Reporty"
+        actions={
           <Button onClick={() => handleSave()}>
             <Save /> Uložit
           </Button>
-        </div>
-      </header>
-      <Separator />
-      <ReportsToolbar
-        setStartTime={setPeriodStart}
-        setEndTime={setPeriodEnd}
-        setClientId={setClientId}
-        setProjectId={setProjectId}
-        setBillable={setBillable}
+        }
       />
-      {isLoading ? null : <ReportDetail data={data} />}
+      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500 ease-out delay-100 fill-mode-both">
+        <ReportsToolbar
+          setStartTime={setPeriodStart}
+          setEndTime={setPeriodEnd}
+          setClientId={setClientId}
+          setProjectId={setProjectId}
+          setBillable={setBillable}
+        />
+        {isLoading ? null : <ReportDetail data={data} />}
+      </div>
     </div>
   );
 }

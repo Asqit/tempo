@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, type ReactElement } from "react";
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,14 @@ type ClientPickerProps = {
   onChange: (nextValue: number) => void;
   disabled?: boolean;
   placeholder?: string;
+  id?: string;
+  trigger?: (props: {
+    selected: ClientOption | null;
+    disabled: boolean;
+    isLoading: boolean;
+    placeholder: string;
+    id?: string;
+  }) => ReactElement;
 };
 
 function normalizeClients(data: unknown): ClientOption[] {
@@ -117,12 +125,11 @@ export function ClientPicker({
   onChange,
   disabled = false,
   placeholder = "Vyber klienta",
+  id,
+  trigger,
 }: ClientPickerProps) {
   const workspaceHeader = getWorkspaceHeader();
-  const [page, setPage] = useState(1);
-  const [loadedPages, setLoadedPages] = useState<Record<number, ClientPage>>(
-    {},
-  );
+  const [pageSize, setPageSize] = useState(10);
 
   const { data, isLoading, isFetching } = $api.useQuery(
     "get",
@@ -130,8 +137,8 @@ export function ClientPicker({
     {
       params: {
         query: {
-          page,
-          size: 10,
+          page: 1,
+          size: pageSize,
         },
         header: workspaceHeader,
       },
@@ -139,47 +146,20 @@ export function ClientPicker({
     },
   );
 
-  useEffect(() => {
-    if (!data) {
-      return;
-    }
-
-    const pageData = normalizeClientsPage(data);
-
-    setLoadedPages((current) => ({
-      ...current,
-      [pageData.page]: pageData,
-    }));
-  }, [data]);
-
   const currentPageData = useMemo(() => {
-    if (data) {
-      return normalizeClientsPage(data);
-    }
+    return data
+      ? normalizeClientsPage(data)
+      : { options: [], page: 1, pages: 1, total: 0, size: pageSize };
+  }, [data, pageSize]);
 
-    return (
-      loadedPages[page] ?? {
-        options: [],
-        page,
-        pages: 1,
-        total: 0,
-        size: 10,
-      }
-    );
-  }, [data, loadedPages, page]);
-
-  const options = useMemo(() => {
-    return Object.values(loadedPages)
-      .sort((left, right) => left.page - right.page)
-      .flatMap((pageData) => pageData.options);
-  }, [loadedPages]);
+  const options = currentPageData.options;
 
   const selected = useMemo(
     () => options.find((option) => option.id === value) ?? null,
     [options, value],
   );
 
-  const hasMore = currentPageData.pages > currentPageData.page;
+  const hasMore = pageSize < 100 && currentPageData.total > options.length;
   const isDisabled = disabled || isLoading || !options.length;
 
   const handleSelect = (nextValue: number) => {
@@ -191,7 +171,7 @@ export function ClientPicker({
       return;
     }
 
-    setPage((current) => current + 1);
+    setPageSize((current) => Math.min(100, current + 10));
   };
 
   if (!workspaceHeader) {
@@ -202,24 +182,39 @@ export function ClientPicker({
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button
-            type="button"
-            variant="outline"
-            disabled={isDisabled}
-            className="min-w-48 justify-between"
-          />
+          trigger ? (
+            trigger({
+              selected,
+              disabled: isDisabled,
+              isLoading,
+              placeholder,
+              id,
+            })
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              id={id}
+              disabled={isDisabled}
+              className="min-w-48 justify-between"
+            />
+          )
         }
       >
-        <span className="truncate">
-          {selected?.name ??
-            (isLoading
-              ? "Načítám klienty..."
-              : options.length
-                ? placeholder
-                : "Klienti nenalezeni")}
-        </span>
+        {!trigger ? (
+          <>
+            <span className="truncate">
+              {selected?.name ??
+                (isLoading
+                  ? "Načítám klienty..."
+                  : options.length
+                    ? placeholder
+                    : "Klienti nenalezeni")}
+            </span>
 
-        <ChevronsUpDownIcon className="size-4" />
+            <ChevronsUpDownIcon className="size-4" />
+          </>
+        ) : null}
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-64">

@@ -38,7 +38,7 @@ export function ProjectWeeklyChart({
   formatHours,
 }: ProjectWeeklyChartProps) {
   return (
-    <div className="rounded-none border border-border/70 bg-card p-3">
+    <div className="rounded-xl border border-border/70 bg-card p-3">
       <div className="mb-2 flex items-center justify-between">
         <h3 className="text-sm font-semibold">Aktivita v aktualnim tydnu</h3>
         <p className="text-xs text-muted-foreground">
@@ -81,7 +81,7 @@ export function ProjectWeeklyChart({
             <Bar
               dataKey="hours"
               fill="var(--color-hours)"
-              radius={[0, 0, 0, 0]}
+              radius={[4, 4, 0, 0]}
             />
           </BarChart>
         </ChartContainer>

@@ -22,6 +22,7 @@ interface Props {
   setValue(d: Date): void;
   withTime?: boolean;
   label?: string;
+  id?: string;
 }
 
 function mergeDateAndTime(date: Date, time: string): Date {
@@ -36,7 +37,11 @@ export function DatePicker({
   setValue,
   withTime = false,
   label = "Vyber datum",
+  id,
 }: Props) {
+  const generatedId = React.useId();
+  const inputId = id ?? `date-picker-${generatedId.replaceAll(":", "")}`;
+  const timeInputId = `${inputId}-time`;
   const [date, setDate] = React.useState<Date>(value ?? new Date());
   const [time, setTime] = React.useState<string>(
     format(value ?? new Date(), "HH:mm:ss"),
@@ -59,6 +64,7 @@ export function DatePicker({
         render={
           <Button
             variant="outline"
+            id={id}
             data-empty={!date}
             className="justify-start text-left font-normal data-[empty=true]:text-muted-foreground"
           />
@@ -82,10 +88,10 @@ export function DatePicker({
           <div className="border-t bg-card p-3">
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="time">Čas</FieldLabel>
+                <FieldLabel htmlFor={timeInputId}>Čas</FieldLabel>
                 <InputGroup>
                   <InputGroupInput
-                    id="time"
+                    id={timeInputId}
                     type="time"
                     step="1"
                     value={time}

@@ -1,10 +1,7 @@
 import { Outlet } from "@tanstack/react-router";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./components/app-sidebar";
+import { AppHeader } from "./components/app-header";
 import { useWorkspaceStore } from "@/features/workspaces/store";
 import { WorkspaceOverview } from "@/features/workspaces/components/workspace-overview";
 
@@ -19,8 +16,9 @@ export function AppLayout() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <div className="flex min-h-svh flex-col py-4 bg-sidebar">
-          <main className="flex-1 px-4 py-5 md:px-8 md:py-7 rounded-tl-lg bg-background">
+        <div className="flex min-h-svh flex-col bg-sidebar pl-4">
+          <AppHeader />
+          <main className="flex-1 rounded-tl-xl bg-background px-4 py-5 md:px-8 md:py-7">
             <Outlet />
           </main>
         </div>

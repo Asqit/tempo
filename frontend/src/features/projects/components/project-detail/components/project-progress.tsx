@@ -21,7 +21,7 @@ export function ProjectProgress({
   endDate,
 }: ProjectProgressProps) {
   return (
-    <div className="rounded-none border border-border/70 bg-card p-3 space-y-3">
+    <div className="space-y-3 rounded-xl border border-border/70 bg-card p-3">
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">{formatDate(startDate)}</span>
         <span className="text-muted-foreground">{formatDate(endDate)}</span>

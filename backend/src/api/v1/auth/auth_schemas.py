@@ -1,11 +1,13 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from src.api.v1.auth.auth_helpers import Token
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    email: str
 
 
 class UserCreate(BaseModel):

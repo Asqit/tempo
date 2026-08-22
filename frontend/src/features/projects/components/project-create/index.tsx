@@ -10,6 +10,7 @@ import { ClientPicker } from "@/features/clients/components/client-picker";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -23,30 +24,13 @@ import {
 } from "@/components/ui/field";
 import { ColorAvatar } from "@/components/share/color-avatar";
 import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/share/date-picker";
+import { useMemo } from "react";
 
 type ProjectCreateFormProps = {
   onCreated?: () => void;
   trigger?: React.ReactNode;
 };
-
-function toDateTimeLocalInput(value: string | null): string {
-  if (!value) {
-    return "";
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
 
 function fromDateTimeLocalInput(value: string): string | null {
   if (!value) {
@@ -72,6 +56,7 @@ const formSchema = z.object({
 type FormSchema = z.infer<typeof formSchema>;
 
 export function ProjectCreate({ onCreated, trigger }: ProjectCreateFormProps) {
+  const fallbackProjectDate = useMemo(() => new Date(), []);
   const workspaceHeader = getWorkspaceHeader();
   const { mutateAsync } = $api.useMutation("post", "/api/v1/projects/");
   const form = useForm({
@@ -82,8 +67,8 @@ export function ProjectCreate({ onCreated, trigger }: ProjectCreateFormProps) {
       name: "",
       description: "",
       client_id: null,
-      start_time: "",
-      end_time: "",
+      start_time: new Date().toISOString(),
+      end_time: new Date().toISOString(),
     } as FormSchema,
     onSubmit: async ({ value }) => {
       try {
@@ -136,9 +121,12 @@ export function ProjectCreate({ onCreated, trigger }: ProjectCreateFormProps) {
   const clientId = useSelector(form.store, (s) => s.values.client_id);
 
   const dialogContent = (
-    <DialogContent className="rounded-none border-border/80">
+    <DialogContent className="border-border/80">
       <DialogHeader>
-        <DialogTitle>Nový Projekt</DialogTitle>
+        <DialogTitle>Nový projekt</DialogTitle>
+        <DialogDescription>
+          Vytvoř projekt a přiřaď ho ke klientovi.
+        </DialogDescription>
       </DialogHeader>
       <form
         className="flex flex-col gap-5"
@@ -153,8 +141,8 @@ export function ProjectCreate({ onCreated, trigger }: ProjectCreateFormProps) {
             <form.Field
               name="name"
               children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
+                      const isInvalid =
+                        field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <Field data-invalid={isInvalid} className="flex-1">
                     <FieldLabel htmlFor={field.name}>Název projektu</FieldLabel>
@@ -179,7 +167,7 @@ export function ProjectCreate({ onCreated, trigger }: ProjectCreateFormProps) {
             />
           </div>
 
-          <details className="rounded-none border border-border/70 bg-muted/25 p-3">
+          <details className="rounded-lg border border-border/70 bg-muted/25 p-3">
             <summary className="cursor-pointer text-sm font-medium text-foreground">
               Rozšířené možnosti
             </summary>
@@ -192,7 +180,7 @@ export function ProjectCreate({ onCreated, trigger }: ProjectCreateFormProps) {
                   return (
                     <Field data-invalid={isInvalid} className="flex-1">
                       <FieldLabel htmlFor={field.name}>
-                        Popis Projektu
+                        Popis projektu
                       </FieldLabel>
                       <FieldContent>
                         <Textarea
@@ -230,17 +218,19 @@ export function ProjectCreate({ onCreated, trigger }: ProjectCreateFormProps) {
                       isLoading,
                       placeholder,
                     }) => (
-                      <button
+                      <Button
                         type="button"
                         disabled={disabled}
-                        className="flex h-9 w-full min-w-0 items-center justify-between rounded-none border border-input/80 bg-background px-3 py-1.5 text-left text-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50"
+                        variant="outline"
+                        id="client_id"
+                        className="h-9 w-full min-w-0 justify-between text-left text-sm font-normal"
                       >
                         <span className="truncate">
                           {selected?.name ??
                             (isLoading ? "Načítám klienty..." : placeholder)}
                         </span>
                         <ChevronsUpDownIcon className="size-4 shrink-0" />
-                      </button>
+                      </Button>
                     )}
                   />
                 </FieldContent>
@@ -251,18 +241,17 @@ export function ProjectCreate({ onCreated, trigger }: ProjectCreateFormProps) {
                 children={(field) => {
                   return (
                     <Field>
-                      <FieldLabel htmlFor={field.name}>
+                      <FieldLabel htmlFor="project-start-time">
                         Začátek projektu
                       </FieldLabel>
                       <FieldContent>
-                        <Input
-                          id={field.name}
-                          name={field.name}
-                          type="datetime-local"
-                          value={field.state.value}
-                          onBlur={field.handleBlur}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          autoComplete="off"
+                        <DatePicker
+                          id="project-start-time"
+                          withTime
+                          value={new Date(
+                            field.state.value ?? fallbackProjectDate,
+                          )}
+                          setValue={(d) => field.handleChange(d.toISOString())}
                         />
                       </FieldContent>
                     </Field>
@@ -275,18 +264,17 @@ export function ProjectCreate({ onCreated, trigger }: ProjectCreateFormProps) {
                 children={(field) => {
                   return (
                     <Field>
-                      <FieldLabel htmlFor={field.name}>
+                      <FieldLabel htmlFor="project-end-time">
                         Konec projektu
                       </FieldLabel>
                       <FieldContent>
-                        <Input
-                          id={field.name}
-                          name={field.name}
-                          type="datetime-local"
-                          value={field.state.value}
-                          onBlur={field.handleBlur}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          autoComplete="off"
+                        <DatePicker
+                          id="project-end-time"
+                          withTime
+                          value={new Date(
+                            field.state.value ?? fallbackProjectDate,
+                          )}
+                          setValue={(d) => field.handleChange(d.toISOString())}
                         />
                       </FieldContent>
                     </Field>

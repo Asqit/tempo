@@ -14,12 +14,8 @@ class WorkspaceService:
         return await paginate(db, select(Workspace).where(Workspace.user_id == user_id))
 
     @staticmethod
-    async def get_workspace(db: AsyncSession, user_id: int, workspace_id: int):
-        result = await db.execute(
-            select(Workspace).where(
-                Workspace.user_id == user_id, Workspace.id == workspace_id
-            )
-        )
+    async def get_workspace(db: AsyncSession, workspace_id: int):
+        result = await db.execute(select(Workspace).where(Workspace.id == workspace_id))
 
         workspace = result.scalar_one_or_none()
         if workspace is None:

@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 from src.core.database import Base
 
 
+# TODO: rename to singular
 class WorkspaceMembers(Base):
     __tablename__ = "workspace_members"
     __table_args__ = (UniqueConstraint("user_id", "workspace_id"),)

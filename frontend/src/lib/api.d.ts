@@ -393,6 +393,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/notifications/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get All Notifications */
+        get: operations["get_all_notifications_api_v1_notifications__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Read Notification */
+        put: operations["read_notification_api_v1_notifications__id__read_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/members/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Workspace Members */
+        get: operations["list_workspace_members_api_v1_workspaces__workspace_id__members__get"];
+        put?: never;
+        /** Add Workspace Member */
+        post: operations["add_workspace_member_api_v1_workspaces__workspace_id__members__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/members/{member_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Change Member Role */
+        put: operations["change_member_role_api_v1_workspaces__workspace_id__members__member_id__put"];
+        post?: never;
+        /** Leave Workspace */
+        delete: operations["leave_workspace_api_v1_workspaces__workspace_id__members__member_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -531,10 +601,40 @@ export interface components {
             user: components["schemas"]["UserRead"];
             token: components["schemas"]["Token"];
         };
+        /** NotificationRead */
+        NotificationRead: {
+            /** Id */
+            id: number;
+            /** User Id */
+            user_id: number;
+            type: components["schemas"]["NotificationType"];
+            /** Payload */
+            payload: components["schemas"]["WorkspaceInvitePayload"] | components["schemas"]["WorkspaceRemovedPayload"];
+            /** Read At */
+            read_at?: string | null;
+        };
+        /**
+         * NotificationType
+         * @enum {string}
+         */
+        NotificationType: "workspace_invite" | "workspace_removed";
         /** Page[ClientRead] */
         Page_ClientRead_: {
             /** Items */
             items: components["schemas"]["ClientRead"][];
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Size */
+            size: number;
+            /** Pages */
+            pages: number;
+        };
+        /** Page[NotificationRead] */
+        Page_NotificationRead_: {
+            /** Items */
+            items: components["schemas"]["NotificationRead"][];
             /** Total */
             total: number;
             /** Page */
@@ -857,6 +957,24 @@ export interface components {
             /** Name */
             name: string;
         };
+        /** WorkspaceInvitePayload */
+        WorkspaceInvitePayload: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "workspace_invite";
+            /** Workspace Id */
+            workspace_id: number;
+            /** Workspace Name */
+            workspace_name: string;
+            /** Invited By User Id */
+            invited_by_user_id: number;
+            /** Invited By Name */
+            invited_by_name: string;
+            /** Role */
+            role: string;
+        };
         /** WorkspaceMemberRead */
         WorkspaceMemberRead: {
             /** Id */
@@ -872,7 +990,6 @@ export interface components {
             id: number;
             /** Name */
             name: string;
-            user: components["schemas"]["UserRead"];
             /** Members */
             members: components["schemas"]["WorkspaceMemberRead"][];
             /** Clients */
@@ -889,6 +1006,22 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** WorkspaceRemovedPayload */
+        WorkspaceRemovedPayload: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "workspace_removed";
+            /** Workspace Id */
+            workspace_id: number;
+            /** Workspace Name */
+            workspace_name: string;
+            /** Removed By User Id */
+            removed_by_user_id: number;
+            /** Removed By Name */
+            removed_by_name: string;
         };
         /**
          * WorkspaceRole
@@ -2134,6 +2267,165 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_all_notifications_api_v1_notifications__get: {
+        parameters: {
+            query?: {
+                unread?: boolean;
+                /** @description Page number */
+                page?: number;
+                /** @description Page size */
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_NotificationRead_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_notification_api_v1_notifications__id__read_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_workspace_members_api_v1_workspaces__workspace_id__members__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    add_workspace_member_api_v1_workspaces__workspace_id__members__post: {
+        parameters: {
+            query: {
+                candidate_email: string;
+            };
+            header?: never;
+            path: {
+                workspace_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    change_member_role_api_v1_workspaces__workspace_id__members__member_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    leave_workspace_api_v1_workspaces__workspace_id__members__member_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
         };

@@ -97,7 +97,7 @@ export function ProjectRow({
       </TableCell>
       {!compact ? (
         <TableCell>
-          <span className="inline-flex items-center rounded-none border border-border/70 bg-muted/40 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+          <span className="inline-flex items-center rounded-full border border-border/70 bg-muted/40 px-2.5 py-1 text-xs font-medium text-muted-foreground">
             Aktivní
           </span>
         </TableCell>
