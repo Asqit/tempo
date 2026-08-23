@@ -24,8 +24,8 @@ import type { components } from "@/lib/api.d";
 import { useNavigate } from "@tanstack/react-router";
 
 const formSchema = z.object({
-  username: z.string().min(1, "Uzivatelske jmeno je povinne"),
-  password: z.string().min(1, "Heslo je povinne"),
+  username: z.string().min(1, "Uživatelské jméno je povinné"),
+  password: z.string().min(1, "Heslo je povinné"),
 });
 
 export function LoginForm() {
@@ -62,7 +62,7 @@ export function LoginForm() {
         login(response.user, response.token.access_token);
         navigate({ to: "/app" });
       } catch {
-        toast.error("Prihlaseni se nezdarilo");
+        toast.error("Přihlášení se nezdařilo");
       }
     },
   });
@@ -72,7 +72,7 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle>Přihlášení</CardTitle>
         <CardDescription>
-          Zadej prihlasovaci udaje pro pokracovani.
+          Zadejte přihlašovací údaje pro pokračování.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -99,7 +99,7 @@ export function LoginForm() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
-                      placeholder="tvoje.jmeno"
+              placeholder="vas.email"
                       autoComplete="username"
                     />
                     {isInvalid && (
@@ -144,7 +144,7 @@ export function LoginForm() {
             Vymazat
           </Button>
           <Button type="submit" form="login-form">
-            Prihlasit se
+            Přihlásit se
           </Button>
         </Field>
       </CardFooter>

@@ -50,7 +50,7 @@ export function RegisterForm() {
 
         navigate({ to: "/login" });
       } catch {
-        toast.error("Prihlaseni se nezdarilo");
+        toast.error("Registrace se nezdařila");
       }
     },
   });
@@ -87,7 +87,7 @@ export function RegisterForm() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
-                      placeholder="tvoje.jmeno"
+                      placeholder="Vaše jméno"
                       autoComplete="name"
                     />
                     {isInvalid && (
@@ -113,7 +113,7 @@ export function RegisterForm() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
-                      placeholder="tvůj.email"
+                      placeholder="vas.email"
                       autoComplete="email"
                     />
                     {isInvalid && (
@@ -139,7 +139,7 @@ export function RegisterForm() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
-                      placeholder="Kde Bydlíš?"
+                      placeholder="Např. Česko"
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
