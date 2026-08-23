@@ -3,14 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { $api } from "@/lib/api";
 import { useWorkspaceStore } from "@/features/workspaces/store";
 import {
-  differenceInMinutes,
-  parseISO,
   getHours,
   startOfMonth,
   endOfMonth,
 } from "date-fns";
 import { useMemo } from "react";
 import { TimeEntryCalendar } from "@/features/time-entry/components/calendar";
+import { durationMinutesBetween, formatDuration } from "@/lib/time";
 
 export const Route = createFileRoute("/app/")({
   component: RouteComponent,
@@ -46,10 +45,7 @@ function RouteComponent() {
       (acc, entry) => {
         if (!entry.end_time) return acc;
 
-        const minutes = differenceInMinutes(
-          parseISO(entry.end_time),
-          parseISO(entry.start_time),
-        );
+        const minutes = durationMinutesBetween(entry.start_time, entry.end_time);
 
         acc.totalMinutes += minutes;
 
@@ -62,16 +58,9 @@ function RouteComponent() {
       { totalMinutes: 0, billableMinutes: 0 },
     );
 
-    const formatDuration = (minutes: number) => {
-      const h = Math.floor(minutes / 60);
-      const m = minutes % 60;
-
-      return `${h}h:${String(m).padStart(2, "0")}m`;
-    };
-
     return {
-      total: formatDuration(totalMinutes),
-      billable: formatDuration(billableMinutes),
+      total: formatDuration(totalMinutes, "dashboard"),
+      billable: formatDuration(billableMinutes, "dashboard"),
     };
   }, [data, isLoading]);
   const greeting = useMemo(() => {

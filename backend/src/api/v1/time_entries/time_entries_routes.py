@@ -15,6 +15,9 @@ from src.api.v1.time_entries.time_entries_schemas import (
 from src.api.v1.time_entries.time_entries_service import TimeEntryService
 from src.api.v1.workspace.workspace_models import Workspace
 from src.api.v1.workspace.workspace_utils import get_current_workspace
+from src.api.v1.workspace_members.workspace_members_helpers import require_role
+from src.api.v1.workspace_members.workspace_members_models import WorkspaceMembers
+from src.api.v1.workspace_members.workspace_members_schemas import WorkspaceRole
 from src.core.database import get_db
 
 router = APIRouter(prefix="/time-entries", tags=["TimeEntries"])
@@ -24,6 +27,7 @@ router = APIRouter(prefix="/time-entries", tags=["TimeEntries"])
 async def get_all_time_entries(
     db: Annotated[AsyncSession, Depends(get_db)],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
+    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.MEMBER))],
     project_id: int | None = None,
     start_time: datetime | None = None,
     end_time: datetime | None = None,
@@ -39,6 +43,7 @@ async def get_calendar_entries(
     start_time: datetime,
     end_time: datetime,
     db: Annotated[AsyncSession, Depends(get_db)],
+    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.MEMBER))],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
 ):
     return await TimeEntryService.get_calendar_entries(
@@ -49,6 +54,7 @@ async def get_calendar_entries(
 @router.get("/last", response_model=TimeEntryRead, tags=["mcp"])
 async def get_last_entry(
     db: Annotated[AsyncSession, Depends(get_db)],
+    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.MEMBER))],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
 ):
     return await TimeEntryService.get_last_entry(db, workspace)
@@ -58,6 +64,7 @@ async def get_last_entry(
 async def get_time_entry(
     id: int,
     db: Annotated[AsyncSession, Depends(get_db)],
+    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.MEMBER))],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
 ):
     return await TimeEntryService.get_time_entry(db, workspace, id)
@@ -69,6 +76,7 @@ async def get_time_entry(
 async def create_time_entry(
     payload: TimeEntryCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
+    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.MEMBER))],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
 ):
     return await TimeEntryService.create_time_entry(db, workspace, payload)
@@ -79,6 +87,7 @@ async def update_time_entry(
     id: int,
     payload: TimeEntryUpdate,
     db: Annotated[AsyncSession, Depends(get_db)],
+    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.MEMBER))],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
 ):
     return await TimeEntryService.update_time_entry(db, workspace, id, payload)
@@ -88,6 +97,7 @@ async def update_time_entry(
 async def delete_time_entry(
     id: int,
     db: Annotated[AsyncSession, Depends(get_db)],
+    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.MEMBER))],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
 ):
     return await TimeEntryService.delete_time_entry(db, workspace, id)
@@ -97,6 +107,7 @@ async def delete_time_entry(
 async def bulk_delete(
     body: TimeEntryBulkDelete,
     db: Annotated[AsyncSession, Depends(get_db)],
+    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.MEMBER))],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
 ):
     return await TimeEntryService.bulk_delete(db, workspace, body.ids)

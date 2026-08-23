@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { TimeEntryUpdateDialog } from "./time-entry-update-dialog";
 
 import { queryClient } from "@/lib/api";
+import { durationSecondsBetween, formatDuration } from "@/lib/time";
 
 type EntriesTableProps = {
   projectId?: number | null;
@@ -69,17 +70,6 @@ function formatDateTime(value: string | null) {
   }
 
   return new Date(value).toLocaleString("cs-CZ");
-}
-
-function formatDuration(startTime: string, endTime: string | null) {
-  const start = new Date(startTime).getTime();
-  const end = endTime ? new Date(endTime).getTime() : Date.now();
-  const totalSeconds = Math.max(0, Math.floor((end - start) / 1000));
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
 export function EntriesTable({
@@ -379,7 +369,10 @@ export function EntriesTable({
                     <TableCell>
                       <div className="inline-flex items-center gap-2 rounded-md border border-border/70 bg-muted/25 px-2 py-1 font-mono text-xs tabular-nums text-foreground">
                         <Timer className="size-3.5 text-muted-foreground" />
-                        {formatDuration(entry.start_time, entry.end_time)}
+                        {formatDuration(
+                          durationSecondsBetween(entry.start_time, entry.end_time),
+                          "clock",
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>

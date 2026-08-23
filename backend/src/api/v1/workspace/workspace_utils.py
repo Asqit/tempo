@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Annotated
 
 from fastapi import Depends, Header, HTTPException, status
@@ -12,7 +14,7 @@ from src.core.database import get_db
 
 
 async def get_current_workspace(
-    workspace_id: Annotated[int, Header(alias="X-Workspace-Id")],
+    x_workspace_id: Annotated[int, Header(alias="X-Workspace-Id")],
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> Workspace:
@@ -20,18 +22,14 @@ async def get_current_workspace(
     Dependency for getting current selected workspace.
     !!It already requires AUTH, so no auth dep needed afterwards if not explicitly needed
     """
-    workspace = await db.scalar(
-        select(Workspace).where(
-            Workspace.id == workspace_id, Workspace.user_id == current_user.id
-        )
-    )
 
-    member = await get_member(db, workspace_id, current_user.id)
+    workspace = await db.scalar(select(Workspace).where(Workspace.id == x_workspace_id))
+    member = await get_member(db, x_workspace_id, current_user.id)
 
     if workspace is None or member is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="invalid workspace/user combination",
+            detail=f"invalid workspace/user combination {x_workspace_id} {current_user.id}",
         )
 
     return workspace

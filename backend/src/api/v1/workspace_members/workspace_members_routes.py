@@ -3,9 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from src.api.v1.workspace.workspace_models import Workspace
 from src.api.v1.workspace.workspace_service import WorkspaceService
-from src.api.v1.workspace.workspace_utils import get_current_workspace
 from src.api.v1.workspace_members.workspace_members_helpers import (
     require_role,
 )
@@ -42,10 +40,14 @@ async def add_workspace_member(
 
 
 @router.put("/{member_id}")
-async def change_member_role():
+async def change_member_role(
+    _member: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.ADMIN))],
+):
     pass
 
 
 @router.delete("/{member_id}")
-async def leave_workspace():
+async def leave_workspace(
+    _member: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.ADMIN))],
+):
     pass

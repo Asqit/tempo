@@ -12,15 +12,10 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Inbox } from "lucide-react";
+import { formatDuration } from "@/lib/time";
 
 interface Props {
   reports: Array<components["schemas"]["ReportRead"]>;
-}
-
-function fmtMinutes(mins: number) {
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  return m > 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
 export function ReportsList({ reports }: Props) {
@@ -130,7 +125,7 @@ export function ReportsList({ reports }: Props) {
                     {report.snapshots.length}
                   </TableCell>
                   <TableCell className="text-right font-medium tabular-nums">
-                    {fmtMinutes(totalMins)}
+                    {formatDuration(totalMins, "short")}
                   </TableCell>
                 </TableRow>
               );

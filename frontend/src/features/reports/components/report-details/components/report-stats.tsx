@@ -1,62 +1,54 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { components } from "@/lib/api.d";
 import { cn } from "@/lib/utils";
+import { calculateAmount, formatMoney } from "@/lib/money";
+import { durationMinutesBetween, formatHoursFromMinutes } from "@/lib/time";
 import { Clock, Wallet, TrendingUp } from "lucide-react";
 
 interface Props {
   entries: Array<components["schemas"]["TimeEntryRead"]>;
 }
 
-function durationHours(entry: components["schemas"]["TimeEntryRead"]): number {
-  if (!entry.end_time) return 0;
-  const ms =
-    new Date(entry.end_time).getTime() - new Date(entry.start_time).getTime();
-  return ms / 1000 / 60 / 60;
-}
-
-function formatHours(hours: number): string {
-  return hours.toFixed(1).replace(/\.0$/, "") + "h";
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("cs-CZ", {
-    style: "currency",
-    currency: "CZK",
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
 export function ReportStats({ entries }: Props) {
-  const totalHours = entries.reduce((sum, e) => sum + durationHours(e), 0);
+  const totalMinutes = entries.reduce(
+    (sum, e) => sum + durationMinutesBetween(e.start_time, e.end_time),
+    0,
+  );
+  const totalHours = totalMinutes / 60;
   const billableEntries = entries.filter((e) => e.billable);
-  const billableHours = billableEntries.reduce(
-    (sum, e) => sum + durationHours(e),
+  const billableMinutes = billableEntries.reduce(
+    (sum, e) => sum + durationMinutesBetween(e.start_time, e.end_time),
     0,
   );
 
   const totalEarned = billableEntries.reduce(
-    (sum, e) => sum + durationHours(e) * Number(e.client?.hourly_rate ?? 0),
+    (sum, e) =>
+      sum +
+      (calculateAmount(
+        durationMinutesBetween(e.start_time, e.end_time),
+        e.client?.hourly_rate,
+      ) ?? 0),
     0,
   );
 
   const stats = [
     {
       label: "Total hours",
-      value: formatHours(totalHours),
+      value: formatHoursFromMinutes(totalMinutes, false),
       icon: Clock,
     },
     {
       label: "Billable hours",
-      value: formatHours(billableHours),
+      value: formatHoursFromMinutes(billableMinutes, false),
       icon: TrendingUp,
       sub:
         totalHours > 0
-          ? `${Math.round((billableHours / totalHours) * 100)}% of total`
+          ? `${Math.round((billableMinutes / totalMinutes) * 100)}% of total`
           : undefined,
     },
     {
       label: "Total earned",
-      value: formatCurrency(totalEarned),
+      value: formatMoney(totalEarned),
       icon: Wallet,
     },
   ];

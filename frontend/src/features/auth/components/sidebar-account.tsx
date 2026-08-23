@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  Check,
-  ChevronsUpDown,
-  LogOut,
-  Settings,
-} from "lucide-react";
+import { Check, ChevronsUpDown, LogOut, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Button } from "@/components/ui/button";
@@ -62,6 +57,7 @@ export function SidebarAccount() {
   const handleLogout = async () => {
     try {
       await logoutMutation({ params: { cookie: { refresh_token: null } } });
+      reset();
       logout();
       navigate({ to: "/" });
     } catch {

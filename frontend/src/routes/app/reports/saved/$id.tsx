@@ -24,7 +24,7 @@ function RouteComponent() {
   const { data, isLoading } = $api.useQuery("get", "/api/v1/reports/{id}", {
     params: {
       path: {
-        id,
+        id: numericId,
       },
       header: {
         "X-Workspace-Id": activeWorkspace!,
@@ -34,9 +34,18 @@ function RouteComponent() {
 
   if (isLoading) return null;
 
+  if (!data) {
+    return (
+      <p className="text-sm text-destructive">
+        Report se nepodařilo načíst.
+      </p>
+    );
+  }
+
   return (
-    <div className="space-y-6 animate-in fade-in duration-300 ease-out fill-mode-both">
+    <div className="print-report space-y-6 animate-in fade-in duration-300 ease-out fill-mode-both">
       <PageHeader
+        className="print-report-page-header"
         eyebrow="Uložený report"
         title={
           <>
@@ -44,7 +53,7 @@ function RouteComponent() {
           </>
         }
       />
-      <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 ease-out delay-100 fill-mode-both">
+      <div className="print-report-content animate-in fade-in slide-in-from-bottom-2 duration-500 ease-out delay-100 fill-mode-both">
         <SavedReportDetails report={data} data={data.snapshots} />
       </div>
     </div>

@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from src.api.v1.auth.auth_models import User
 from src.api.v1.notifications.notifications_models import Notification, NotificationType
+from src.api.v1.notifications.notifications_schemas import WorkspaceInvitePayload
 from src.api.v1.workspace.workspace_models import Workspace
 from src.api.v1.workspace_members.workspace_members_models import WorkspaceMembers
 from src.api.v1.workspace_members.workspace_members_schemas import WorkspaceRole
@@ -25,16 +26,18 @@ class WorkspaceMembersService:
             user_id=user.id, role=WorkspaceRole.MEMBER, workspace_id=workspace.id
         )
 
+        payload = WorkspaceInvitePayload(
+            workspace_id=workspace.id,
+            workspace_name=workspace.name,
+            invited_by_user_id=authorized_person.user_id,
+            invited_by_name=authorized_person.user.name,
+            role=WorkspaceRole.MEMBER,
+        )
+
         notification = Notification(
             user_id=user.id,
             type=NotificationType.WORKSPACE_INVITE,
-            payload={
-                "workspace_id": workspace.id,
-                "workspace_name": workspace.name,
-                "invited_by_user_id": authorized_person.user_id,
-                "invited_by_name": authorized_person.user.name,
-                "role": WorkspaceRole.MEMBER,
-            },
+            payload=payload.model_dump(mode="json"),
         )
 
         db.add(membership)

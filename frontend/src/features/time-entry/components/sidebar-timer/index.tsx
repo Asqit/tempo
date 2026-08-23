@@ -1,6 +1,6 @@
 import { Play, Square } from "lucide-react";
 import { useLiveTimeEntry } from "../../hooks/use-live-time-entry";
-import { formatElapsed } from "../../utils/format-elapsed";
+import { formatElapsed } from "@/lib/time";
 
 export function SidebarTimer() {
   const { isPlaying, isLoading, entry, elapsed, start, stop } =

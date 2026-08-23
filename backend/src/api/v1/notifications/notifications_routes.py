@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,10 +23,10 @@ async def get_all_notifications(
     return await NotificationsService.get_notifications(db, current_user.id, unread)
 
 
-@router.put("/{id}/read")
+@router.put("/{id}/read", status_code=status.HTTP_204_NO_CONTENT)
 async def read_notification(
     id: int,
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
-    return await NotificationsService.read_notification()
+    return await NotificationsService.read_notification(db, current_user.id, id)

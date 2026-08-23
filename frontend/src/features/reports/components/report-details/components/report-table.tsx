@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { generateColorFromString } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Inbox } from "lucide-react";
+import { durationMinutesBetween, formatDuration } from "@/lib/time";
 
 interface Props {
   entries: Array<components["schemas"]["TimeEntryRead"]>;
@@ -28,21 +29,6 @@ function useNow(active: boolean, intervalMs = 30_000) {
     return () => clearInterval(id);
   }, [active, intervalMs]);
   return now;
-}
-
-function durationMinutes(
-  entry: components["schemas"]["TimeEntryRead"],
-  now: number,
-): number {
-  const start = new Date(entry.start_time).getTime();
-  const end = entry.end_time ? new Date(entry.end_time).getTime() : now;
-  return Math.max(0, Math.round((end - start) / 60000));
-}
-
-function formatDuration(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
 function formatDayLabel(day: Date): string {
@@ -68,7 +54,11 @@ export function ReportTable({ entries }: Props) {
   const grouped = React.useMemo(() => groupByDay(entries), [entries]);
 
   const grandTotal = React.useMemo(
-    () => entries.reduce((sum, e) => sum + durationMinutes(e, now), 0),
+    () =>
+      entries.reduce(
+        (sum, e) => sum + durationMinutesBetween(e.start_time, e.end_time, now),
+        0,
+      ),
     [entries, now],
   );
 
@@ -102,7 +92,8 @@ export function ReportTable({ entries }: Props) {
           <TableBody>
             {grouped.map(([day, dayEntries]) => {
               const dayTotal = dayEntries.reduce(
-                (sum, e) => sum + durationMinutes(e, now),
+                (sum, e) =>
+                  sum + durationMinutesBetween(e.start_time, e.end_time, now),
                 0,
               );
               const dayHasRunning = dayEntries.some((e) => !e.end_time);
@@ -114,7 +105,7 @@ export function ReportTable({ entries }: Props) {
                       {formatDayLabel(new Date(day))}
                     </TableCell>
                     <TableCell className="text-right font-medium tabular-nums">
-                      {formatDuration(dayTotal)}
+                      {formatDuration(dayTotal, "short")}
                       {dayHasRunning && (
                         <span
                           className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-orange-500 align-middle"
@@ -125,7 +116,11 @@ export function ReportTable({ entries }: Props) {
                   </TableRow>
 
                   {dayEntries.map((entry) => {
-                    const minutes = durationMinutes(entry, now);
+                    const minutes = durationMinutesBetween(
+                      entry.start_time,
+                      entry.end_time,
+                      now,
+                    );
                     const isRunning = !entry.end_time;
 
                     return (
@@ -177,10 +172,10 @@ export function ReportTable({ entries }: Props) {
                           {isRunning ? (
                             <span className="inline-flex items-center gap-1.5 font-medium text-orange-500">
                               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-orange-500" />
-                              {formatDuration(minutes)}
+                              {formatDuration(minutes, "short")}
                             </span>
                           ) : (
-                            formatDuration(minutes)
+                            formatDuration(minutes, "short")
                           )}
                         </TableCell>
                       </TableRow>
@@ -197,7 +192,7 @@ export function ReportTable({ entries }: Props) {
             {entries.length} {entries.length === 1 ? "záznam" : "záznamů"}
           </span>
           <span className="font-medium tabular-nums">
-            Celkově: {formatDuration(grandTotal)}
+            Celkově: {formatDuration(grandTotal, "short")}
           </span>
         </div>
       </CardContent>

@@ -6,6 +6,7 @@ import { ProjectHeader } from "./components/project-header";
 import { ProjectProgress } from "./components/project-progress";
 import { ProjectStatsGrid } from "./components/project-stats-grid";
 import { Separator } from "@/components/ui/separator";
+import { formatHours } from "@/lib/time";
 
 type ProjectDetailProps = {
   id: number;
@@ -30,13 +31,6 @@ type WeekBarPoint = {
   label: string;
   hours: number;
 };
-
-function formatHours(hours: number): string {
-  return `${hours.toLocaleString("cs-CZ", {
-    minimumFractionDigits: hours > 0 && hours < 10 ? 1 : 0,
-    maximumFractionDigits: 1,
-  })} h`;
-}
 
 function toDateOrNull(value: unknown): Date | null {
   if (typeof value !== "string") {

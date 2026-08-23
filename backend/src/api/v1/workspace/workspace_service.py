@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlalchemy import exists, select
+from sqlalchemy import exists, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.workspace.workspace_models import Workspace
@@ -11,7 +11,19 @@ from src.api.v1.workspace_members.workspace_members_models import WorkspaceMembe
 class WorkspaceService:
     @staticmethod
     async def list_workspaces(db: AsyncSession, user_id: int):
-        return await paginate(db, select(Workspace).where(Workspace.user_id == user_id))
+        query = (
+            select(Workspace)
+            .outerjoin(WorkspaceMembers, WorkspaceMembers.workspace_id == Workspace.id)
+            .where(
+                or_(
+                    Workspace.user_id == user_id,
+                    WorkspaceMembers.user_id == user_id,
+                )
+            )
+            .distinct()
+            .order_by(Workspace.id)
+        )
+        return await paginate(db, query)
 
     @staticmethod
     async def get_workspace(db: AsyncSession, workspace_id: int):

@@ -8,6 +8,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { $api, getWorkspaceHeader } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { formatMoney } from "@/lib/money";
 import { ProjectsTable } from "@/features/projects/components/projects-table";
 import { ClientHeader } from "./components/client-header";
 
@@ -109,7 +110,7 @@ export function ClientDetail({ id }: ClientDetailProps) {
           label="Hodinová sazba"
           value={
             client.hourly_rate
-              ? `${client.hourly_rate.toLocaleString("cs-CZ")} Kč`
+              ? formatMoney(Number(client.hourly_rate), client.currency)
               : "—"
           }
           description={
@@ -179,7 +180,7 @@ export function ClientDetail({ id }: ClientDetailProps) {
                 label="Hodinová sazba"
                 value={
                   client.hourly_rate
-                    ? `${client.hourly_rate.toLocaleString("cs-CZ")} Kč/h`
+                    ? `${formatMoney(Number(client.hourly_rate), client.currency)}/h`
                     : "Nenastaveno"
                 }
               />

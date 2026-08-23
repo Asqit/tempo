@@ -284,3 +284,97 @@
     }
   }
 }
+
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 12mm;
+  }
+
+  :root {
+    --background: #ffffff;
+    --foreground: #17231b;
+    --card: #ffffff;
+    --card-foreground: #17231b;
+    --muted: #f2f5f1;
+    --muted-foreground: #526157;
+    --border: #d8e0d8;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #17231b !important;
+  }
+
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .print-app-sidebar,
+  .print-app-header,
+  .print-report-controls {
+    display: none !important;
+  }
+
+  .print-report-shell,
+  .print-report-shell > div,
+  .print-report-main {
+    display: block !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+  }
+
+  .print-report {
+    max-width: none !important;
+    color: #17231b !important;
+  }
+
+  .print-report-page-header {
+    margin-bottom: 18px;
+    border-color: #d8e0d8 !important;
+  }
+
+  .print-report-page-header * {
+    animation: none !important;
+  }
+
+  .print-report-content,
+  .print-report-content * {
+    animation: none !important;
+  }
+
+  .print-report [data-slot="card"] {
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-report table {
+    break-inside: auto;
+  }
+
+  .print-report table thead {
+    display: table-header-group;
+  }
+
+  .print-report table tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .recharts-wrapper,
+  [data-chart] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}

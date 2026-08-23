@@ -15,7 +15,7 @@ import { TimeEntryCreateForm } from "../time-entry-create-form";
 
 type TimeEntryCreateDialogProps = {
   onCreated?: () => void;
-  trigger?: React.ReactNode;
+  trigger?: React.ReactElement;
 };
 
 export function TimeEntryCreateDialog({
@@ -32,7 +32,7 @@ export function TimeEntryCreateDialog({
   if (trigger) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>{trigger}</DialogTrigger>
+        <DialogTrigger render={trigger} />
 
         <DialogContent>
           <DialogHeader>
@@ -48,14 +48,16 @@ export function TimeEntryCreateDialog({
     );
   }
 
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button type="button" variant="ghost" size="sm">
-          <Plus className="size-3.5" />
-          Nový výkaz
-        </Button>
-      </DialogTrigger>
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger
+        render={
+          <Button type="button" variant="ghost" size="sm">
+            <Plus className="size-3.5" />
+            Nový výkaz
+          </Button>
+        }
+      />
 
       <DialogContent>
         <DialogHeader>

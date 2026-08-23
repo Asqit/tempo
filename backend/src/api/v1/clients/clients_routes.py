@@ -14,6 +14,9 @@ from src.api.v1.clients.clients_schemas import ClientCreate, ClientRead, ClientU
 from src.api.v1.clients.clients_service import ClientsService
 from src.api.v1.workspace.workspace_models import Workspace
 from src.api.v1.workspace.workspace_utils import get_current_workspace
+from src.api.v1.workspace_members.workspace_members_helpers import require_role
+from src.api.v1.workspace_members.workspace_members_models import WorkspaceMembers
+from src.api.v1.workspace_members.workspace_members_schemas import WorkspaceRole
 from src.core.database import get_db
 
 router = APIRouter(prefix="/clients", tags=["Clients"])
@@ -28,39 +31,41 @@ async def search_client_company(
     return await justice.search(query)
 
 
-@router.get("/", tags=["mcp"])
+@router.get("/")
 async def get_clients(
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
+    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.MEMBER))],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> Page[ClientRead]:
     return await ClientsService.get_all_clients(db, workspace)
 
 
-@router.get("/{id}", response_model=ClientRead, tags=["mcp"])
+@router.get("/{id}", response_model=ClientRead)
 async def get_client(
     id: int,
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
+    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.MEMBER))],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     return await ClientsService.get_client(db, id, workspace)
 
 
-@router.post(
-    "/", response_model=ClientRead, status_code=status.HTTP_201_CREATED, tags=["mcp"]
-)
+@router.post("/", response_model=ClientRead, status_code=status.HTTP_201_CREATED)
 async def create_client(
     payload: ClientCreate,
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
+    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.ADMIN))],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     return await ClientsService.create_client(db, payload, workspace)
 
 
-@router.put("/{id}", response_model=ClientRead, tags=["mcp"])
+@router.put("/{id}", response_model=ClientRead)
 async def update_client(
     id: int,
     payload: ClientUpdate,
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
+    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.ADMIN))],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     return await ClientsService.update_client(db, id, payload, workspace)
@@ -69,6 +74,7 @@ async def update_client(
 @router.delete("/{id}")
 async def delete_client(
     id: int,
+    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.ADMIN))],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):

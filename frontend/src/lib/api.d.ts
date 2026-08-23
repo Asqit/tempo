@@ -2002,7 +2002,9 @@ export interface operations {
     update_workspace_api_v1_workspaces__workspace_id__put: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path: {
                 workspace_id: number;
             };
@@ -2037,7 +2039,9 @@ export interface operations {
     delete_workspace_api_v1_workspaces__workspace_id__delete: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path: {
                 workspace_id: number;
             };
@@ -2362,7 +2366,9 @@ export interface operations {
             query: {
                 candidate_email: string;
             };
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path: {
                 workspace_id: number;
             };
@@ -2393,7 +2399,9 @@ export interface operations {
     change_member_role_api_v1_workspaces__workspace_id__members__member_id__put: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2408,12 +2416,23 @@ export interface operations {
                     "application/json": unknown;
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
     leave_workspace_api_v1_workspaces__workspace_id__members__member_id__delete: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2426,6 +2445,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

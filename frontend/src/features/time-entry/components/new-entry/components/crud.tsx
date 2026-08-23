@@ -9,6 +9,7 @@ import { useDebounceCallback } from "usehooks-ts";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { formatElapsed } from "@/lib/time";
 
 type ActionType = "description" | "client" | "project";
 
@@ -16,14 +17,6 @@ interface Props {
   id?: number | null;
   callback(): Promise<void> | void;
   state: "playing" | "stopped";
-}
-
-function formatElapsedTime(durationMs: number) {
-  const totalSeconds = Math.max(0, Math.floor(durationMs / 1000));
-  const h = Math.floor(totalSeconds / 3600);
-  const m = Math.floor((totalSeconds % 3600) / 60);
-  const s = totalSeconds % 60;
-  return [h, m, s].map((v) => String(v).padStart(2, "0")).join(":");
 }
 
 export function TimerCRUD({ id, state, callback }: Props) {
@@ -183,7 +176,7 @@ export function TimerCRUD({ id, state, callback }: Props) {
           )}
           aria-label="Uplynulý čas"
         >
-          {formatElapsedTime(elapsedTimeMs)}
+          {formatElapsed(elapsedTimeMs / 1000, true)}
         </time>
         <Button
           className="group shadow-sm transition-all"

@@ -19,5 +19,5 @@ class Notification(Base):
     type: Mapped[NotificationType] = mapped_column(Enum(NotificationType))
     payload: Mapped[dict] = mapped_column(JSON)
     read_at: Mapped[datetime | None] = mapped_column(
-        DateTime, nullable=True, default=None
+        DateTime(timezone=True), nullable=True, default=None
     )
