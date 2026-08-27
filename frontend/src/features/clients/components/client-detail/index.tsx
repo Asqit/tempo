@@ -35,7 +35,7 @@ function formatDateTime(value: string | null | undefined) {
 }
 
 export function ClientDetail({ id }: ClientDetailProps) {
-  const { activeWorkspace, role } = useWorkspaceStore();
+  const { activeWorkspace } = useWorkspaceStore();
 
   const {
     data: client,

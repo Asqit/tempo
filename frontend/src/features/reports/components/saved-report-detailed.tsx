@@ -1,11 +1,11 @@
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { CalendarDays, Clock3, FileText, ListFilter, Wallet } from "lucide-react";
+  CalendarDays,
+  Clock3,
+  FileText,
+  ListFilter,
+  Wallet,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -108,7 +108,8 @@ export function SavedReportDetailed({ data, report }: Props) {
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                   <Badge variant="outline">
                     <CalendarDays data-icon="inline-start" />
-                    {formatShortDay(report.period_start.slice(0, 10))} – {formatShortDay(report.period_end.slice(0, 10))}
+                    {formatShortDay(report.period_start.slice(0, 10))} –{" "}
+                    {formatShortDay(report.period_end.slice(0, 10))}
                   </Badge>
                   {clientNames && (
                     <Badge variant="secondary">
@@ -123,7 +124,9 @@ export function SavedReportDetailed({ data, report }: Props) {
               </div>
             </div>
             <div className="text-right text-xs text-muted-foreground">
-              <p>{report.description || "Všechny zaznamenané hodiny v období"}</p>
+              <p>
+                {report.description || "Všechny zaznamenané hodiny v období"}
+              </p>
               <p className="mt-1 tabular-nums">{data.length} záznamů</p>
             </div>
           </div>
@@ -179,7 +182,10 @@ export function SavedReportDetailed({ data, report }: Props) {
               <EmptyReport />
             ) : (
               <ChartContainer config={chartConfig} className="h-[230px] w-full">
-                <BarChart data={dailyBreakdown} margin={{ left: -20, right: 8 }}>
+                <BarChart
+                  data={dailyBreakdown}
+                  margin={{ left: -20, right: 8 }}
+                >
                   <CartesianGrid vertical={false} strokeDasharray="4 4" />
                   <XAxis
                     dataKey="label"
@@ -191,7 +197,9 @@ export function SavedReportDetailed({ data, report }: Props) {
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tickFormatter={(value) => formatHoursFromMinutes(Number(value))}
+                    tickFormatter={(value) =>
+                      formatHoursFromMinutes(Number(value))
+                    }
                     width={48}
                   />
                   <ChartTooltip
@@ -224,7 +232,9 @@ export function SavedReportDetailed({ data, report }: Props) {
         <Card className="border-border/80 shadow-none">
           <CardHeader className="border-b border-border/70">
             <CardTitle className="text-base">Kam šel čas</CardTitle>
-            <p className="text-sm text-muted-foreground">Rozdělení podle projektu.</p>
+            <p className="text-sm text-muted-foreground">
+              Rozdělení podle projektu.
+            </p>
           </CardHeader>
           <CardContent className="flex flex-col gap-4 pt-5">
             {projectBreakdown.length === 0 ? (
@@ -254,7 +264,9 @@ export function SavedReportDetailed({ data, report }: Props) {
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {formatDuration(project.minutes, "short")} · {project.entries} {project.entries === 1 ? "záznam" : "záznamů"}
+                    {formatDuration(project.minutes, "short")} ·{" "}
+                    {project.entries}{" "}
+                    {project.entries === 1 ? "záznam" : "záznamů"}
                   </p>
                 </div>
               ))
@@ -283,11 +295,21 @@ export function SavedReportDetailed({ data, report }: Props) {
               <table className="w-full min-w-[680px] text-sm">
                 <thead className="bg-muted/30">
                   <tr className="border-b border-border text-left">
-                    <th className="px-5 py-3 text-xs font-medium text-muted-foreground">Datum</th>
-                    <th className="px-5 py-3 text-xs font-medium text-muted-foreground">Popis</th>
-                    <th className="px-5 py-3 text-xs font-medium text-muted-foreground">Projekt</th>
-                    <th className="px-5 py-3 text-right text-xs font-medium text-muted-foreground">Doba</th>
-                    <th className="px-5 py-3 text-right text-xs font-medium text-muted-foreground">Částka</th>
+                    <th className="px-5 py-3 text-xs font-medium text-muted-foreground">
+                      Datum
+                    </th>
+                    <th className="px-5 py-3 text-xs font-medium text-muted-foreground">
+                      Popis
+                    </th>
+                    <th className="px-5 py-3 text-xs font-medium text-muted-foreground">
+                      Projekt
+                    </th>
+                    <th className="px-5 py-3 text-right text-xs font-medium text-muted-foreground">
+                      Doba
+                    </th>
+                    <th className="px-5 py-3 text-right text-xs font-medium text-muted-foreground">
+                      Částka
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -298,7 +320,10 @@ export function SavedReportDetailed({ data, report }: Props) {
                         new Date(right.logged_at).getTime(),
                     )
                     .map((entry) => {
-                      const amount = calculateAmount(entry.duration_minutes, hourlyRate);
+                      const amount = calculateAmount(
+                        entry.duration_minutes,
+                        hourlyRate,
+                      );
 
                       return (
                         <tr
@@ -310,21 +335,30 @@ export function SavedReportDetailed({ data, report }: Props) {
                               {formatDay(entry.logged_at.slice(0, 10))}
                             </p>
                             <p className="mt-0.5 text-xs text-muted-foreground">
-                              {new Date(entry.logged_at).toLocaleTimeString("cs-CZ", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
+                              {new Date(entry.logged_at).toLocaleTimeString(
+                                "cs-CZ",
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                },
+                              )}
                             </p>
                           </td>
                           <td className="max-w-[22rem] px-5 py-3 align-top">
                             {entry.description || (
-                              <span className="italic text-muted-foreground">Bez popisu</span>
+                              <span className="italic text-muted-foreground">
+                                Bez popisu
+                              </span>
                             )}
                           </td>
                           <td className="px-5 py-3 align-top">
-                            <p className="text-xs font-medium">{entry.project_name ?? "Bez projektu"}</p>
+                            <p className="text-xs font-medium">
+                              {entry.project_name ?? "Bez projektu"}
+                            </p>
                             {entry.client_name && (
-                              <p className="mt-0.5 text-xs text-muted-foreground">{entry.client_name}</p>
+                              <p className="mt-0.5 text-xs text-muted-foreground">
+                                {entry.client_name}
+                              </p>
                             )}
                           </td>
                           <td className="whitespace-nowrap px-5 py-3 text-right align-top font-mono text-xs font-medium tabular-nums">
@@ -369,10 +403,18 @@ function SummaryCard({
         </div>
         <div className="min-w-0">
           <p className="text-xs text-muted-foreground">{label}</p>
-          <p className={emphasis ? "mt-1 truncate text-xl font-semibold tabular-nums text-primary" : "mt-1 truncate text-xl font-semibold tabular-nums"}>
+          <p
+            className={
+              emphasis
+                ? "mt-1 truncate text-xl font-semibold tabular-nums text-primary"
+                : "mt-1 truncate text-xl font-semibold tabular-nums"
+            }
+          >
             {value}
           </p>
-          <p className="mt-0.5 truncate text-xs text-muted-foreground">{detail}</p>
+          <p className="mt-0.5 truncate text-xs text-muted-foreground">
+            {detail}
+          </p>
         </div>
       </CardContent>
     </Card>

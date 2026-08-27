@@ -22,7 +22,7 @@ class DBWorkspaceInvitation(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class WorkspaceInvitation(DBWorkspaceInvitation):
+class WorkspaceInvitationRead(DBWorkspaceInvitation):
     id: int
     workspace_id: int
     user_id: int

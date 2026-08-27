@@ -1,3 +1,10 @@
+import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { toast } from "sonner";
+import * as z from "zod";
+import { UserPlus } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -6,7 +13,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldContent,
@@ -15,13 +21,16 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { useForm } from "@tanstack/react-form";
-import { UserPlus } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { $api } from "@/lib/api";
+import type { components } from "@/lib/api.d";
 import { useWorkspaceStore } from "../store";
-import { toast } from "sonner";
-import * as z from "zod";
 
 const formSchema = z.object({
   email: z.email("Zadejte platný e-mail"),
@@ -29,54 +38,38 @@ const formSchema = z.object({
 
 export function WorkspaceShare() {
   const [open, setOpen] = useState(false);
+  const [role, setRole] = useState<components["schemas"]["WorkspaceRole"]>(
+    "member",
+  );
   const { activeWorkspace } = useWorkspaceStore();
   const { mutateAsync, isPending } = $api.useMutation(
     "post",
-    "/api/v1/workspaces/{workspace_id}/members/",
+    "/api/v1/workspaces/invitations",
   );
 
-  const handleInvite = async (email: string) => {
-    if (!activeWorkspace) return;
-
-    try {
-      await mutateAsync({
-        params: {
-          path: {
-            workspace_id: activeWorkspace,
-          },
-          header: {
-            "X-Workspace-Id": activeWorkspace,
-          },
-          query: {
-            candidate_email: email,
-          },
-        },
-      });
-
-      setOpen(false);
-      form.reset();
-      toast.success("Člen byl pozván do workspace");
-    } catch {
-      toast.error(
-        "Nepodařilo se pozvat člena workspace. Zkontrolujte e-mail a zkuste to znovu.",
-      );
-    }
-  };
-
   const form = useForm({
-    defaultValues: {
-      email: "",
-    },
-    validators: {
-      onSubmit: formSchema,
-    },
+    defaultValues: { email: "" },
+    validators: { onSubmit: formSchema },
     onSubmit: async ({ value }) => {
       if (!activeWorkspace) {
-        toast.error("Nejprve vyberte workspace");
+        toast.error("Nejprve vyberte workspace.");
         return;
       }
 
-      await handleInvite(value.email.trim());
+      try {
+        await mutateAsync({
+          params: { header: { "X-Workspace-Id": activeWorkspace } },
+          body: { email: value.email.trim(), role },
+        });
+        setOpen(false);
+        form.reset();
+        setRole("member");
+        toast.success("Pozvánka byla odeslána.");
+      } catch {
+        toast.error(
+          "Pozvánku se nepodařilo odeslat. Zkontrolujte e-mail a zkuste to znovu.",
+        );
+      }
     },
   });
 
@@ -88,9 +81,9 @@ export function WorkspaceShare() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Pozvat členy workspace</DialogTitle>
+          <DialogTitle>Pozvat člena do workspace</DialogTitle>
           <DialogDescription>
-            Zadejte e-mail člověka, kterého chcete přidat do tohoto workspace.
+            Pozvaný člověk musí mít účet se stejnou e-mailovou adresou.
           </DialogDescription>
         </DialogHeader>
         <form
@@ -113,29 +106,36 @@ export function WorkspaceShare() {
                     <FieldContent>
                       <Input
                         id={field.name}
-                        name={field.name}
                         type="email"
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
-                          field.handleChange(event.target.value)
-                        }
+                        onChange={(event) => field.handleChange(event.target.value)}
                         aria-invalid={isInvalid}
                         placeholder="kolega@firma.cz"
                         autoComplete="email"
                         autoFocus
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
                     </FieldContent>
                   </Field>
                 );
               }}
             />
+            <Field>
+              <FieldLabel htmlFor="invite-role">Role ve workspace</FieldLabel>
+              <Select value={role} onValueChange={(value) => setRole(value as typeof role)}>
+                <SelectTrigger id="invite-role">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="member">Člen</SelectItem>
+                  <SelectItem value="admin">Administrátor</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
           </FieldGroup>
           <Button className="w-full" type="submit" disabled={isPending}>
-            {isPending ? "Odesílám pozvánku…" : "Pozvat člena"}
+            {isPending ? "Odesílám pozvánku…" : "Odeslat pozvánku"}
           </Button>
         </form>
       </DialogContent>

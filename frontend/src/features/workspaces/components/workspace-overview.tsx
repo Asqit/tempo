@@ -36,7 +36,7 @@ function CreateWorkspaceDialog() {
 
   const { mutate, isPending } = $api.useMutation(
     "post",
-    "/api/v1/workspaces/",
+    "/api/v1/workspaces",
     {
       onSuccess: (workspace) => {
         queryClient.invalidateQueries({

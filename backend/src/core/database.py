@@ -51,6 +51,7 @@ from src.api.v1.projects import projects_models  # noqa: F401
 from src.api.v1.reports import reports_models  # noqa: F401
 from src.api.v1.time_entries import time_entires_models  # noqa: F401
 from src.api.v1.workspace import (  # noqa: F401
+    invitation_models,
     workspace_members_models,
     workspace_models,
 )

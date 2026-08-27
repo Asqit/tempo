@@ -42,7 +42,6 @@ def create_app() -> FastAPI:
 
     app.include_router(v1)
 
-    app.add_middleware(logging_middleware.LoggingMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -51,7 +50,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    add_pagination(app)
+    _ = add_pagination(app)
 
     # FastApiMCP package is now incompatible with FastAPI
     # mcp = FastApiMCP(

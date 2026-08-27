@@ -6,6 +6,14 @@ from sqlalchemy import exists, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.auth.auth_models import User
+from src.api.v1.notifications.notifications_schemas import (
+    WorkspaceInviteAcceptedPayload,
+    WorkspaceInvitePayload,
+    WorkspaceLeftPayload,
+    WorkspaceRemovedPayload,
+    WorkspaceRoleChangedPayload,
+)
+from src.api.v1.notifications.notifications_service import NotificationsService
 from src.api.v1.workspace.invitation_models import WorkspaceInvitation
 from src.api.v1.workspace.invitation_schemas import WorkspaceInvitationCreate
 from src.api.v1.workspace.workspace_members_helpers import has_permission
@@ -14,7 +22,7 @@ from src.api.v1.workspace.workspace_members_schemas import (
     WorkspaceRole,
 )
 from src.api.v1.workspace.workspace_models import Workspace
-from src.api.v1.workspace.workspace_schemas import WorkspaceCreate, WorkspaceUpdate
+from src.api.v1.workspace.workspace_schemas import WorkspaceCreate
 
 from .workspace_members_models import WorkspaceMember
 
@@ -87,7 +95,7 @@ class WorkspaceService:
     # -------------------------------------------------------------- LIST MEMBERS
     @staticmethod
     async def list_workspace_members(db: AsyncSession, workspace_id: int):
-        return paginate(
+        return await paginate(
             db,
             select(WorkspaceMember).where(WorkspaceMember.workspace_id == workspace_id),
         )
@@ -111,7 +119,24 @@ class WorkspaceService:
         ) and admin.role != WorkspaceRole.OWNER:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
+        old_role = member.role
         member.role = body.role
+
+        if member.user_id != admin.user_id and old_role != body.role:
+            await NotificationsService.create_notification(
+                db,
+                member.user_id,
+                WorkspaceRoleChangedPayload(
+                    workspace_id=admin.workspace_id,
+                    workspace_name=admin.workspace.name,
+                    member_user_id=member.user_id,
+                    member_name=member.user.name,
+                    changed_by_user_id=admin.user_id,
+                    changed_by_name=admin.user.name,
+                    old_role=old_role.value,
+                    new_role=body.role.value,
+                ),
+            )
 
         await db.commit()
         await db.refresh(member)
@@ -132,6 +157,18 @@ class WorkspaceService:
         ):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
+        if member.user_id != admin.user_id:
+            await NotificationsService.create_notification(
+                db,
+                member.user_id,
+                WorkspaceRemovedPayload(
+                    workspace_id=member.workspace_id,
+                    workspace_name=member.workspace.name,
+                    removed_by_user_id=admin.user_id,
+                    removed_by_name=admin.user.name,
+                ),
+            )
+
         await db.delete(member)
         await db.commit()
         return member_id
@@ -139,6 +176,19 @@ class WorkspaceService:
     # -------------------------------------------------------------- LEAVE WORKSPACE
     @staticmethod
     async def leave_workspace(db: AsyncSession, member: WorkspaceMember):
+        if member.user_id != member.workspace.user_id:
+            owner = await db.get(User, member.workspace.user_id)
+            if owner is not None:
+                _ = await NotificationsService.create_notification(
+                    db,
+                    owner.id,
+                    WorkspaceLeftPayload(
+                        workspace_id=member.workspace_id,
+                        workspace_name=member.workspace.name,
+                        user_id=member.user_id,
+                        user_name=member.user.name,
+                    ),
+                )
         await db.delete(member)
         await db.commit()
 
@@ -146,11 +196,9 @@ class WorkspaceService:
     # -------------------------------------------------------------- GET INVITATIONS
     @staticmethod
     async def list_invitations(db: AsyncSession, user_id: int):
-        return paginate(
+        return await paginate(
             db,
-            select(WorkspaceInvitation)
-            .where(WorkspaceInvitation.user_id == user_id)
-            .order_by(WorkspaceInvitation.expires_at.desc()),
+            select(WorkspaceInvitation).where(WorkspaceInvitation.user_id == user_id),
         )
 
     # -------------------------------------------------------------- CREATE INVITATION
@@ -177,7 +225,9 @@ class WorkspaceService:
         )
 
         if conflict is not None:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT)
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail="already invited"
+            )
 
         membership = await db.scalar(
             select(WorkspaceMember).where(
@@ -187,19 +237,36 @@ class WorkspaceService:
         )
 
         if membership:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT)
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail="already member"
+            )
 
+        role = body.role or WorkspaceRole.MEMBER
         invite = WorkspaceInvitation(
             workspace_id=workspace_id,
             user_id=invitee_user.id,
+            role=role,
             expires_at=datetime.now(UTC) + timedelta(days=30),
         )
 
         db.add(invite)
+        await db.flush()
+
+        _ = await NotificationsService.create_notification(
+            db,
+            invitee_user.id,
+            WorkspaceInvitePayload(
+                invitation_id=invite.id,
+                workspace_id=workspace_id,
+                workspace_name=member.workspace.name,
+                invited_by_user_id=member.user_id,
+                invited_by_name=member.user.name,
+                role=role.value,
+            ),
+        )
+
         await db.commit()
         await db.refresh(invite)
-
-        # TODO: Post notifications
 
         return invite
 
@@ -227,7 +294,21 @@ class WorkspaceService:
             role=invitation.role,
         )
 
-        # TODO: Post notifications
+        workspace = await db.get(Workspace, invitation.workspace_id)
+        owner = await db.get(User, workspace.user_id) if workspace else None
+        accepter = await db.get(User, user_id)
+        if workspace is not None and owner is not None and accepter is not None:
+            await NotificationsService.create_notification(
+                db,
+                owner.id,
+                WorkspaceInviteAcceptedPayload(
+                    workspace_id=workspace.id,
+                    workspace_name=workspace.name,
+                    accepted_by_user_id=accepter.id,
+                    accepted_by_name=accepter.name,
+                    role=membership.role.value,
+                ),
+            )
 
         invitation.accepted_at = now
         db.add(membership)

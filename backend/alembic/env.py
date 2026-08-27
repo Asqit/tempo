@@ -10,6 +10,7 @@ from src.api.v1.auth.auth_models import *
 from src.api.v1.clients.clients_models import *
 from src.api.v1.projects.projects_models import *
 from src.api.v1.time_entries.time_entires_models import *
+from src.api.v1.workspace import invitation_models, workspace_members_models, workspace_models
 from src.core.config import app_config
 from src.core.database import Base
 
