@@ -323,6 +323,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reports/live": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Live Report */
+        get: operations["get_live_report_api_v1_reports_live_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/reports/": {
         parameters: {
             query?: never;
@@ -335,23 +352,6 @@ export interface paths {
         put?: never;
         /** Save Live Report */
         post: operations["save_live_report_api_v1_reports__post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/reports/live": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Live Report */
-        get: operations["get_live_report_api_v1_reports_live_get"];
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -567,10 +567,10 @@ export interface components {
              * Format: date-time
              */
             period_end: string;
-            /** Client Id */
-            client_id?: number | null;
-            /** Project Id */
-            project_id?: number | null;
+            /** Client Ids */
+            client_ids?: number[] | null;
+            /** Project Ids */
+            project_ids?: number[] | null;
             /** Billable */
             billable?: boolean | null;
         };
@@ -816,8 +816,10 @@ export interface components {
             description: string;
             /** Workspace Id */
             workspace_id: number;
-            client_snapshot: components["schemas"]["ReportClientSnapshot"] | null;
-            project_snapshot: components["schemas"]["ReportProjectSnapshot"] | null;
+            /** Client Snapshot */
+            client_snapshot: components["schemas"]["ReportClientSnapshot"][];
+            /** Project Snapshot */
+            project_snapshot: components["schemas"]["ReportProjectSnapshot"][];
             /** Snapshots */
             snapshots: components["schemas"]["ReportEntrySnapshot"][];
         };
@@ -1971,7 +1973,9 @@ export interface operations {
     get_workspace_api_v1_workspaces__workspace_id__get: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
             path: {
                 workspace_id: number;
             };
@@ -2067,11 +2071,46 @@ export interface operations {
             };
         };
     };
+    get_live_report_api_v1_reports_live_get: {
+        parameters: {
+            query: {
+                period_start: string;
+                period_end: string;
+                client_ids?: number[] | null;
+                project_ids?: number[] | null;
+                billable?: boolean | null;
+            };
+            header: {
+                "X-Workspace-Id": number;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimeEntryRead"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_static_reports_api_v1_reports__get: {
         parameters: {
             query?: {
-                client_id?: number | null;
-                project_id?: number | null;
                 query?: string | null;
                 /** @description Page number */
                 page?: number;
@@ -2128,43 +2167,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_live_report_api_v1_reports_live_get: {
-        parameters: {
-            query: {
-                period_start: string;
-                period_end: string;
-                client_id?: number | null;
-                project_id?: number | null;
-                billable?: boolean | null;
-            };
-            header: {
-                "X-Workspace-Id": number;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TimeEntryRead"][];
                 };
             };
             /** @description Validation Error */

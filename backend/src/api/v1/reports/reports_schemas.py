@@ -9,8 +9,8 @@ class CreateReport(BaseModel):
     description: str = Field(max_length=64)
     period_start: datetime
     period_end: datetime
-    client_id: int | None = Field(default=None)
-    project_id: int | None = Field(default=None)
+    client_ids: list[int] | None = Field(default=None)
+    project_ids: list[int] | None = Field(default=None)
     billable: bool | None = Field(default=None)
 
 
@@ -46,6 +46,6 @@ class ReportRead(DBReportBase):
     name: str
     description: str
     workspace_id: int
-    client_snapshot: ReportClientSnapshot | None
-    project_snapshot: ReportProjectSnapshot | None
+    client_snapshot: list[ReportClientSnapshot]
+    project_snapshot: list[ReportProjectSnapshot]
     snapshots: list[ReportEntrySnapshot]

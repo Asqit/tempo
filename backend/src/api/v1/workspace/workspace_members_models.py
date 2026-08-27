@@ -5,16 +5,16 @@ from typing import TYPE_CHECKING
 from sqlalchemy import Enum, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.api.v1.workspace_members.workspace_members_schemas import WorkspaceRole
+from src.api.v1.workspace.workspace_members_schemas import WorkspaceRole
 
 if TYPE_CHECKING:
     from src.api.v1.auth.auth_models import User
-    from src.api.v1.workspace.workspace_models import Workspace
+
+    from .workspace_models import Workspace
 from src.core.database import Base
 
 
-# TODO: rename to singular
-class WorkspaceMembers(Base):
+class WorkspaceMember(Base):
     __tablename__ = "workspace_members"
     __table_args__ = (UniqueConstraint("user_id", "workspace_id"),)
 

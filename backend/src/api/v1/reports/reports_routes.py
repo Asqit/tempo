@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_204_NO_CONTENT
@@ -16,32 +16,28 @@ from src.core.database import get_db
 router = APIRouter(prefix="/reports", tags=["Reports"])
 
 
-@router.get("/", response_model=Page[ReportRead])
-async def get_static_reports(
-    db: Annotated[AsyncSession, Depends(get_db)],
-    workspace: Annotated[Workspace, Depends(get_current_workspace)],
-    client_id: int | None = None,
-    project_id: int | None = None,
-    query: str | None = None,
-):
-    return await ReportsService.get_static_reports(
-        db, workspace, client_id, project_id, query
-    )
-
-
 @router.get("/live", response_model=list[TimeEntryRead])
 async def get_live_report(
     period_start: datetime,
     period_end: datetime,
     db: Annotated[AsyncSession, Depends(get_db)],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
-    client_id: int | None = None,
-    project_id: int | None = None,
+    client_ids: Annotated[list[int] | None, Query()] = None,
+    project_ids: Annotated[list[int] | None, Query()] = None,
     billable: bool | None = None,
 ):
     return await ReportsService.get_live_report(
-        db, workspace, period_start, period_end, client_id, project_id, billable
+        db, workspace, period_start, period_end, client_ids, project_ids, billable
     )
+
+
+@router.get("/", response_model=Page[ReportRead])
+async def get_static_reports(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    workspace: Annotated[Workspace, Depends(get_current_workspace)],
+    query: str | None = None,
+):
+    return await ReportsService.get_static_reports(db, workspace, query)
 
 
 @router.get("/{id}", response_model=ReportRead)

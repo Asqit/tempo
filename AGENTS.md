@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This repository contains a Vite/React frontend in [frontend](frontend). This file only covers frontend work — never read, reason about, or touch backend code.
+This repository contains a Vite/React frontend in [frontend](frontend). This file only covers frontend work — never touch backend code.
 
 ## Working conventions
 

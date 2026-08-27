@@ -6,11 +6,12 @@ import {
 } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import { $api, getWorkspaceHeader } from "@/lib/api";
+import { $api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { formatMoney } from "@/lib/money";
 import { ProjectsTable } from "@/features/projects/components/projects-table";
 import { ClientHeader } from "./components/client-header";
+import { useWorkspaceStore } from "@/features/workspaces/store";
 
 type ClientDetailProps = {
   id: number;
@@ -34,7 +35,7 @@ function formatDateTime(value: string | null | undefined) {
 }
 
 export function ClientDetail({ id }: ClientDetailProps) {
-  const workspaceHeader = getWorkspaceHeader();
+  const { activeWorkspace, role } = useWorkspaceStore();
 
   const {
     data: client,
@@ -46,11 +47,13 @@ export function ClientDetail({ id }: ClientDetailProps) {
     {
       params: {
         path: { id },
-        header: workspaceHeader,
+        header: {
+          "X-Workspace-Id": activeWorkspace!,
+        },
       },
     },
     {
-      enabled: !!workspaceHeader,
+      enabled: !!activeWorkspace,
     },
   );
 
@@ -64,15 +67,15 @@ export function ClientDetail({ id }: ClientDetailProps) {
           page: 1,
           size: 100,
         },
-        header: workspaceHeader,
+        header: {
+          "X-Workspace-Id": activeWorkspace!,
+        },
       },
     },
     {
-      enabled: !!workspaceHeader,
+      enabled: !!activeWorkspace,
     },
   );
-
-  if (!workspaceHeader) return null;
 
   if (isLoading) {
     return <ClientDetailSkeleton />;
@@ -316,10 +319,8 @@ function ClientDetailSkeleton() {
             key={index}
             className={cn(
               "rounded-none border border-border/70 bg-card p-5",
-              index === 0 &&
-                "rounded-t-xl sm:rounded-tr-none sm:rounded-l-xl",
-              index === 2 &&
-                "rounded-b-xl sm:rounded-bl-none sm:rounded-r-xl",
+              index === 0 && "rounded-t-xl sm:rounded-tr-none sm:rounded-l-xl",
+              index === 2 && "rounded-b-xl sm:rounded-bl-none sm:rounded-r-xl",
             )}
           >
             <Skeleton className="size-9 rounded-lg" />

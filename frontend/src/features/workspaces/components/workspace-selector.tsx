@@ -18,9 +18,11 @@ import { $api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWorkspaceStore } from "../store";
+import { useAuthStore } from "@/features/auth";
 
 export function WorkspaceSelector() {
-  const { activeWorkspace, setWorkspace, reset } = useWorkspaceStore();
+  const { user } = useAuthStore();
+  const { activeWorkspace, setWorkspace, setRole, reset } = useWorkspaceStore();
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
   const { data, isLoading } = $api.useQuery("get", "/api/v1/workspaces", {
@@ -31,8 +33,24 @@ export function WorkspaceSelector() {
   const activeWorkspaceName = active?.name ?? "Všechny workspace";
 
   const handleWorkspaceChange = (id: number | null) => {
-    if (id === null) reset();
-    else setWorkspace(id);
+    if (id === null) {
+      reset();
+      setOpen(false);
+      return;
+    }
+
+    const workspace = workspaces.find((w) => w.id === id);
+    const member = workspace?.members.find(
+      (member) => member.user_id === user?.id,
+    );
+
+    if (!workspace || !member) {
+      return;
+    }
+
+    setWorkspace(workspace.id);
+    setRole(member.role);
+
     setOpen(false);
     queryClient.invalidateQueries();
   };

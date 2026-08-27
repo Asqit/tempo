@@ -8,8 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.auth.auth_helpers import get_current_user
 from src.api.v1.auth.auth_models import User
+from src.api.v1.workspace.workspace_members_helpers import get_member
 from src.api.v1.workspace.workspace_models import Workspace
-from src.api.v1.workspace_members.workspace_members_helpers import get_member
 from src.core.database import get_db
 
 

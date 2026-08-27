@@ -7,7 +7,19 @@ export type Snapshot = components["schemas"]["ReportEntrySnapshot"];
 export type ReportDetails = components["schemas"]["ReportRead"];
 
 export function getReportRate(report: ReportDetails) {
-  return parseHourlyRate(report.client_snapshot?.hourly_rate);
+  return parseHourlyRate(report.client_snapshot[0]?.hourly_rate);
+}
+
+export function getReportCurrency(report: ReportDetails) {
+  return report.client_snapshot[0]?.currency;
+}
+
+export function getReportClientNames(report: ReportDetails) {
+  return report.client_snapshot.map((client) => client.name).join(", ");
+}
+
+export function getReportProjectNames(report: ReportDetails) {
+  return report.project_snapshot.map((project) => project.name).join(", ");
 }
 
 export function getReportTotalMinutes(data: Snapshot[]) {

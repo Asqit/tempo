@@ -1,4 +1,4 @@
-import * as React from "react";
+import type { DateRange } from "react-day-picker";
 import {
   format,
   startOfWeek,
@@ -8,7 +8,7 @@ import {
   endOfMonth,
   subMonths,
 } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Folder, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -25,8 +25,9 @@ import {
 } from "@/components/ui/select";
 import { ClientPicker } from "@/features/clients/components/client-picker";
 import { ProjectPicker } from "@/features/projects/components/project-picker";
-import type { DateRange } from "react-day-picker";
 import { cs } from "date-fns/locale";
+import { FilterPill } from "@/components/share/filter-pill";
+import { useState } from "react";
 
 type Preset =
   "this_week" | "last_week" | "this_month" | "last_month" | "custom";
@@ -34,11 +35,11 @@ type Preset =
 interface Props {
   setStartTime(d: string): void;
   setEndTime(d: string): void;
-  setClientId(id: number): void;
-  setProjectId(id: number): void;
+  setClientIds(ids: number[]): void;
+  setProjectIds(ids: number[]): void;
   setBillable(b: boolean): void;
-  clientId?: number;
-  projectId?: number;
+  clientIds?: number[];
+  projectIds?: number[];
 }
 
 function getPresetRange(preset: Preset): DateRange | undefined {
@@ -71,18 +72,17 @@ export function ReportsToolbar(props: Props) {
   const {
     setStartTime,
     setEndTime,
-    setClientId,
-    setProjectId,
-    setBillable,
-    clientId,
-    projectId,
+    setClientIds,
+    setProjectIds,
+    clientIds,
+    projectIds,
   } = props;
 
-  const [preset, setPreset] = React.useState<Preset>("this_week");
-  const [range, setRange] = React.useState<DateRange | undefined>(
+  const [preset, setPreset] = useState<Preset>("this_week");
+  const [range, setRange] = useState<DateRange | undefined>(
     getPresetRange("this_week"),
   );
-  const [popoverOpen, setPopoverOpen] = React.useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   function applyRange(next: DateRange | undefined) {
     setRange(next);
@@ -110,54 +110,92 @@ export function ReportsToolbar(props: Props) {
   const rangeLabel =
     range?.from && range?.to
       ? `${format(range.from, "d MMM")} – ${format(range.to, "d MMM yyyy")}`
-      : "Select range";
+      : "Vyberte období";
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Select
-        value={preset}
-        onValueChange={(v) => handlePresetChange(v as Preset)}
+      {/* Období */}
+      <FilterPill
+        icon={CalendarIcon}
+        label={rangeLabel}
+        active={preset === "custom"}
+        onClear={() => {
+          setPreset("this_week");
+          applyRange(getPresetRange("this_week"));
+        }}
       >
-        <SelectTrigger className="w-[160px]">
-          <SelectValue placeholder="Period" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="this_week">This week</SelectItem>
-          <SelectItem value="last_week">Last week</SelectItem>
-          <SelectItem value="this_month">This month</SelectItem>
-          <SelectItem value="last_month">Last month</SelectItem>
-          <SelectItem value="custom">Custom</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className="w-[240px] justify-start text-left font-normal"
-            onClick={() => {
-              setPreset("custom");
-              setPopoverOpen(true);
-            }}
+        <div className="flex items-center gap-2 w-fit">
+          <Select
+            value={preset}
+            onValueChange={(v) => handlePresetChange(v as Preset)}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {rangeLabel}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            locale={cs}
-            mode="range"
-            selected={range}
-            onSelect={handleCustomSelect}
-            numberOfMonths={2}
-            defaultMonth={range?.from}
-          />
-        </PopoverContent>
-      </Popover>
+            <SelectTrigger className="w-[160px] border-0 shadow-none">
+              <SelectValue placeholder="Období" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="this_week">Tento Týden</SelectItem>
+              <SelectItem value="last_week">Minulý Týden</SelectItem>
+              <SelectItem value="this_month">Tento Měsíc</SelectItem>
+              <SelectItem value="last_month">Minulý Měsíc</SelectItem>
+              <SelectItem value="custom">Vlastní</SelectItem>
+            </SelectContent>
+          </Select>
 
-      <ClientPicker value={clientId ?? 0} onChange={(v) => setClientId(v)} />
-      <ProjectPicker value={projectId ?? 0} onChange={(v) => setProjectId(v)} />
+          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+            <PopoverTrigger>
+              <Button
+                variant="ghost"
+                className="h-8 px-2 font-normal"
+                onClick={() => {
+                  setPreset("custom");
+                  setPopoverOpen(true);
+                }}
+              >
+                {rangeLabel}
+              </Button>
+            </PopoverTrigger>
+
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                locale={cs}
+                mode="range"
+                selected={range}
+                onSelect={handleCustomSelect}
+                numberOfMonths={2}
+                defaultMonth={range?.from}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+      </FilterPill>
+
+      <FilterPill
+        icon={User}
+        label={clientIds?.length ? `Klienti (${clientIds.length})` : "Klienti"}
+        active={!!clientIds?.length}
+        onClear={() => setClientIds([])}
+      >
+        <ClientPicker
+          multiple
+          value={clientIds ?? []}
+          onChange={setClientIds}
+        />
+      </FilterPill>
+
+      <FilterPill
+        icon={Folder}
+        label={
+          projectIds?.length ? `Projekty (${projectIds.length})` : "Projekty"
+        }
+        active={!!projectIds?.length}
+        onClear={() => setProjectIds([])}
+      >
+        <ProjectPicker
+          multiple
+          value={projectIds ?? []}
+          onChange={setProjectIds}
+        />
+      </FilterPill>
     </div>
   );
 }

@@ -6,7 +6,8 @@ from pydantic import BaseModel, Field
 from src.api.v1.auth.auth_schemas import UserRead
 from src.api.v1.clients.clients_schemas import ClientShallow
 from src.api.v1.time_entries.time_entries_schemas import TimeEntryRead
-from src.api.v1.workspace_members.workspace_members_schemas import (
+
+from .workspace_members_schemas import (
     WorkspaceMemberRead,
 )
 

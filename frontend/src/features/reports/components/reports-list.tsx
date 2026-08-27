@@ -64,7 +64,7 @@ export function ReportsList({ reports }: Props) {
                   onClick={() =>
                     navigate({
                       to: "/app/reports/saved/$id",
-                      params: { id: report.id },
+                      params: { id: String(report.id) },
                     })
                   }
                   onKeyDown={(e) => {
@@ -72,7 +72,7 @@ export function ReportsList({ reports }: Props) {
                       e.preventDefault();
                       navigate({
                         to: "/app/reports/saved/$id",
-                        params: { id: report.id },
+                        params: { id: String(report.id) },
                       });
                     }
                   }}
@@ -87,13 +87,14 @@ export function ReportsList({ reports }: Props) {
                     )}
                   </TableCell>
                   <TableCell>
-                    {report.client_snapshot ? (
+                    {report.client_snapshot.length > 0 ? (
                       <span className="inline-flex items-center gap-1.5">
-                        {report.client_snapshot.name}
-                        {report.client_snapshot.hourly_rate && (
+                        {report.client_snapshot.map((client) => client.name).join(", ")}
+                        {report.client_snapshot.length === 1 &&
+                          report.client_snapshot[0].hourly_rate && (
                           <span className="text-xs text-muted-foreground">
-                            ({report.client_snapshot.hourly_rate}{" "}
-                            {report.client_snapshot.currency}/h)
+                            ({report.client_snapshot[0].hourly_rate}{" "}
+                            {report.client_snapshot[0].currency}/h)
                           </span>
                         )}
                       </span>
@@ -102,7 +103,9 @@ export function ReportsList({ reports }: Props) {
                     )}
                   </TableCell>
                   <TableCell>
-                    {report.project_snapshot?.name ?? (
+                    {report.project_snapshot.length > 0 ? (
+                      report.project_snapshot.map((project) => project.name).join(", ")
+                    ) : (
                       <span className="text-muted-foreground">—</span>
                     )}
                   </TableCell>

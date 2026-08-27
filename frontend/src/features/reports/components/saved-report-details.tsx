@@ -20,7 +20,7 @@ const REPORT_MODES: Array<{
   icon: typeof ListChecks;
 }> = [
   { value: "detailed", label: "Detail", icon: ListChecks },
-  { value: "timesheet", label: "Timesheet", icon: CalendarDays },
+  { value: "timesheet", label: "Výkaz času", icon: CalendarDays },
   { value: "workload", label: "Vytížení", icon: Gauge },
 ];
 

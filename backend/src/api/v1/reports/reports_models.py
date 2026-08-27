@@ -74,19 +74,11 @@ class Report(Base):
         ForeignKey("workspaces.id", ondelete="CASCADE")
     )
 
-    # weak live refs — nulled if source deleted, snapshots below keep the real data
-    client_id: Mapped[int | None] = mapped_column(
-        ForeignKey("clients.id", ondelete="SET NULL"), nullable=True
+    client_snapshot: Mapped[list[ReportClientSnapshot]] = relationship(
+        cascade="all, delete-orphan", lazy="selectin"
     )
-    project_id: Mapped[int | None] = mapped_column(
-        ForeignKey("projects.id", ondelete="SET NULL"), nullable=True
-    )
-
-    client_snapshot: Mapped[ReportClientSnapshot | None] = relationship(
-        cascade="all, delete-orphan", uselist=False, lazy="selectin"
-    )
-    project_snapshot: Mapped[ReportProjectSnapshot | None] = relationship(
-        cascade="all, delete-orphan", uselist=False, lazy="selectin"
+    project_snapshot: Mapped[list[ReportProjectSnapshot]] = relationship(
+        cascade="all, delete-orphan", lazy="selectin"
     )
     snapshots: Mapped[list[ReportEntrySnapshot]] = relationship(
         cascade="all, delete-orphan", lazy="selectin"

@@ -1,15 +1,17 @@
+import type { components } from "@/lib/api.d";
 import { Button } from "@/components/ui/button";
 import { TimeEntryCreateDialog } from "@/features/time-entry/components/time-entry-create-dialog";
-
 import { PlayCircle } from "lucide-react";
-import type { components } from "@/lib/api.d";
 import { ClientUpdateDialog } from "../../client-update-dialog";
+import { useWorkspaceStore } from "@/features/workspaces/store";
 
 type ClientHeaderProps = {
   client: components["schemas"]["ClientRead"];
 };
 
 export function ClientHeader({ client }: ClientHeaderProps) {
+  const { role } = useWorkspaceStore();
+
   return (
     <header className="flex items-center justify-between">
       <div>
@@ -20,10 +22,20 @@ export function ClientHeader({ client }: ClientHeaderProps) {
         <h1 className="text-3xl uppercase font-black">{client.name}</h1>
       </div>
       <div className="flex gap-2 items-center">
-        <ClientUpdateDialog
-          trigger={<Button variant="outline">Upravit klienta</Button>}
-          client={client}
-        />
+        {role === "member" ? (
+          <Button
+            title="nemáte pravomoce na úpravy klienta"
+            variant="outline"
+            disabled
+          >
+            Upravit Klienta
+          </Button>
+        ) : (
+          <ClientUpdateDialog
+            trigger={<Button variant="outline">Upravit klienta</Button>}
+            client={client}
+          />
+        )}
         <TimeEntryCreateDialog
           trigger={
             <Button

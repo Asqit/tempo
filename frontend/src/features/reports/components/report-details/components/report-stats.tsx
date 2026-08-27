@@ -33,21 +33,21 @@ export function ReportStats({ entries }: Props) {
 
   const stats = [
     {
-      label: "Total hours",
+      label: "Celkem hodin",
       value: formatHoursFromMinutes(totalMinutes, false),
       icon: Clock,
     },
     {
-      label: "Billable hours",
+      label: "Zpoplatněné hodiny",
       value: formatHoursFromMinutes(billableMinutes, false),
       icon: TrendingUp,
       sub:
         totalHours > 0
-          ? `${Math.round((billableMinutes / totalMinutes) * 100)}% of total`
+          ? `${Math.round((billableMinutes / totalMinutes) * 100)} % z celku`
           : undefined,
     },
     {
-      label: "Total earned",
+      label: "Celková částka",
       value: formatMoney(totalEarned),
       icon: Wallet,
     },

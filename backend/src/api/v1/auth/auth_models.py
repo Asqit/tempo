@@ -5,8 +5,8 @@ from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.api.v1.workspace.workspace_members_models import WorkspaceMember
 from src.api.v1.workspace.workspace_models import Workspace
-from src.api.v1.workspace_members.workspace_members_models import WorkspaceMembers
 from src.core.database import Base
 
 
@@ -34,7 +34,7 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(32))
-    email: Mapped[str] = mapped_column(String(32))
+    email: Mapped[str] = mapped_column(String(32), unique=True)
     country: Mapped[str] = mapped_column(String())
     hashed_password: Mapped[str] = mapped_column(String(255))
 
@@ -42,6 +42,6 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan"
     )
 
-    workspace_accesses: Mapped[list[WorkspaceMembers]] = relationship(
+    workspace_accesses: Mapped[list[WorkspaceMember]] = relationship(
         back_populates="user", lazy="selectin"
     )

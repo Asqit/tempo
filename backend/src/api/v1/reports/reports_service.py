@@ -7,6 +7,8 @@ from sqlalchemy import asc, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from src.api.v1.clients.clients_models import Client
+from src.api.v1.projects.projects_models import Project
 from src.api.v1.reports.reports_models import (
     Report,
     ReportClientSnapshot,
@@ -49,15 +51,12 @@ class ReportsService:
     async def get_static_reports(
         db: AsyncSession,
         workspace: Workspace,
-        client_id: int | None,
-        project_id: int | None,
         query: str | None,
     ):
-        filters = [Report.id == id, Report.workspace_id == workspace.id]
-        if project_id is not None:
-            filters.append(Report.project_id == project_id)
-        if client_id is not None:
-            filters.append(Report.client_id == client_id)
+        filters = [
+            Report.workspace_id == workspace.id,
+        ]
+
         if query:
             filters.append(
                 or_(
@@ -69,8 +68,8 @@ class ReportsService:
         return await paginate(
             db,
             select(Report)
-            .where(Report.workspace_id == workspace.id)
-            .order_by(Report.id.desc())
+            .where(*filters)
+            .order_by(Report.created_at.desc())
             .options(*ReportsService.REPORT_LOAD_OPTIONS),
         )
 
@@ -90,8 +89,8 @@ class ReportsService:
         workspace: Workspace,
         period_start: datetime,
         period_end: datetime,
-        client_id: int | None,
-        project_id: int | None,
+        client_ids: list[int] | None,
+        project_ids: list[int] | None,
         billable: bool | None,
     ):
         filters = [
@@ -99,10 +98,10 @@ class ReportsService:
             TimeEntry.start_time >= period_start,
             or_(TimeEntry.end_time.is_(None), TimeEntry.end_time <= period_end),
         ]
-        if client_id is not None:
-            filters.append(TimeEntry.client_id == client_id)
-        if project_id is not None:
-            filters.append(TimeEntry.project_id == project_id)
+        if client_ids is not None:
+            filters.append(TimeEntry.client_id.in_(client_ids))
+        if project_ids is not None:
+            filters.append(TimeEntry.project_id.in_(project_ids))
         if billable is not None:
             filters.append(TimeEntry.billable == billable)
 
@@ -123,8 +122,8 @@ class ReportsService:
             workspace,
             period_start=body.period_start,
             period_end=body.period_end,
-            client_id=body.client_id,
-            project_id=body.project_id,
+            client_ids=body.client_ids,
+            project_ids=body.project_ids,
             billable=body.billable,
         )
 
@@ -134,34 +133,21 @@ class ReportsService:
             description=body.description,
             period_start=body.period_start,
             period_end=body.period_end,
-            client_id=body.client_id,
-            project_id=body.project_id,
         )
         db.add(report)
         await db.flush()
 
-        # freeze client/project at the report level, if given
-        if entries:
-            first = entries[0]
-            if first.client is not None:
-                db.add(
-                    ReportClientSnapshot(
-                        report_id=report.id,
-                        name=first.client.name,
-                        hourly_rate=first.client.hourly_rate,
-                        currency=first.client.currency,
-                    )
-                )
-            if first.project is not None:
-                db.add(
-                    ReportProjectSnapshot(
-                        report_id=report.id,
-                        name=first.project.name,
-                    )
-                )
+        clients_map: dict[int, Client] = {}
+        projects_map: dict[int, Project] = {}
 
         for entry in entries:
             duration = 0
+            if entry.client is not None:
+                clients_map[entry.client.id] = entry.client
+
+            if entry.project is not None:
+                projects_map[entry.project.id] = entry.project
+
             if entry.end_time:
                 duration = int((entry.end_time - entry.start_time).total_seconds() / 60)
             db.add(
@@ -175,6 +161,19 @@ class ReportsService:
                     project_name=entry.project.name if entry.project else None,
                 )
             )
+
+        for client in clients_map.values():
+            db.add(
+                ReportClientSnapshot(
+                    report_id=report.id,
+                    name=client.name,
+                    hourly_rate=client.hourly_rate,
+                    currency=client.currency,
+                )
+            )
+
+        for project in projects_map.values():
+            db.add(ReportProjectSnapshot(report_id=report.id, name=project.name))
 
         await db.commit()
         await db.refresh(

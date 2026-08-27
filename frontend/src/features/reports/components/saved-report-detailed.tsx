@@ -22,6 +22,9 @@ import {
   formatDay,
   formatShortDay,
   getReportRate,
+  getReportClientNames,
+  getReportCurrency,
+  getReportProjectNames,
   getReportTotalMinutes,
   groupSnapshotsByDay,
   type ReportDetails,
@@ -38,6 +41,9 @@ const UNASSIGNED_LABEL = "Bez projektu";
 export function SavedReportDetailed({ data, report }: Props) {
   const totalMinutes = getReportTotalMinutes(data);
   const hourlyRate = getReportRate(report);
+  const currency = getReportCurrency(report);
+  const clientNames = getReportClientNames(report);
+  const projectNames = getReportProjectNames(report);
   const totalAmount = calculateAmount(totalMinutes, hourlyRate);
   const days = groupSnapshotsByDay(data);
 
@@ -104,14 +110,14 @@ export function SavedReportDetailed({ data, report }: Props) {
                     <CalendarDays data-icon="inline-start" />
                     {formatShortDay(report.period_start.slice(0, 10))} – {formatShortDay(report.period_end.slice(0, 10))}
                   </Badge>
-                  {report.client_snapshot && (
+                  {clientNames && (
                     <Badge variant="secondary">
                       <FileText data-icon="inline-start" />
-                      {report.client_snapshot.name}
+                      {clientNames}
                     </Badge>
                   )}
-                  {report.project_snapshot && (
-                    <Badge variant="secondary">{report.project_snapshot.name}</Badge>
+                  {projectNames && (
+                    <Badge variant="secondary">{projectNames}</Badge>
                   )}
                 </div>
               </div>
@@ -147,14 +153,14 @@ export function SavedReportDetailed({ data, report }: Props) {
           icon={Wallet}
           label="Odhadovaná částka"
           value={
-            totalAmount === null || !report.client_snapshot
+            totalAmount === null || !currency
               ? "—"
-              : formatMoney(totalAmount, report.client_snapshot.currency)
+              : formatMoney(totalAmount, currency)
           }
           detail={
-            hourlyRate === null || !report.client_snapshot
+            hourlyRate === null || !currency
               ? "Bez hodinové sazby"
-              : `${formatMoney(hourlyRate, report.client_snapshot.currency)} / h`
+              : `${formatMoney(hourlyRate, currency)} / h`
           }
           emphasis
         />
@@ -325,9 +331,9 @@ export function SavedReportDetailed({ data, report }: Props) {
                             {formatDuration(entry.duration_minutes, "short")}
                           </td>
                           <td className="whitespace-nowrap px-5 py-3 text-right align-top font-mono text-xs tabular-nums">
-                            {amount === null || !report.client_snapshot
+                            {amount === null || !currency
                               ? "—"
-                              : formatMoney(amount, report.client_snapshot.currency)}
+                              : formatMoney(amount, currency)}
                           </td>
                         </tr>
                       );

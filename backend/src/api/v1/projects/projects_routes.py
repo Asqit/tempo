@@ -11,11 +11,11 @@ from src.api.v1.projects.projects_schema import (
     ProjectUpdate,
 )
 from src.api.v1.projects.projects_service import ProjectsService
+from src.api.v1.workspace.workspace_members_helpers import require_role
+from src.api.v1.workspace.workspace_members_models import WorkspaceMember
+from src.api.v1.workspace.workspace_members_schemas import WorkspaceRole
 from src.api.v1.workspace.workspace_models import Workspace
 from src.api.v1.workspace.workspace_utils import get_current_workspace
-from src.api.v1.workspace_members.workspace_members_helpers import require_role
-from src.api.v1.workspace_members.workspace_members_models import WorkspaceMembers
-from src.api.v1.workspace_members.workspace_members_schemas import WorkspaceRole
 from src.core.database import get_db
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
@@ -25,7 +25,7 @@ router = APIRouter(prefix="/projects", tags=["Projects"])
 async def get_projects(
     db: Annotated[AsyncSession, Depends(get_db)],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
-    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.MEMBER))],
+    _role: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.MEMBER))],
     client_id: int | None = None,
 ):
     return await ProjectsService.get_projects(db, workspace, client_id)
@@ -35,7 +35,7 @@ async def get_projects(
 async def get_project(
     id: int,
     db: Annotated[AsyncSession, Depends(get_db)],
-    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.MEMBER))],
+    _role: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.MEMBER))],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
 ):
     return await ProjectsService.get_project(db, workspace, id)
@@ -47,7 +47,7 @@ async def get_project(
 async def create_project(
     payload: ProjectCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
-    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.ADMIN))],
+    _role: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.ADMIN))],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
     client_id: int,
 ):
@@ -59,7 +59,7 @@ async def update_project(
     id: int,
     payload: ProjectUpdate,
     db: Annotated[AsyncSession, Depends(get_db)],
-    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.ADMIN))],
+    _role: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.ADMIN))],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
     client_id: int,
 ):
@@ -71,7 +71,7 @@ async def delete_project(
     id: int,
     db: Annotated[AsyncSession, Depends(get_db)],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
-    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.ADMIN))],
+    _role: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.ADMIN))],
     client_id: int,
 ):
     return await ProjectsService.delete_project(db, workspace, client_id, id)
@@ -82,7 +82,7 @@ async def bulk_delete(
     body: ProjectBulkDelete,
     db: Annotated[AsyncSession, Depends(get_db)],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
-    _role: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.ADMIN))],
+    _role: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.ADMIN))],
     client_id: int,
 ):
     return await ProjectsService.bulk_delete(db, workspace, client_id, body.ids)

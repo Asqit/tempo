@@ -1,161 +1,84 @@
 import { useMemo, type ReactElement } from "react";
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  EntityPicker,
+  type EntityPickerProps,
+  type PickerOption,
+} from "@/components/ui/entity-picker";
 import { $api, getWorkspaceHeader } from "@/lib/api";
 
-type ProjectOption = {
-  id: number;
-  name: string;
-};
-
-type ProjectPickerProps = {
-  value: number | null;
-  onChange: (nextValue: number) => void;
-  disabled?: boolean;
-  placeholder?: string;
+type ProjectOption = PickerOption;
+type ProjectTriggerProps = {
+  selected: ProjectOption | null;
+  disabled: boolean;
+  isLoading: boolean;
+  placeholder: string;
   id?: string;
-  trigger?: (props: {
-    selected: ProjectOption | null;
-    disabled: boolean;
-    isLoading: boolean;
-    placeholder: string;
-    id?: string;
-  }) => ReactElement;
 };
 
 function normalizeProjects(data: unknown): ProjectOption[] {
-  const source =
-    data &&
-    typeof data === "object" &&
-    "items" in data &&
-    Array.isArray((data as { items?: unknown[] }).items)
-      ? (data as { items: unknown[] }).items
-      : Array.isArray(data)
-        ? data
-        : [];
+  if (!data || typeof data !== "object" || !("items" in data)) return [];
+  const items = (data as { items?: unknown }).items;
+  if (!Array.isArray(items)) return [];
 
-  return source
-    .map((item) => {
-      if (!item || typeof item !== "object") {
-        return null;
-      }
-
-      const raw = item as {
-        id?: unknown;
-        name?: unknown;
-      };
-
-      if (typeof raw.id !== "number" || typeof raw.name !== "string") {
-        return null;
-      }
-
-      return {
-        id: raw.id,
-        name: raw.name,
-      } satisfies ProjectOption;
-    })
-    .filter((project): project is ProjectOption => project !== null);
+  return items.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const raw = item as { id?: unknown; name?: unknown };
+    return typeof raw.id === "number" && typeof raw.name === "string"
+      ? [{ id: raw.id, name: raw.name }]
+      : [];
+  });
 }
 
-export function ProjectPicker({
-  value,
-  onChange,
-  disabled = false,
-  placeholder = "Vyber projekt",
-  id,
-  trigger,
-}: ProjectPickerProps) {
-  const workspaceHeader = getWorkspaceHeader();
+export type ProjectPickerProps =
+  | {
+      multiple?: false;
+      value: number | null;
+      onChange: (value: number) => void;
+      disabled?: boolean;
+      placeholder?: string;
+      id?: string;
+      trigger?: (props: ProjectTriggerProps) => ReactElement;
+    }
+  | {
+      multiple: true;
+      value: number[];
+      onChange: (value: number[]) => void;
+      disabled?: boolean;
+      placeholder?: string;
+      id?: string;
+      trigger?: (props: {
+        selected: ProjectOption[];
+        disabled: boolean;
+        isLoading: boolean;
+        placeholder: string;
+        id?: string;
+      }) => ReactElement;
+    };
 
+export function ProjectPicker(props: ProjectPickerProps) {
+  const workspaceHeader = getWorkspaceHeader();
   const { data, isLoading } = $api.useQuery("get", "/api/v1/projects/", {
     params: {
-      query: {
-        page: 1,
-        size: 100,
-      },
+      query: { page: 1, size: 100 },
       header: workspaceHeader ?? { "X-Workspace-Id": 0 },
     },
     enabled: !!workspaceHeader,
-  } as unknown as never);
-
+  });
   const options = useMemo(() => normalizeProjects(data), [data]);
 
-  const selected = useMemo(
-    () => options.find((option) => option.id === value) ?? null,
-    [options, value],
-  );
+  if (!workspaceHeader) return null;
 
-  const isDisabled = disabled || isLoading || options.length === 0;
-
-  if (!workspaceHeader) {
-    return null;
-  }
+  const pickerProps = props as unknown as EntityPickerProps<ProjectOption>;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          trigger ? (
-            trigger({
-              selected,
-              disabled: isDisabled,
-              isLoading,
-              placeholder,
-              id,
-            })
-          ) : (
-            <Button
-              type="button"
-              variant="outline"
-              id={id}
-              disabled={isDisabled}
-              className="min-w-48 justify-between"
-            />
-          )
-        }
-      >
-        {!trigger ? (
-          <>
-            <span className="truncate">
-              {selected?.name ??
-                (isLoading
-                  ? "Načítám projekty..."
-                  : options.length
-                    ? placeholder
-                    : "Projekty nenalezeny")}
-            </span>
-
-            <ChevronsUpDownIcon className="size-4" />
-          </>
-        ) : null}
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent className="w-64">
-        {options.length > 0 ? (
-          options.map((option) => (
-            <DropdownMenuItem
-              key={option.id}
-              onClick={() => onChange(option.id)}
-              className="justify-between"
-            >
-              <span className="truncate">{option.name}</span>
-
-              {value === option.id ? <CheckIcon className="size-4" /> : null}
-            </DropdownMenuItem>
-          ))
-        ) : (
-          <div className="px-2 py-1.5 text-sm text-muted-foreground">
-            {isLoading ? "Načítám projekty..." : "Projekty nenalezeny"}
-          </div>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <EntityPicker
+      {...pickerProps}
+      options={options}
+      isLoading={isLoading}
+      placeholder={props.placeholder ?? "Vyber projekt"}
+      emptyLabel="Projekty nenalezeny"
+      loadingLabel="Načítám projekty..."
+    />
   );
 }

@@ -16,7 +16,7 @@ function RouteComponent() {
   if (!Number.isFinite(numericId)) {
     return (
       <p className="text-sm text-destructive">
-        Tohle není validní ID projektu.
+        Tohle není platné ID reportu.
       </p>
     );
   }

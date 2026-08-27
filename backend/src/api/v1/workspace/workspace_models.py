@@ -7,11 +7,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.api.v1.clients.clients_models import Client
 from src.api.v1.time_entries.time_entires_models import TimeEntry
-from src.api.v1.workspace_members.workspace_members_models import WorkspaceMembers
 from src.core.database import Base
 
 if TYPE_CHECKING:
     from src.api.v1.auth.auth_models import User
+
+    from .workspace_members_models import WorkspaceMember
 
 
 class Workspace(Base):
@@ -23,7 +24,7 @@ class Workspace(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped[User] = relationship(back_populates="workspaces", lazy="selectin")
 
-    members: Mapped[list[WorkspaceMembers]] = relationship(
+    members: Mapped[list[WorkspaceMember]] = relationship(
         back_populates="workspace", lazy="selectin"
     )
 

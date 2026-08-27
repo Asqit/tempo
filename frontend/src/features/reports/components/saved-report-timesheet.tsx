@@ -8,6 +8,7 @@ import { formatDuration } from "@/lib/time";
 import {
   formatDay,
   getReportRate,
+  getReportCurrency,
   getReportTotalMinutes,
   groupSnapshotsByDay,
   type ReportDetails,
@@ -22,6 +23,7 @@ interface Props {
 export function SavedReportTimesheet({ data, report }: Props) {
   const totalMinutes = getReportTotalMinutes(data);
   const hourlyRate = getReportRate(report);
+  const currency = getReportCurrency(report);
   const totalAmount = calculateAmount(totalMinutes, hourlyRate);
   const days = groupSnapshotsByDay(data);
 
@@ -33,7 +35,7 @@ export function SavedReportTimesheet({ data, report }: Props) {
             <div>
               <CardTitle className="flex items-center gap-2 text-base">
                 <ClipboardList className="size-4 text-primary" />
-                Timesheet pro klienta
+                Výkaz času pro klienta
               </CardTitle>
               <p className="mt-1 text-sm text-muted-foreground">
                 Denní přehled práce připravený ke kontrole nebo odeslání.
@@ -62,9 +64,9 @@ export function SavedReportTimesheet({ data, report }: Props) {
               K fakturaci
             </p>
             <p className="mt-1 text-2xl font-semibold tabular-nums">
-              {totalAmount === null || !report.client_snapshot
+              {totalAmount === null || !currency
                 ? "—"
-                : formatMoney(totalAmount, report.client_snapshot.currency)}
+                : formatMoney(totalAmount, currency)}
             </p>
           </div>
         </CardContent>
@@ -91,9 +93,9 @@ export function SavedReportTimesheet({ data, report }: Props) {
                     <h3 className="text-sm font-semibold capitalize">{formatDay(day)}</h3>
                     <div className="flex items-center gap-3 text-sm tabular-nums">
                       <span className="font-medium">{formatDuration(dayMinutes, "spaced")}</span>
-                      {dayAmount !== null && report.client_snapshot && (
+                      {dayAmount !== null && currency && (
                         <span className="text-muted-foreground">
-                          {formatMoney(dayAmount, report.client_snapshot.currency)}
+                          {formatMoney(dayAmount, currency)}
                         </span>
                       )}
                     </div>

@@ -142,13 +142,12 @@ export function ReportTable({ entries }: Props) {
                                 style={{
                                   backgroundColor: generateColorFromString(
                                     entry.project.name,
-                                  ),
-                                  // @ts-expect-error -- CSS custom property for the ring color
+                                  ).bg,
                                   "--tw-ring-color": generateColorFromString(
                                     entry.project.name,
                                   ),
                                   opacity: 1,
-                                }}
+                                } as React.CSSProperties}
                               />
                               {entry.project.name}
                             </span>

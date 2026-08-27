@@ -6,21 +6,25 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.auth.auth_helpers import get_current_user
 from src.api.v1.auth.auth_models import User
+from src.api.v1.workspace.invitation_schemas import WorkspaceInvitationCreate
+from src.api.v1.workspace.workspace_members_helpers import require_role
+from src.api.v1.workspace.workspace_members_models import WorkspaceMember
+from src.api.v1.workspace.workspace_members_schemas import (
+    WorkspaceMemberUpdate,
+    WorkspaceRole,
+)
 from src.api.v1.workspace.workspace_schemas import (
     WorkspaceCreate,
     WorkspaceRead,
     WorkspaceUpdate,
 )
 from src.api.v1.workspace.workspace_service import WorkspaceService
-from src.api.v1.workspace_members.workspace_members_helpers import require_role
-from src.api.v1.workspace_members.workspace_members_models import WorkspaceMembers
-from src.api.v1.workspace_members.workspace_members_schemas import WorkspaceRole
 from src.core.database import get_db
 
 router = APIRouter(prefix="/workspaces", tags=["Workspace"])
 
 
-@router.post("/", response_model=WorkspaceRead)
+@router.post("", response_model=WorkspaceRead)
 async def create_workspace(
     body: WorkspaceCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -37,29 +41,91 @@ async def list_workspaces(
     return await WorkspaceService.list_workspaces(db, current_user.id)
 
 
-@router.get("/{workspace_id}", response_model=WorkspaceRead)
-async def get_workspace(
-    workspace_id: int,
-    db: Annotated[AsyncSession, Depends(get_db)],
-    _: Annotated[User, Depends(get_current_user)],
-):
-    return await WorkspaceService.get_workspace(db, workspace_id)
-
-
-@router.put("/{workspace_id}", response_model=WorkspaceRead)
-async def update_workspace(
-    workspace_id: int,
-    body: WorkspaceUpdate,
-    db: Annotated[AsyncSession, Depends(get_db)],
-    user: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.MEMBER))],
-):
-    return await WorkspaceService.update_workspace(db, user.id, workspace_id, body)
-
-
-@router.delete("/{workspace_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_workspace(
-    workspace_id: int,
     db: Annotated[AsyncSession, Depends(get_db)],
-    user: Annotated[WorkspaceMembers, Depends(require_role(WorkspaceRole.MEMBER))],
+    member: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.OWNER))],
 ):
-    return await WorkspaceService.delete_workspace(db, user.id, workspace_id)
+    return await WorkspaceService.delete_workspace(db, member)
+
+
+# --------------------------------------------------------------------------------------- MEMBERS <<--
+
+
+@router.get("/members")
+async def list_workspace_members(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    member: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.MEMBER))],
+):
+    """Get all members for selected workspace"""
+    return await WorkspaceService.list_workspace_members(db, member.workspace_id)
+
+
+@router.put("/members/{member_id}")
+async def update_workspace_member(
+    body: WorkspaceMemberUpdate,
+    member_id: int,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    admin: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.ADMIN))],
+):
+    """Update workspace member"""
+    return await WorkspaceService.update_workspace_member(db, member_id, body, admin)
+
+
+@router.delete("/members/{member_id}")
+async def remove_workspace_member(
+    member_id: int,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    admin: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.ADMIN))],
+):
+    """removes member from workspace"""
+    await WorkspaceService.remove_workspace_member(db, member_id, admin)
+
+
+@router.delete("/members/me")
+async def leave_workspace(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    member: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.MEMBER))],
+):
+    """removes requestee from workspace"""
+    await WorkspaceService.leave_workspace(db, member)
+
+
+# --------------------------------------------------------------------------------------- INVITATIONS <<--
+
+
+@router.get("/invitations")
+async def list_all_workspace_invitations(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    return await WorkspaceService.list_invitations(db, current_user.id)
+
+
+@router.post("/invitations")
+async def create_invitation(
+    body: WorkspaceInvitationCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    member: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.MEMBER))],
+):
+    return await WorkspaceService.create_invitation(
+        db, body, member, member.workspace_id
+    )
+
+
+@router.post("/invitations/accept/{invitation_id}")
+async def accept_invitation(
+    invitation_id: int,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    return await WorkspaceService.accept_invitation(db, invitation_id, current_user.id)
+
+
+@router.delete("/invitations/revoke/{invitation_id}")
+async def revoke_invitation(
+    invitation_id: int,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    return await WorkspaceService.revoke_invitation(db, invitation_id, current_user.id)
