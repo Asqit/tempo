@@ -1,0 +1,14 @@
+{
+  "name": "@tempo/api-types",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun ../../scripts/watch-openapi.ts"
+  },
+  "exports": {
+    ".": "./src/api.d.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "@tempo/api",
+  "private": true,
+  "scripts": {
+    "dev": "uv run python -m uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir src"  }
+}
