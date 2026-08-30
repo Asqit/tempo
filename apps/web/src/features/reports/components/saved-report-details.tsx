@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CalendarDays, Gauge, ListChecks } from "lucide-react";
 
-import { Toggle } from "@/components/ui/toggle";
+import { Toggle } from "@tempo/ui/components/toggle";
 import { SavedReportDetailed } from "./saved-report-detailed";
 import { SavedReportTimesheet } from "./saved-report-timesheet";
 import { SavedReportWorkload } from "./saved-report-workload";

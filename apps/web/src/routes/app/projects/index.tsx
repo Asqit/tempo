@@ -4,7 +4,7 @@ import { ProjectsTable } from "@/features/projects/components/projects-table";
 import { ProjectCreate } from "@/features/projects/components/project-create";
 import { ClientPicker } from "@/features/clients/components/client-picker";
 import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 import { PageHeader } from "@/components/share/page-header";
 
 export const Route = createFileRoute("/app/projects/")({

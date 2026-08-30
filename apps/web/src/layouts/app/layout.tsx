@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "@tanstack/react-router";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@tempo/ui/components/sidebar";
 import { AppSidebar } from "./components/app-sidebar";
 import { AppHeader } from "./components/app-header";
 import { WorkspaceOverview } from "@/features/workspaces/components/workspace-overview";
@@ -27,7 +27,7 @@ export function AppLayout() {
       <SidebarInset className="print-report-shell">
         <div className="flex min-h-svh flex-col bg-sidebar pl-4">
           <AppHeader />
-          <main className="flex-1 rounded-tl-2xl bg-background px-4 py-5 md:px-8 md:py-7 print-report-main">
+          <main className="flex-1 rounded-tl-2xl bg-background shadow-lg px-4 py-5 md:px-8 md:py-7 print-report-main">
             <WorkspaceRequiredContent />
           </main>
         </div>

@@ -1,4 +1,4 @@
-import { Progress, ProgressLabel } from "@/components/ui/progress";
+import { Progress, ProgressLabel } from "@tempo/ui/components/progress";
 
 function formatDate(date: Date | null): string {
   if (!date) return "—";

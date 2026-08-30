@@ -5,7 +5,7 @@ import { EntriesTable } from "@/features/time-entry/components/entries-table";
 import { ProjectHeader } from "./components/project-header";
 import { ProjectProgress } from "./components/project-progress";
 import { ProjectStatsGrid } from "./components/project-stats-grid";
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@tempo/ui/components/separator";
 import { formatHours } from "@/lib/time";
 
 type ProjectDetailProps = {

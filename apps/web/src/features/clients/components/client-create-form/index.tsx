@@ -1,17 +1,24 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@tempo/ui/components/button";
 import { $api, getWorkspaceHeader } from "@/lib/api";
 import type { components } from "@/lib/api.d";
+import {
+  ClientFormFields,
+  emptyClientFormValues,
+  type ClientFormValues,
+} from "../client-form-fields";
+import { clientPayload } from "../client-types";
 
 type ClientCreateFormProps = {
   onCreated?: (client: components["schemas"]["ClientRead"]) => void;
 };
 
 export function ClientCreateForm({ onCreated }: ClientCreateFormProps) {
-  const [name, setName] = useState("");
+  const [values, setValues] = useState<ClientFormValues>(
+    emptyClientFormValues,
+  );
   const workspaceHeader = getWorkspaceHeader();
   const { mutateAsync, isPending } = $api.useMutation(
     "post",
@@ -21,50 +28,40 @@ export function ClientCreateForm({ onCreated }: ClientCreateFormProps) {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const trimmedName = name.trim();
-    if (!trimmedName) {
-      toast.error("Nazev klienta je povinny");
+    if (!values.name.trim()) {
+      toast.error("Název klienta je povinný.");
+      return;
+    }
+    if (!workspaceHeader) {
+      toast.error("Vyber workspace.");
       return;
     }
 
     try {
-      if (!workspaceHeader) {
-        toast.error("Vyber workspace");
-        return;
-      }
-
       const createdClient = await mutateAsync({
-        params: {
-          header: workspaceHeader,
-        },
-        body: {
-          name: trimmedName,
-        },
+        params: { header: workspaceHeader },
+        body: clientPayload(values),
       });
-
-      setName("");
+      setValues(emptyClientFormValues());
       onCreated?.(createdClient);
-      toast.success("Klient byl vytvoren");
+      toast.success("Klient byl vytvořen.");
     } catch {
-      toast.error("Vytvoreni klienta se nezdarilo");
+      toast.error("Vytvoření klienta se nezdařilo.");
     }
   };
 
   return (
-    <form
-      className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center"
-      onSubmit={handleSubmit}
-    >
-      <Input
-        value={name}
-        onChange={(event) => setName(event.target.value)}
-        placeholder="Nazev klienta"
+    <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+      <ClientFormFields
+        values={values}
+        setValues={setValues}
         disabled={isPending}
-        className="sm:flex-1"
       />
-      <Button type="submit" disabled={isPending}>
-        {isPending ? "Vytvarim..." : "Vytvorit klienta"}
-      </Button>
+      <div className="flex justify-end border-t border-border/70 pt-4">
+        <Button type="submit" disabled={isPending}>
+          {isPending ? "Vytvářím..." : "Vytvořit klienta"}
+        </Button>
+      </div>
     </form>
   );
 }

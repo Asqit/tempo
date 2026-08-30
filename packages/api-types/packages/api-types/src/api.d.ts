@@ -559,8 +559,33 @@ export interface components {
             name: string;
             /** Hourly Rate */
             hourly_rate?: number | string | null;
+            /** Is Company */
+            is_company?: boolean | null;
+            /** Street */
+            street?: string | null;
+            /** City */
+            city?: string | null;
+            /** Postal Code */
+            postal_code?: string | null;
+            /** Country */
+            country?: string | null;
+            /** Ico */
+            ico?: string | null;
+            /** Dic */
+            dic?: string | null;
+            /**
+             * Vat Payer
+             * @default false
+             */
+            vat_payer: boolean | null;
+            /** Bank Account */
+            bank_account?: string | null;
+            /** Iban */
+            iban?: string | null;
             /** Currency */
             currency?: string | null;
+            /** Discount Percentage */
+            discount_percentage?: number | string | null;
         };
         /** ClientRead */
         ClientRead: {
@@ -570,8 +595,30 @@ export interface components {
             name: string;
             /** Hourly Rate */
             hourly_rate: string | null;
+            /** Is Company */
+            is_company: boolean | null;
+            /** Street */
+            street: string | null;
+            /** City */
+            city: string | null;
+            /** Postal Code */
+            postal_code: string | null;
+            /** Country */
+            country: string | null;
+            /** Ico */
+            ico: string | null;
+            /** Dic */
+            dic: string | null;
+            /** Vat Payer */
+            vat_payer: boolean | null;
+            /** Bank Account */
+            bank_account: string | null;
+            /** Iban */
+            iban: string | null;
             /** Currency */
-            currency: string;
+            currency: string | null;
+            /** Discount Percentage */
+            discount_percentage: string | null;
             /**
              * Created At
              * Format: date-time
@@ -591,8 +638,30 @@ export interface components {
             name: string;
             /** Hourly Rate */
             hourly_rate: string | null;
+            /** Is Company */
+            is_company: boolean | null;
+            /** Street */
+            street: string | null;
+            /** City */
+            city: string | null;
+            /** Postal Code */
+            postal_code: string | null;
+            /** Country */
+            country: string | null;
+            /** Ico */
+            ico: string | null;
+            /** Dic */
+            dic: string | null;
+            /** Vat Payer */
+            vat_payer: boolean | null;
+            /** Bank Account */
+            bank_account: string | null;
+            /** Iban */
+            iban: string | null;
             /** Currency */
-            currency: string;
+            currency: string | null;
+            /** Discount Percentage */
+            discount_percentage: string | null;
             /**
              * Created At
              * Format: date-time
@@ -607,11 +676,36 @@ export interface components {
         /** ClientUpdate */
         ClientUpdate: {
             /** Name */
-            name?: string | null;
+            name: string;
             /** Hourly Rate */
-            hourly_rate: number | string | null;
+            hourly_rate?: number | string | null;
+            /** Is Company */
+            is_company?: boolean | null;
+            /** Street */
+            street?: string | null;
+            /** City */
+            city?: string | null;
+            /** Postal Code */
+            postal_code?: string | null;
+            /** Country */
+            country?: string | null;
+            /** Ico */
+            ico?: string | null;
+            /** Dic */
+            dic?: string | null;
+            /**
+             * Vat Payer
+             * @default false
+             */
+            vat_payer: boolean | null;
+            /** Bank Account */
+            bank_account?: string | null;
+            /** Iban */
+            iban?: string | null;
             /** Currency */
-            currency: string | null;
+            currency?: string | null;
+            /** Discount Percentage */
+            discount_percentage?: number | string | null;
         };
         /** CreateReport */
         CreateReport: {

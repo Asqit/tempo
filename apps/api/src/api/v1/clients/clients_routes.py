@@ -25,7 +25,7 @@ router = APIRouter(prefix="/clients", tags=["Clients"])
 @router.get("/justice-search")
 async def search_client_company(
     query: str,
-    _: Annotated[User, Depends(get_current_user)],
+    # _: Annotated[User, Depends(get_current_user)],
     justice: Annotated[JusticeRegistryClient, Depends(get_justice_registry_client)],
 ):
     return await justice.search(query)

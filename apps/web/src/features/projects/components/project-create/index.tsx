@@ -3,8 +3,8 @@ import { ChevronsUpDownIcon, FilePlusCorner } from "lucide-react";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@tempo/ui/components/button";
+import { Input } from "@tempo/ui/components/input";
 import { $api, getWorkspaceHeader } from "@/lib/api";
 import { ClientPicker } from "@/features/clients/components/client-picker";
 import {
@@ -14,16 +14,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@tempo/ui/components/dialog";
 import {
   Field,
   FieldContent,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
+} from "@tempo/ui/components/field";
 import { ColorAvatar } from "@/components/share/color-avatar";
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "@tempo/ui/components/textarea";
 import { DatePicker } from "@/components/share/date-picker";
 import { useMemo } from "react";
 

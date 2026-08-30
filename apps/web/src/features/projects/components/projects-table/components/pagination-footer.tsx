@@ -5,7 +5,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
+} from "@tempo/ui/components/pagination";
 
 type PaginationFooterProps = {
   page: number;

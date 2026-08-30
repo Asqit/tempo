@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pencil } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 import {
   Dialog,
   DialogContent,
@@ -9,18 +9,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@tempo/ui/components/dialog";
 import { ClientEditForm } from "../client-update-form";
+import type { ClientWithBilling } from "../client-types";
 
 type Props = {
-  client: {
-    id: number;
-    name: string;
-    hourly_rate: number | string | null;
-    currency: string | null;
-  };
+  client: ClientWithBilling;
   onUpdated?: () => void;
-  trigger?: React.ReactNode;
+  trigger?: React.ReactElement;
 };
 
 export function ClientUpdateDialog({ client, onUpdated, trigger }: Props) {
@@ -33,20 +29,22 @@ export function ClientUpdateDialog({ client, onUpdated, trigger }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger ?? (
-          <Button type="button" variant="ghost" size="sm">
-            <Pencil className="size-3.5" />
-            Upravit klienta
-          </Button>
-        )}
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          trigger ?? (
+            <Button type="button" variant="ghost" size="sm">
+              <Pencil className="size-3.5" />
+              Upravit klienta
+            </Button>
+          )
+        }
+      />
 
-      <DialogContent>
+      <DialogContent className="max-h-[min(90vh,820px)] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Upravit klienta</DialogTitle>
           <DialogDescription>
-            Upravte údaje a výchozí hodinovou sazbu klienta.
+            Upravte kontaktní, fakturační a cenové údaje klienta.
           </DialogDescription>
         </DialogHeader>
 

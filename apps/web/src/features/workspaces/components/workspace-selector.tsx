@@ -7,13 +7,13 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
-import { Button } from "@/components/ui/button";
+} from "@tempo/ui/components/command";
+import { Button } from "@tempo/ui/components/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@tempo/ui/components/popover";
 import { $api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";

@@ -10,9 +10,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
+} from "@tempo/ui/components/table";
+import { Checkbox } from "@tempo/ui/components/checkbox";
+import { Button } from "@tempo/ui/components/button";
 import { toast } from "sonner";
 import { TimeEntryUpdateDialog } from "./time-entry-update-dialog";
 

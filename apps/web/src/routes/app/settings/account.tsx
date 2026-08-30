@@ -7,9 +7,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Field, FieldContent, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+} from "@tempo/ui/components/card";
+import { Field, FieldContent, FieldGroup, FieldLabel } from "@tempo/ui/components/field";
+import { Input } from "@tempo/ui/components/input";
 import { SettingsLayout } from "@/features/settings/components/settings-layout";
 import { createFileRoute } from "@tanstack/react-router";
 

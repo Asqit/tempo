@@ -7,14 +7,14 @@ import {
   Wallet,
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@tempo/ui/components/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@tempo/ui/components/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "@/components/ui/chart";
+} from "@tempo/ui/components/chart";
 import { generateColorFromString } from "@/lib/utils";
 import { calculateAmount, formatMoney } from "@/lib/money";
 import { formatHoursFromMinutes, formatDuration } from "@/lib/time";

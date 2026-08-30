@@ -5,9 +5,9 @@ import {
   PopoverHeader,
   PopoverTitle,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@tempo/ui/components/popover";
 import { $api, queryClient } from "@/lib/api";
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 import type { components } from "@/lib/api.d";
 import { Check, Bell } from "lucide-react";
 import { toast } from "sonner";

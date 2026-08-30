@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "base-nova",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/styles/globals.css",
+    "baseColor": "olive",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "@tempo/ui/components",
+    "utils": "@tempo/ui/lib/utils",
+    "ui": "@tempo/ui/components/ui",
+    "lib": "@tempo/ui/lib",
+    "hooks": "@tempo/ui/hooks"
+  },
+  "iconLibrary": "lucide"
+}

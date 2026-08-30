@@ -3,19 +3,19 @@ import * as React from "react";
 import { format } from "date-fns";
 import { cs } from "date-fns/locale";
 import { Calendar as CalendarIcon, Clock2Icon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Button } from "@tempo/ui/components/button";
+import { Calendar } from "@tempo/ui/components/calendar";
+import { Field, FieldGroup, FieldLabel } from "@tempo/ui/components/field";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-} from "@/components/ui/input-group";
+} from "@tempo/ui/components/input-group";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@tempo/ui/components/popover";
 
 interface Props {
   value: Date;

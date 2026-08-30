@@ -4,13 +4,13 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar";
+} from "@tempo/ui/components/sidebar";
 import { SidebarAccount } from "@/features/auth/components/sidebar-account";
 import { AppSidebarNav } from "./app-sidebar-nav";
 import { Brand } from "@/components/share/brand";
 import { SidebarTimer } from "@/features/time-entry/components/sidebar-timer";
 import { TimeEntryCreateDialog } from "@/features/time-entry/components/time-entry-create-dialog";
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 import { PlayCircle } from "lucide-react";
 
 export function AppSidebar() {

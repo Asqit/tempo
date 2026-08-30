@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@tempo/ui/components/card";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/clients/new")({

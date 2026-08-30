@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import "./index.css";
 
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@tempo/ui/components/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { routeTree } from "./routeTree.gen";
 import { QueryClientProvider } from "@tanstack/react-query";

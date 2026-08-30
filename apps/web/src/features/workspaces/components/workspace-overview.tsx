@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@tempo/ui/components/card";
 import { ColorAvatar } from "@/components/share/color-avatar";
 import {
   Dialog,
@@ -14,9 +14,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@tempo/ui/components/dialog";
+import { Input } from "@tempo/ui/components/input";
+import { Label } from "@tempo/ui/components/label";
 import { $api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";

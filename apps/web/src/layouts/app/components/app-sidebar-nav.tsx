@@ -13,7 +13,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from "@tempo/ui/components/collapsible";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -24,7 +24,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
+} from "@tempo/ui/components/sidebar";
 import type {
   SidebarMenuItemConfig,
   SidebarMenuSubItemConfig,

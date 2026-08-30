@@ -2,7 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 import {
   Card,
   CardContent,
@@ -10,14 +10,14 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@tempo/ui/components/card";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+} from "@tempo/ui/components/field";
+import { Input } from "@tempo/ui/components/input";
 import { $api } from "@/lib/api";
 import { useAuthStore } from "../store";
 import type { components } from "@/lib/api.d";

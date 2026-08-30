@@ -3,7 +3,7 @@ import { Save } from "lucide-react";
 import { toast } from "sonner";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 import {
   Dialog,
   DialogClose,
@@ -13,16 +13,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@tempo/ui/components/dialog";
 import {
   Field,
   FieldContent,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from "@tempo/ui/components/field";
+import { Input } from "@tempo/ui/components/input";
+import { Textarea } from "@tempo/ui/components/textarea";
 import { PageHeader } from "@/components/share/page-header";
 import { ReportDetail } from "@/features/reports/components/report-details/";
 import { ReportsToolbar } from "@/features/reports/components/reports-toolbar";

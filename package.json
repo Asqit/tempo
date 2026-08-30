@@ -6,6 +6,7 @@
     "packages/*"
   ],
   "scripts": {
+    "release": "release-it",
     "api:types": "bun scripts/gen-openapi.ts",
     "api:types:watch": "bun scripts/watch-openapi.ts",
     "dev": "turbo dev",
@@ -17,6 +18,7 @@
     "@types/bun": "^1.4.0",
     "chokidar": "^5.0.0",
     "openapi-typescript": "^7.13.0",
+    "release-it": "^21.0.2",
     "turbo": "^2.10.12"
   },
   "devEngines": {

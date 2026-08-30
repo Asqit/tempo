@@ -1,15 +1,15 @@
 import { type ReactElement } from "react";
 import { ChevronsUpDownIcon } from "lucide-react";
 
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
+import { Checkbox } from "@tempo/ui/components/checkbox";
+import { Button } from "@tempo/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@tempo/ui/components/dropdown-menu";
 
 export type PickerOption = { id: number; name: string };
 

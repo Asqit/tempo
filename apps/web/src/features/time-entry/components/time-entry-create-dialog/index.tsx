@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@tempo/ui/components/dialog";
 
 import { TimeEntryCreateForm } from "../time-entry-create-form";
 

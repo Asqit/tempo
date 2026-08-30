@@ -1,5 +1,5 @@
 import type { components } from "@/lib/api.d";
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 import { TimeEntryCreateDialog } from "@/features/time-entry/components/time-entry-create-dialog";
 import { PlayCircle } from "lucide-react";
 import { ClientUpdateDialog } from "../../client-update-dialog";

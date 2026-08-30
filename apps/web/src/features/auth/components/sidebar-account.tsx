@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronsUpDown, LogOut, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { ModeToggle } from "@/components/ui/mode-toggle";
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 import {
   Command,
   CommandEmpty,
@@ -12,13 +12,13 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from "@tempo/ui/components/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
+} from "@tempo/ui/components/popover";
+import { SidebarMenu, SidebarMenuItem } from "@tempo/ui/components/sidebar";
 import { ColorAvatar } from "@/components/share/color-avatar";
 import { useAuthStore } from "@/features/auth";
 import { useWorkspaceStore } from "@/features/workspaces/store";

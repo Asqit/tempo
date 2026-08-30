@@ -46,6 +46,11 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 from src.api.v1.auth import auth_models  # noqa: F401
 from src.api.v1.clients import clients_models  # noqa: F401
+from src.api.v1.invoices.models import (
+    issued_invoice,
+    issued_invoice_item,
+    number_series,
+)
 from src.api.v1.notifications import notifications_models  # noqa: F401
 from src.api.v1.projects import projects_models  # noqa: F401
 from src.api.v1.reports import reports_models  # noqa: F401

@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Building2, FolderKanban, UserRound } from "lucide-react";
 
-import { Checkbox } from "@/components/ui/checkbox";
-import { TableCell, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@tempo/ui/components/checkbox";
+import { TableCell, TableRow } from "@tempo/ui/components/table";
 import { generateColorFromString } from "@/lib/utils";
 
 import type { ProjectItem } from "../types";

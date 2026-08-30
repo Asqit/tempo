@@ -1,19 +1,19 @@
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@tempo/ui/components/button";
+import { Input } from "@tempo/ui/components/input";
 import { ClientPicker } from "@/features/clients/components/client-picker";
 import { ProjectPicker } from "@/features/projects/components/project-picker";
 import { DatePicker } from "@/components/share/date-picker";
 import { $api, getWorkspaceHeader } from "@/lib/api";
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "@tempo/ui/components/switch";
 import {
   Field,
   FieldContent,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
+} from "@tempo/ui/components/field";
 
 type TimeEntryUpdateFormProps = {
   id: number;

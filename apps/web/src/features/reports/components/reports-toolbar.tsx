@@ -9,20 +9,20 @@ import {
   subMonths,
 } from "date-fns";
 import { Calendar as CalendarIcon, Folder, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@tempo/ui/components/button";
+import { Calendar } from "@tempo/ui/components/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@tempo/ui/components/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@tempo/ui/components/select";
 import { ClientPicker } from "@/features/clients/components/client-picker";
 import { ProjectPicker } from "@/features/projects/components/project-picker";
 import { cs } from "date-fns/locale";

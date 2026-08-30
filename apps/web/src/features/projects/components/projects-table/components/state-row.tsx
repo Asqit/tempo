@@ -1,4 +1,4 @@
-import { TableCell, TableRow } from "@/components/ui/table";
+import { TableCell, TableRow } from "@tempo/ui/components/table";
 
 type StateRowProps = {
   colSpan: number;

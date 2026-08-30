@@ -1,5 +1,5 @@
 import type { components } from "@/lib/api.d";
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 import { ClientPicker } from "@/features/clients/components/client-picker";
 import { ProjectPicker } from "@/features/projects/components/project-picker";
 import { $api, getWorkspaceHeader } from "@/lib/api";
@@ -7,7 +7,7 @@ import { Pause, Play, Tag, User2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { toast } from "sonner";
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@tempo/ui/components/separator";
 import { cn } from "@/lib/utils";
 import { formatElapsed } from "@/lib/time";
 

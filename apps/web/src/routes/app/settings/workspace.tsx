@@ -5,15 +5,15 @@ import { Clock3, LogOut, MailCheck, Trash2, Users, XCircle } from "lucide-react"
 import { toast } from "sonner";
 
 import { ColorAvatar } from "@/components/share/color-avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@tempo/ui/components/badge";
+import { Button } from "@tempo/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@tempo/ui/components/card";
 import {
   Dialog,
   DialogClose,
@@ -23,14 +23,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@tempo/ui/components/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@tempo/ui/components/select";
 import { SettingsLayout } from "@/features/settings/components/settings-layout";
 import { useAuthStore } from "@/features/auth";
 import { WorkspaceShare } from "@/features/workspaces/components/workspace-share";

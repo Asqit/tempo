@@ -1,11 +1,15 @@
 import {
   CalendarDays,
   CircleDollarSign,
+  Building2,
   FolderKanban,
   Hash,
+  Landmark,
+  MapPin,
+  Percent,
 } from "lucide-react";
 
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@tempo/ui/components/skeleton";
 import { $api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { formatMoney } from "@/lib/money";
@@ -38,7 +42,7 @@ export function ClientDetail({ id }: ClientDetailProps) {
   const { activeWorkspace } = useWorkspaceStore();
 
   const {
-    data: client,
+    data: rawClient,
     isLoading,
     isError,
   } = $api.useQuery(
@@ -56,6 +60,7 @@ export function ClientDetail({ id }: ClientDetailProps) {
       enabled: !!activeWorkspace,
     },
   );
+  const client = rawClient;
 
   const { data: projects } = $api.useQuery(
     "get",
@@ -113,7 +118,7 @@ export function ClientDetail({ id }: ClientDetailProps) {
           label="Hodinová sazba"
           value={
             client.hourly_rate
-              ? formatMoney(Number(client.hourly_rate), client.currency)
+              ? formatMoney(Number(client.hourly_rate), client.currency ?? undefined)
               : "—"
           }
           description={
@@ -158,49 +163,89 @@ export function ClientDetail({ id }: ClientDetailProps) {
         </section>
 
         <aside className="space-y-4">
-          <div className="overflow-hidden rounded-xl border border-border/70 bg-card">
-            <div className="flex items-center justify-between border-b px-5 py-4">
-              <div>
-                <h3 className="font-heading text-sm font-semibold">
-                  Informace
-                </h3>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  Základní údaje klienta
-                </p>
-              </div>
-            </div>
+          <DetailCard
+            title="Právní údaje"
+            description="Identita klienta pro fakturaci"
+          >
+            <InfoRow
+              icon={Building2}
+              label="Typ / DPH"
+              value={[
+                client.is_company === null
+                  ? null
+                  : client.is_company
+                    ? "Firma"
+                    : "Fyzická osoba",
+                client.vat_payer === null
+                  ? null
+                  : client.vat_payer
+                    ? "Plátce DPH"
+                    : "Neplátce DPH",
+              ]
+                .filter(Boolean)
+                .join(" · ") || "Neuvedeno"}
+            />
+            <InfoRow icon={Hash} label="IČO" value={client.ico || "Neuvedeno"} mono />
+            <InfoRow icon={Hash} label="DIČ" value={client.dic || "Neuvedeno"} mono />
+          </DetailCard>
 
-            <div className="divide-y">
-              <InfoRow
-                icon={Hash}
-                label="Client ID"
-                value={`CL-${String(client.id).padStart(4, "0")}`}
-                mono
-              />
+          <DetailCard
+            title="Kontaktní údaje"
+            description="Adresa a platební informace"
+          >
+            <InfoRow
+              icon={MapPin}
+              label="Adresa"
+              value={
+                [client.street, client.city, client.postal_code, client.country]
+                  .filter(Boolean)
+                  .join(", ") || "Neuvedeno"
+              }
+              wrap
+            />
+            <InfoRow
+              icon={Landmark}
+              label="Bankovní údaje"
+              value={
+                [client.bank_account, client.iban].filter(Boolean).join(" · ") ||
+                "Neuvedeno"
+              }
+              wrap
+            />
+            <InfoRow
+              icon={CircleDollarSign}
+              label="Výchozí sazba"
+              value={
+                client.hourly_rate
+                  ? formatMoney(Number(client.hourly_rate), client.currency ?? undefined) + "/h"
+                  : "Nenastaveno"
+              }
+            />
+            <InfoRow
+              icon={Percent}
+              label="Sleva"
+              value={
+                client.discount_percentage === null
+                  ? "Nenastaveno"
+                  : client.discount_percentage + "%"
+              }
+            />
+          </DetailCard>
 
-              <InfoRow
-                icon={CircleDollarSign}
-                label="Hodinová sazba"
-                value={
-                  client.hourly_rate
-                    ? `${formatMoney(Number(client.hourly_rate), client.currency)}/h`
-                    : "Nenastaveno"
-                }
-              />
-
-              <InfoRow
-                icon={CalendarDays}
-                label="Vytvořeno"
-                value={formatDateTime(client.created_at)}
-              />
-
-              <InfoRow
-                icon={CalendarDays}
-                label="Poslední změna"
-                value={formatDateTime(client.updated_at)}
-              />
-            </div>
-          </div>
+          <DetailCard title="Záznam" description="Technické údaje">
+            <InfoRow
+              icon={CalendarDays}
+              label="Historie"
+              value={
+                <span className="flex flex-wrap gap-x-2 gap-y-0.5 text-xs">
+                  <span>Vytvořeno {formatDateTime(client.created_at)}</span>
+                  <span className="text-muted-foreground/50">·</span>
+                  <span>Upraveno {formatDateTime(client.updated_at)}</span>
+                </span>
+              }
+              wrap
+            />
+          </DetailCard>
 
           <div className="rounded-xl border border-border/70 bg-muted/50 p-5">
             <p className="text-xs font-medium text-muted-foreground">TIP</p>
@@ -265,9 +310,36 @@ type InfoRowProps = {
   label: string;
   value: React.ReactNode;
   mono?: boolean;
+  wrap?: boolean;
 };
 
-function InfoRow({ icon: Icon, label, value, mono = false }: InfoRowProps) {
+function DetailCard({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-border/70 bg-card">
+      <div className="border-b px-5 py-4">
+        <h3 className="font-heading text-sm font-semibold">{title}</h3>
+        <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
+      </div>
+      <div className="divide-y">{children}</div>
+    </div>
+  );
+}
+
+function InfoRow({
+  icon: Icon,
+  label,
+  value,
+  mono = false,
+  wrap = false,
+}: InfoRowProps) {
   return (
     <div className="flex items-center gap-3 px-5 py-4">
       <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted">
@@ -282,8 +354,8 @@ function InfoRow({ icon: Icon, label, value, mono = false }: InfoRowProps) {
         <p
           className={
             mono
-              ? "mt-0.5 truncate font-mono text-xs"
-              : "mt-0.5 truncate text-sm font-medium"
+            ? cn("mt-0.5", wrap ? "break-words" : "truncate", "font-mono text-xs")
+            : cn("mt-0.5", wrap ? "break-words" : "truncate", "text-sm font-medium")
           }
         >
           {value}

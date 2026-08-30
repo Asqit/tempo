@@ -1,12 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@tempo/ui/components/button";
+import { Checkbox } from "@tempo/ui/components/checkbox";
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@tempo/ui/components/table";
 import { useWorkspaceStore } from "@/features/workspaces/store";
 import { $api } from "@/lib/api";
 import { useMemo, useState } from "react";

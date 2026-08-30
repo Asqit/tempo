@@ -11,6 +11,7 @@ from fastapi_pagination import add_pagination
 from src.api.middlewares import logging_middleware
 from src.api.v1.router import v1
 from src.core.logger import configure_logging
+from src.core.startup import startup
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ async def lifespan(app: FastAPI):
 
 
 def create_app() -> FastAPI:
+    startup()
     configure_logging()
 
     app = FastAPI(

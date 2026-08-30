@@ -1,8 +1,8 @@
 import { Activity, CalendarRange, Layers3 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Badge } from "@tempo/ui/components/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@tempo/ui/components/card";
+import { Progress } from "@tempo/ui/components/progress";
 import { generateColorFromString } from "@/lib/utils";
 import { formatDuration, formatHoursFromMinutes } from "@/lib/time";
 import {

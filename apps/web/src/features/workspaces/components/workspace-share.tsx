@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 import { UserPlus } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 import {
   Dialog,
   DialogContent,
@@ -12,22 +12,22 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@tempo/ui/components/dialog";
 import {
   Field,
   FieldContent,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+} from "@tempo/ui/components/field";
+import { Input } from "@tempo/ui/components/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@tempo/ui/components/select";
 import { $api } from "@/lib/api";
 import type { components } from "@/lib/api.d";
 import { useWorkspaceStore } from "../store";

@@ -9,10 +9,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+} from "@tempo/ui/components/table";
+import { Badge } from "@tempo/ui/components/badge";
 import { generateColorFromString } from "@/lib/utils";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@tempo/ui/components/card";
 import { Inbox } from "lucide-react";
 import { durationMinutesBetween, formatDuration } from "@/lib/time";
 

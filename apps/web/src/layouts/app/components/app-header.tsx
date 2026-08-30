@@ -7,8 +7,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+} from "@tempo/ui/components/breadcrumb";
+import { SidebarTrigger } from "@tempo/ui/components/sidebar";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { UnreadNotifications } from "@/features/notifications/components/unread";
 

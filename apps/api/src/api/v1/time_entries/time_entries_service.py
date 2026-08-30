@@ -119,18 +119,19 @@ class TimeEntryService:
         db: AsyncSession,
         workspace: Workspace,
         project_id: int | None = None,
+        client_id: int | None = None,
         start_time: datetime | None = None,
         end_time: datetime | None = None,
         billable: bool | None = None,
     ) -> Page[TimeEntryRead]:
         filters = [TimeEntry.workspace_id == workspace.id]
 
+        if client_id is not None:
+            filters.append(TimeEntry.client_id == client_id)
         if project_id is not None:
             filters.append(TimeEntry.project_id == project_id)
-
         if billable is not None:
             filters.append(TimeEntry.billable == billable)
-
         if start_time is not None:
             filters.append(
                 or_(
@@ -138,7 +139,6 @@ class TimeEntryService:
                     TimeEntry.end_time.is_(None),
                 )
             )
-
         if end_time is not None:
             filters.append(TimeEntry.start_time <= end_time)
 

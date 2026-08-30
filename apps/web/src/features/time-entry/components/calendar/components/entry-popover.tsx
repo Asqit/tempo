@@ -5,7 +5,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@tempo/ui/components/popover";
 
 interface Props {
   entry: components["schemas"]["TimeEntryRead"];

@@ -1,8 +1,8 @@
 import { CalendarDays, ClipboardList, Wallet } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Badge } from "@tempo/ui/components/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@tempo/ui/components/card";
+import { Separator } from "@tempo/ui/components/separator";
 import { calculateAmount, formatMoney } from "@/lib/money";
 import { formatDuration } from "@/lib/time";
 import {

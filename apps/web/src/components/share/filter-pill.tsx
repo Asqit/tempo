@@ -1,12 +1,12 @@
 import type { ElementType, ReactNode } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@tempo/ui/components/popover";
 
 interface Props {
   icon: ElementType;

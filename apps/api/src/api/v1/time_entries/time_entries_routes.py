@@ -29,12 +29,13 @@ async def get_all_time_entries(
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
     _role: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.MEMBER))],
     project_id: int | None = None,
+    client_id: int | None = None,
     start_time: datetime | None = None,
     end_time: datetime | None = None,
     billable: bool | None = None,
 ):
     return await TimeEntryService.get_all_time_entries(
-        db, workspace, project_id, start_time, end_time, billable
+        db, workspace, project_id, client_id, start_time, end_time, billable
     )
 
 

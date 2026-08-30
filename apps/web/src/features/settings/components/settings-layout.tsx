@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Building2, UserRound } from "lucide-react";
 
 import { PageHeader } from "@/components/share/page-header";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@tempo/ui/components/card";
 import { cn } from "@/lib/utils";
 
 const settingsLinks = [

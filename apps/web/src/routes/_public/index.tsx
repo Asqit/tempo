@@ -2,7 +2,7 @@ import { useAuthStore } from "@/features/auth";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { ArrowRight, Check, Clock3, ReceiptText, UsersRound } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 
 export const Route = createFileRoute("/_public/")({
   loader() {

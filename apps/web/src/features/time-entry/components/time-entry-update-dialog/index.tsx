@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Pencil } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@tempo/ui/components/button";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@tempo/ui/components/dialog";
 
 import { TimeEntryUpdateForm } from "../time-entry-update-form";
 

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@tempo/ui/components/card";
 import type { components } from "@/lib/api.d";
 import { cn } from "@/lib/utils";
 import { calculateAmount, formatMoney } from "@/lib/money";

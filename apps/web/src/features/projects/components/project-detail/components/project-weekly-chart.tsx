@@ -5,7 +5,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "@/components/ui/chart";
+} from "@tempo/ui/components/chart";
 
 type WeekBarPoint = {
   key: string;

@@ -1,64 +1,57 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@tempo/ui/components/button";
 import { $api, getWorkspaceHeader } from "@/lib/api";
-
-type Client = {
-  id: number;
-  name: string;
-  hourly_rate: number | string | null;
-  currency: string | null;
-};
+import {
+  ClientFormFields,
+  type ClientFormValues,
+} from "../client-form-fields";
+import { clientPayload, type ClientWithBilling } from "../client-types";
 
 type ClientEditFormProps = {
-  client: Client;
+  client: ClientWithBilling;
   onUpdated?: () => void;
 };
 
+function valuesFromClient(client: ClientWithBilling): ClientFormValues {
+  return {
+    name: client.name,
+    is_company: client.is_company ?? false,
+    street: client.street ?? "",
+    city: client.city ?? "",
+    postal_code: client.postal_code ?? "",
+    country: client.country ?? "CZ",
+    ico: client.ico ?? "",
+    dic: client.dic ?? "",
+    vat_payer: client.vat_payer ?? false,
+    bank_account: client.bank_account ?? "",
+    iban: client.iban ?? "",
+    hourly_rate: client.hourly_rate?.toString() ?? "",
+    currency: client.currency ?? "CZK",
+    discount_percentage: client.discount_percentage?.toString() ?? "",
+  };
+}
+
 export function ClientEditForm({ client, onUpdated }: ClientEditFormProps) {
-  const [name, setName] = useState(client.name);
-  const [hourlyRate, setHourlyRate] = useState(
-    client.hourly_rate?.toString() ?? "",
-  );
-  const [currency, setCurrency] = useState(client.currency ?? "CZK");
-
+  const [values, setValues] = useState(() => valuesFromClient(client));
   const workspaceHeader = getWorkspaceHeader();
-
-  useEffect(() => {
-    setName(client.name);
-    setHourlyRate(client.hourly_rate?.toString() ?? "");
-    setCurrency(client.currency ?? "CZK");
-  }, [client]);
-
   const { mutateAsync, isPending } = $api.useMutation(
     "put",
     "/api/v1/clients/{id}",
   );
 
+  useEffect(() => {
+    setValues(valuesFromClient(client));
+  }, [client]);
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const trimmedName = name.trim();
-
-    if (!trimmedName) {
+    if (!values.name.trim()) {
       toast.error("Název klienta je povinný.");
       return;
     }
-
-    const parsedHourlyRate = hourlyRate
-      ? Number(hourlyRate.replace(",", "."))
-      : null;
-
-    if (
-      parsedHourlyRate !== null &&
-      (!Number.isFinite(parsedHourlyRate) || parsedHourlyRate < 0)
-    ) {
-      toast.error("Hodinová sazba musí být platné nezáporné číslo.");
-      return;
-    }
-
     if (!workspaceHeader) {
       toast.error("Není vybrán workspace.");
       return;
@@ -67,18 +60,11 @@ export function ClientEditForm({ client, onUpdated }: ClientEditFormProps) {
     try {
       await mutateAsync({
         params: {
-          path: {
-            id: client.id,
-          },
+          path: { id: client.id },
           header: workspaceHeader,
         },
-        body: {
-          name: trimmedName,
-          hourly_rate: parsedHourlyRate,
-          currency: currency.trim().toUpperCase() || null,
-        },
+        body: clientPayload(values),
       });
-
       toast.success("Klient byl upraven.");
       onUpdated?.();
     } catch {
@@ -87,51 +73,13 @@ export function ClientEditForm({ client, onUpdated }: ClientEditFormProps) {
   };
 
   return (
-    <form className="grid gap-4" onSubmit={handleSubmit}>
-      <div className="grid gap-2">
-        <label htmlFor="client-name" className="text-sm font-medium">
-          Název klienta
-        </label>
-
-        <Input
-          id="client-name"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          placeholder="Např. Acme s.r.o."
-          disabled={isPending}
-          autoFocus
-        />
-      </div>
-
-      <div className="grid gap-2">
-        <label htmlFor="client-hourly-rate" className="text-sm font-medium">
-          Hodinová sazba
-        </label>
-
-        <div className="flex gap-2">
-          <Input
-            id="client-hourly-rate"
-            type="number"
-            min="0"
-            step="0.01"
-            value={hourlyRate}
-            onChange={(event) => setHourlyRate(event.target.value)}
-            placeholder="Např. 1500"
-            disabled={isPending}
-          />
-
-          <Input
-            value={currency}
-            onChange={(event) => setCurrency(event.target.value.toUpperCase())}
-            placeholder="CZK"
-            maxLength={3}
-            className="w-20"
-            disabled={isPending}
-          />
-        </div>
-      </div>
-
-      <div className="flex justify-end pt-2">
+    <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+      <ClientFormFields
+        values={values}
+        setValues={setValues}
+        disabled={isPending}
+      />
+      <div className="flex justify-end border-t border-border/70 pt-4">
         <Button type="submit" disabled={isPending}>
           {isPending ? "Ukládám..." : "Uložit změny"}
         </Button>
