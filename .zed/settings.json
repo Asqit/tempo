@@ -1,3 +1,0 @@
-{
-  "file_scan_exclusions": ["__init__.py", "__pycache__/"],
-}
