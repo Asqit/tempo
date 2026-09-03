@@ -10,11 +10,10 @@ from src.api.utils.justice_registry import (
 )
 from src.api.v1.clients.clients_schemas import ClientCreate, ClientRead, ClientUpdate
 from src.api.v1.clients.clients_service import ClientsService
-from src.api.v1.workspace.workspace_members_helpers import require_role
-from src.api.v1.workspace.workspace_members_models import WorkspaceMember
-from src.api.v1.workspace.workspace_members_schemas import WorkspaceRole
-from src.api.v1.workspace.workspace_models import Workspace
-from src.api.v1.workspace.workspace_utils import get_current_workspace
+from src.api.v1.workspace.models.member_models import WorkspaceMember
+from src.api.v1.workspace.models.workspace_models import Workspace
+from src.api.v1.workspace.schemas.member_schemas import WorkspaceRole
+from src.api.v1.workspace.workspace_utils import get_current_workspace, require_role
 from src.core.database import get_db
 
 router = APIRouter(prefix="/clients", tags=["Clients"])

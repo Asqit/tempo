@@ -9,7 +9,7 @@ from starlette.status import HTTP_204_NO_CONTENT
 from src.api.v1.reports.reports_schemas import CreateReport, ReportRead
 from src.api.v1.reports.reports_service import ReportsService
 from src.api.v1.time_entries.time_entries_schemas import TimeEntryRead
-from src.api.v1.workspace.workspace_models import Workspace
+from src.api.v1.workspace.models.workspace_models import Workspace
 from src.api.v1.workspace.workspace_utils import get_current_workspace
 from src.core.database import get_db
 

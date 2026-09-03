@@ -1,6 +1,5 @@
 from datetime import UTC, datetime
 
-from src.api.v1.workspace.workspace_members_models import WorkspaceMember
 from fastapi import HTTPException, status
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
@@ -16,7 +15,8 @@ from src.api.v1.time_entries.time_entries_schemas import (
     TimeEntryRead,
     TimeEntryUpdate,
 )
-from src.api.v1.workspace.workspace_models import Workspace
+from src.api.v1.workspace.models.member_models import WorkspaceMember
+from src.api.v1.workspace.models.workspace_models import Workspace
 
 
 class TimeEntryService:
@@ -157,7 +157,7 @@ class TimeEntryService:
         db: AsyncSession,
         workspace: Workspace,
         payload: TimeEntryCreate,
-        creator: WorkspaceMember
+        creator: WorkspaceMember,
     ):
         start = payload.start_time or datetime.now(UTC)
 

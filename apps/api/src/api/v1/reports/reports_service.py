@@ -17,7 +17,7 @@ from src.api.v1.reports.reports_models import (
 )
 from src.api.v1.reports.reports_schemas import CreateReport
 from src.api.v1.time_entries.time_entires_models import TimeEntry
-from src.api.v1.workspace.workspace_models import Workspace
+from src.api.v1.workspace.models.workspace_models import Workspace
 
 
 class ReportsService:

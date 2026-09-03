@@ -9,9 +9,9 @@ from src.api.v1.invoices.schemas.issued_invoice import (
     IssuedInvoiceCreate,
     IssuedInvoiceRead,
 )
-from src.api.v1.workspace.workspace_members_helpers import require_role
-from src.api.v1.workspace.workspace_members_models import WorkspaceMember
-from src.api.v1.workspace.workspace_members_schemas import WorkspaceRole
+from src.api.v1.workspace.models.member_models import WorkspaceMember
+from src.api.v1.workspace.schemas.member_schemas import WorkspaceRole
+from src.api.v1.workspace.workspace_utils import require_role
 from src.core.database import get_db
 
 router = APIRouter(prefix="/invoices", tags=["Invoices"])

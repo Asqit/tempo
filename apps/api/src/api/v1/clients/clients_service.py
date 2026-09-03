@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.clients.clients_models import Client
 from src.api.v1.clients.clients_schemas import ClientCreate, ClientRead, ClientUpdate
-from src.api.v1.workspace.workspace_models import Workspace
+from src.api.v1.workspace.models.workspace_models import Workspace
 
 
 class ClientsService:

@@ -6,22 +6,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.auth.auth_helpers import get_current_user
 from src.api.v1.auth.auth_models import User
-from src.api.v1.workspace.invitation_schemas import (
+from src.api.v1.workspace.models.member_models import WorkspaceMember
+from src.api.v1.workspace.schemas.invitation_schemas import (
     WorkspaceInvitationCreate,
     WorkspaceInvitationRead,
 )
-from src.api.v1.workspace.workspace_members_helpers import require_role
-from src.api.v1.workspace.workspace_members_models import WorkspaceMember
-from src.api.v1.workspace.workspace_members_schemas import (
+from src.api.v1.workspace.schemas.member_schemas import (
     WorkspaceMemberRead,
     WorkspaceMemberUpdate,
     WorkspaceRole,
 )
-from src.api.v1.workspace.workspace_schemas import (
+from src.api.v1.workspace.schemas.workspace_schemas import (
     WorkspaceCreate,
     WorkspaceRead,
 )
 from src.api.v1.workspace.workspace_service import WorkspaceService
+from src.api.v1.workspace.workspace_utils import require_role
 from src.core.database import get_db
 
 router = APIRouter(prefix="/workspaces", tags=["Workspace"])

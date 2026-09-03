@@ -7,7 +7,7 @@ from src.api.v1.auth.auth_schemas import UserRead
 from src.api.v1.clients.clients_schemas import ClientShallow
 from src.api.v1.time_entries.time_entries_schemas import TimeEntryRead
 
-from .workspace_members_schemas import (
+from .member_schemas import (
     WorkspaceMemberRead,
 )
 

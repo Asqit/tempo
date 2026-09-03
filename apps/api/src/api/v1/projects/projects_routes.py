@@ -11,11 +11,10 @@ from src.api.v1.projects.projects_schema import (
     ProjectUpdate,
 )
 from src.api.v1.projects.projects_service import ProjectsService
-from src.api.v1.workspace.workspace_members_helpers import require_role
-from src.api.v1.workspace.workspace_members_models import WorkspaceMember
-from src.api.v1.workspace.workspace_members_schemas import WorkspaceRole
-from src.api.v1.workspace.workspace_models import Workspace
-from src.api.v1.workspace.workspace_utils import get_current_workspace
+from src.api.v1.workspace.models.member_models import WorkspaceMember
+from src.api.v1.workspace.models.workspace_models import Workspace
+from src.api.v1.workspace.schemas.member_schemas import WorkspaceRole
+from src.api.v1.workspace.workspace_utils import get_current_workspace, require_role
 from src.core.database import get_db
 
 router = APIRouter(prefix="/projects", tags=["Projects"])

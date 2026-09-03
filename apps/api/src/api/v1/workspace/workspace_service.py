@@ -14,17 +14,17 @@ from src.api.v1.notifications.notifications_schemas import (
     WorkspaceRoleChangedPayload,
 )
 from src.api.v1.notifications.notifications_service import NotificationsService
-from src.api.v1.workspace.invitation_models import WorkspaceInvitation
-from src.api.v1.workspace.invitation_schemas import WorkspaceInvitationCreate
-from src.api.v1.workspace.workspace_members_helpers import has_permission
-from src.api.v1.workspace.workspace_members_schemas import (
+from src.api.v1.workspace.models.invitation_models import WorkspaceInvitation
+from src.api.v1.workspace.models.workspace_models import Workspace
+from src.api.v1.workspace.schemas.invitation_schemas import WorkspaceInvitationCreate
+from src.api.v1.workspace.schemas.member_schemas import (
     WorkspaceMemberUpdate,
     WorkspaceRole,
 )
-from src.api.v1.workspace.workspace_models import Workspace
-from src.api.v1.workspace.workspace_schemas import WorkspaceCreate
+from src.api.v1.workspace.schemas.workspace_schemas import WorkspaceCreate
+from src.api.v1.workspace.workspace_utils import has_permission
 
-from .workspace_members_models import WorkspaceMember
+from .models.member_models import WorkspaceMember
 
 
 class WorkspaceService:

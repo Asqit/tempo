@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from src.api.v1.workspace.workspace_members_schemas import WorkspaceRole
+from src.api.v1.workspace.schemas.member_schemas import WorkspaceRole
 
 
 class WorkspaceInvitationCreate(BaseModel):

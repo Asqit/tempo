@@ -12,7 +12,7 @@ from src.core.database import Base
 if TYPE_CHECKING:
     from src.api.v1.auth.auth_models import User
 
-    from .workspace_members_models import WorkspaceMember
+    from .member_models import WorkspaceMember
 
 
 class Workspace(Base):

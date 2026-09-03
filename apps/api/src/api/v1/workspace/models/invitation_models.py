@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import DateTime, Enum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.api.v1.workspace.workspace_members_schemas import WorkspaceRole
+from src.api.v1.workspace.schemas.member_schemas import WorkspaceRole
 from src.core.database import Base
 
 

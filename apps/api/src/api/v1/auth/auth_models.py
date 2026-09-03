@@ -5,8 +5,8 @@ from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.api.v1.workspace.workspace_members_models import WorkspaceMember
-from src.api.v1.workspace.workspace_models import Workspace
+from src.api.v1.workspace.models.member_models import WorkspaceMember
+from src.api.v1.workspace.models.workspace_models import Workspace
 from src.core.database import Base
 
 

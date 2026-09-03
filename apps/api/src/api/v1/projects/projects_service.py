@@ -14,7 +14,7 @@ from src.api.v1.projects.projects_schema import (
     ProjectRead,
     ProjectUpdate,
 )
-from src.api.v1.workspace.workspace_models import Workspace
+from src.api.v1.workspace.models.workspace_models import Workspace
 
 logger = getLogger(__name__)
 

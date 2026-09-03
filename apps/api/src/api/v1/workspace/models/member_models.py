@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import Enum, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.api.v1.workspace.workspace_members_schemas import WorkspaceRole
+from src.api.v1.workspace.schemas.member_schemas import WorkspaceRole
 
 if TYPE_CHECKING:
     from src.api.v1.auth.auth_models import User

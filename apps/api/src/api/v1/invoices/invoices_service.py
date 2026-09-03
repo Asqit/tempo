@@ -10,7 +10,7 @@ from src.api.v1.invoices.models.issued_invoice import IssuedInvoice
 from src.api.v1.invoices.models.issued_invoice_item import IssuedInvoiceItem
 from src.api.v1.invoices.models.number_series import NumberSeries
 from src.api.v1.invoices.schemas.issued_invoice import IssuedInvoiceCreate
-from src.api.v1.workspace.workspace_members_models import WorkspaceMember
+from src.api.v1.workspace.models.member_models import WorkspaceMember
 
 
 class InvoiceService:
