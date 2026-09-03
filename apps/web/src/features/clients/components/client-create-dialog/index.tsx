@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@tempo/ui/components/dialog";
 import { ClientCreateForm } from "../client-create-form";
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 
 type ClientCreateDialogProps = {
   onCreated?: (client: components["schemas"]["ClientRead"]) => void;

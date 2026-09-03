@@ -5,7 +5,10 @@ from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.invoices.invoices_service import InvoiceService
-from src.api.v1.invoices.schemas.issued_invoice import IssuedInvoiceCreate, IssuedInvoiceRead
+from src.api.v1.invoices.schemas.issued_invoice import (
+    IssuedInvoiceCreate,
+    IssuedInvoiceRead,
+)
 from src.api.v1.workspace.workspace_members_helpers import require_role
 from src.api.v1.workspace.workspace_members_models import WorkspaceMember
 from src.api.v1.workspace.workspace_members_schemas import WorkspaceRole
@@ -40,10 +43,11 @@ async def create_invoice(
     return await InvoiceService.create_invoice()
 
 
-@router.put("{invoice_id}", response_model=IssuedInvoiceRead))
+@router.put("{invoice_id}", response_model=IssuedInvoiceRead)
 async def update_invoice(
+    invoice_id: int,
     body: IssuedInvoiceCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
     member: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.ADMIN))],
 ):
-    pass
+    return await InvoiceService.update_invoice(db, member, invoice_id, body)

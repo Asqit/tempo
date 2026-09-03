@@ -1,12 +1,13 @@
 from datetime import datetime
-from types import coroutine
 
 from fastapi import HTTPException, status
-from fastapi_pagination import paginate
+from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.v1.invoices.invoices_misc import InvoiceStatus
 from src.api.v1.invoices.models.issued_invoice import IssuedInvoice
+from src.api.v1.invoices.models.issued_invoice_item import IssuedInvoiceItem
 from src.api.v1.invoices.models.number_series import NumberSeries
 from src.api.v1.invoices.schemas.issued_invoice import IssuedInvoiceCreate
 from src.api.v1.workspace.workspace_members_models import WorkspaceMember
@@ -33,7 +34,7 @@ class InvoiceService:
         return await paginate(
             db,
             select(IssuedInvoice).where(
-                IssuedInvoice.workspace_id == member.workspace_id,
+                IssuedInvoice.workspace_id == member.workspace_id
             ),
         )
 
@@ -53,11 +54,61 @@ class InvoiceService:
     async def create_invoice(
         db: AsyncSession, member: WorkspaceMember, body: IssuedInvoiceCreate
     ):
-        pass
+        invoice = IssuedInvoice(
+            workspace_id=member.workspace_id,
+            client_id=body.client_id,
+            number_series_id=body.number_series_id,  # | None
+            date_issue=body.date_issue,
+            date_taxing=body.date_taxing,
+            date_maturity=body.date_maturity,
+            items=[
+                IssuedInvoiceItem(
+                    name=item.name,
+                    unit_price=item.unit_price,
+                    amount=item.amount,
+                    vat_rate=item.vat_rate,
+                )
+                for item in body.items
+            ],
+        )
+
+        db.add(invoice)
+        await db.commit()
+        await db.refresh(invoice)
+        return invoice
 
     # -------------------------------------------------------------- UPDATE INVOICE
     @staticmethod
     async def update_invoice(
-        db: AsyncSession, member: WorkspaceMember, invoice_id: int
+        db: AsyncSession,
+        member: WorkspaceMember,
+        invoice_id: int,
+        body: IssuedInvoiceCreate,
     ):
-        pass
+        invoice = await InvoiceService.get_single_invoice(db, member, invoice_id)
+
+        if invoice.status != InvoiceStatus.DRAFT:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Vystavenou fakturu nelze upravovat, pouze stornovat.",
+            )
+
+        invoice.client_id = body.client_id
+        invoice.date_issue = body.date_issue
+        invoice.date_taxing = body.date_taxing
+        invoice.date_maturity = body.date_maturity
+
+        invoice.items.clear()
+        invoice.items.extend(
+            IssuedInvoiceItem(
+                name=item.name,
+                unit_price=item.unit_price,
+                amount=item.amount,
+                vat_rate=item.vat_rate,
+            )
+            for item in body.items
+        )
+
+        await db.commit()
+        await db.refresh(invoice)
+        return invoice

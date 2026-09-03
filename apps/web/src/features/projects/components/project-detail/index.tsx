@@ -136,36 +136,6 @@ function getOverlapHoursInRange(
   return (overlapEndMs - overlapStartMs) / 3_600_000;
 }
 
-function addHoursByDay(
-  buckets: Map<string, WeekBarPoint>,
-  entry: ParsedTimeEntry,
-  rangeStart: Date,
-  rangeEnd: Date,
-  nowMs: number,
-) {
-  const entryStartMs = entry.startAt.getTime();
-  const entryEndMs = entry.endAt ? entry.endAt.getTime() : nowMs;
-  let cursor = Math.max(entryStartMs, rangeStart.getTime());
-  const finalEndMs = Math.min(entryEndMs, rangeEnd.getTime());
-
-  while (cursor < finalEndMs) {
-    const current = new Date(cursor);
-    const bucketKey = toLocalDateKey(current);
-    const bucket = buckets.get(bucketKey);
-
-    if (!bucket) {
-      break;
-    }
-
-    const nextDay = new Date(current);
-    nextDay.setHours(24, 0, 0, 0);
-    const segmentEndMs = Math.min(nextDay.getTime(), finalEndMs);
-
-    bucket.hours += (segmentEndMs - cursor) / 3_600_000;
-    cursor = segmentEndMs;
-  }
-}
-
 function getWeekBounds(reference = new Date()) {
   const start = new Date(reference);
   const mondayOffset = (start.getDay() + 6) % 7;

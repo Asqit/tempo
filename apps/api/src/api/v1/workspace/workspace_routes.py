@@ -20,7 +20,6 @@ from src.api.v1.workspace.workspace_members_schemas import (
 from src.api.v1.workspace.workspace_schemas import (
     WorkspaceCreate,
     WorkspaceRead,
-    WorkspaceUpdate,
 )
 from src.api.v1.workspace.workspace_service import WorkspaceService
 from src.core.database import get_db

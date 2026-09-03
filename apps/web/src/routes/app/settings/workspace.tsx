@@ -1,7 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Clock3, LogOut, MailCheck, Trash2, Users, XCircle } from "lucide-react";
+import {
+  Clock3,
+  LogOut,
+  MailCheck,
+  Trash2,
+  Users,
+  XCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { ColorAvatar } from "@/components/share/color-avatar";
@@ -36,7 +43,7 @@ import { useAuthStore } from "@/features/auth";
 import { WorkspaceShare } from "@/features/workspaces/components/workspace-share";
 import { useWorkspaceStore } from "@/features/workspaces/store";
 import { $api } from "@/lib/api";
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 
 export const Route = createFileRoute("/app/settings/workspace")({
   component: RouteComponent,
@@ -52,10 +59,8 @@ function RouteComponent() {
     "/api/v1/workspaces",
     { params: { query: { size: 100 } } },
   );
-  const { data: invitationsData, isLoading: invitationsLoading } = $api.useQuery(
-    "get",
-    "/api/v1/workspaces/invitations",
-  );
+  const { data: invitationsData, isLoading: invitationsLoading } =
+    $api.useQuery("get", "/api/v1/workspaces/invitations");
   const leaveMutation = $api.useMutation(
     "delete",
     "/api/v1/workspaces/members/me",
@@ -64,7 +69,9 @@ function RouteComponent() {
   const workspace = data?.items.find((item) => item.id === activeWorkspace);
 
   const finishWorkspaceChange = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["get", "/api/v1/workspaces"] });
+    await queryClient.invalidateQueries({
+      queryKey: ["get", "/api/v1/workspaces"],
+    });
     reset();
     await navigate({ to: "/app/workspaces" });
   };
@@ -100,7 +107,9 @@ function RouteComponent() {
   }
   if (isLoading) return <WorkspaceMessage>Načítám workspace…</WorkspaceMessage>;
   if (isError || !workspace) {
-    return <WorkspaceMessage error>Workspace se nepodařilo načíst.</WorkspaceMessage>;
+    return (
+      <WorkspaceMessage error>Workspace se nepodařilo načíst.</WorkspaceMessage>
+    );
   }
 
   return (
@@ -238,7 +247,8 @@ function InvitationRow({
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium">Pozvánka do workspace</p>
         <p className="text-xs text-muted-foreground">
-          {formatInvitationDate(invitation.created_at)} · Role: {getRoleLabel(invitation.role)}
+          {formatInvitationDate(invitation.created_at)} · Role:{" "}
+          {getRoleLabel(invitation.role)}
         </p>
       </div>
       <Badge variant={status.variant}>{status.label}</Badge>
@@ -280,7 +290,11 @@ function getInvitationStatus(invitation: WorkspaceInvitationRecord) {
 }
 
 function getRoleLabel(role: components["schemas"]["WorkspaceRole"]) {
-  return role === "admin" ? "administrátor" : role === "owner" ? "vlastník" : "člen";
+  return role === "admin"
+    ? "administrátor"
+    : role === "owner"
+      ? "vlastník"
+      : "člen";
 }
 
 function formatInvitationDate(value: string) {
@@ -290,11 +304,22 @@ function formatInvitationDate(value: string) {
   }).format(new Date(value));
 }
 
-function WorkspaceMessage({ children, error = false }: { children: string; error?: boolean }) {
+function WorkspaceMessage({
+  children,
+  error = false,
+}: {
+  children: string;
+  error?: boolean;
+}) {
   return (
-    <SettingsLayout title="Workspace" description="Spravujte workspace a jeho členy.">
+    <SettingsLayout
+      title="Workspace"
+      description="Spravujte workspace a jeho členy."
+    >
       <Card>
-        <CardContent className={`flex min-h-48 items-center justify-center text-sm ${error ? "text-destructive" : "text-muted-foreground"}`}>
+        <CardContent
+          className={`flex min-h-48 items-center justify-center text-sm ${error ? "text-destructive" : "text-muted-foreground"}`}
+        >
           {children}
         </CardContent>
       </Card>
@@ -368,7 +393,8 @@ function WorkspaceMembers({
               <Users className="size-4 text-primary" /> Členové workspace
             </CardTitle>
             <CardDescription className="mt-1">
-              {workspace.name} · {workspace.members.length} {workspace.members.length === 1 ? "člen" : "členů"} s přístupem.
+              {workspace.name} · {workspace.members.length}{" "}
+              {workspace.members.length === 1 ? "člen" : "členů"} s přístupem.
             </CardDescription>
           </div>
           {(role === "owner" || role === "admin") && <WorkspaceShare />}
@@ -380,13 +406,17 @@ function WorkspaceMembers({
             <ColorAvatar name={member.user.name} className="size-8 text-xs" />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">
-                {member.user.name} {member.user_id === currentUserId ? "(vy)" : ""}
+                {member.user.name}{" "}
+                {member.user_id === currentUserId ? "(vy)" : ""}
               </p>
-              <p className="truncate text-xs text-muted-foreground">{member.user.email}</p>
+              <p className="truncate text-xs text-muted-foreground">
+                {member.user.email}
+              </p>
             </div>
             <div className="flex items-center gap-2">
               {member.user_id !== currentUserId &&
-              (role === "owner" || (role === "admin" && member.role === "member")) ? (
+              (role === "owner" ||
+                (role === "admin" && member.role === "member")) ? (
                 <Select
                   value={member.role}
                   onValueChange={(value) =>
@@ -408,12 +438,19 @@ function WorkspaceMembers({
                   </SelectContent>
                 </Select>
               ) : (
-                <Badge variant={member.role === "owner" ? "default" : "secondary"}>
-                  {member.role === "owner" ? "Vlastník" : member.role === "admin" ? "Administrátor" : "Člen"}
+                <Badge
+                  variant={member.role === "owner" ? "default" : "secondary"}
+                >
+                  {member.role === "owner"
+                    ? "Vlastník"
+                    : member.role === "admin"
+                      ? "Administrátor"
+                      : "Člen"}
                 </Badge>
               )}
               {member.user_id !== currentUserId &&
-              (role === "owner" || (role === "admin" && member.role === "member")) ? (
+              (role === "owner" ||
+                (role === "admin" && member.role === "member")) ? (
                 <ConfirmWorkspaceAction
                   title="Odebrat člena?"
                   description={`${member.user.name} ztratí přístup k tomuto workspace.`}

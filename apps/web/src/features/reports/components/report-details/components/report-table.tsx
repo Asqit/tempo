@@ -1,4 +1,4 @@
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 import * as React from "react";
 import { format, isToday, isYesterday, startOfDay } from "date-fns";
 import { cs } from "date-fns/locale";
@@ -139,15 +139,17 @@ export function ReportTable({ entries }: Props) {
                             <span className="inline-flex items-center gap-2">
                               <span
                                 className="h-2 w-2 shrink-0 rounded-full ring-2 ring-offset-1 ring-offset-background"
-                                style={{
-                                  backgroundColor: generateColorFromString(
-                                    entry.project.name,
-                                  ).bg,
-                                  "--tw-ring-color": generateColorFromString(
-                                    entry.project.name,
-                                  ),
-                                  opacity: 1,
-                                } as React.CSSProperties}
+                                style={
+                                  {
+                                    backgroundColor: generateColorFromString(
+                                      entry.project.name,
+                                    ).bg,
+                                    "--tw-ring-color": generateColorFromString(
+                                      entry.project.name,
+                                    ),
+                                    opacity: 1,
+                                  } as React.CSSProperties
+                                }
                               />
                               {entry.project.name}
                             </span>

@@ -1,5 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@tempo/ui/components/card";
-import type { components } from "@/lib/api.d";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@tempo/ui/components/card";
+import type { components } from "@tempo/api-types";
 import { cn } from "@/lib/utils";
 import { calculateAmount, formatMoney } from "@/lib/money";
 import { durationMinutesBetween, formatHoursFromMinutes } from "@/lib/time";

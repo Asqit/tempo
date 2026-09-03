@@ -8,8 +8,6 @@ from src.api.utils.justice_registry import (
     JusticeRegistryClient,
     get_justice_registry_client,
 )
-from src.api.v1.auth.auth_helpers import get_current_user
-from src.api.v1.auth.auth_models import User
 from src.api.v1.clients.clients_schemas import ClientCreate, ClientRead, ClientUpdate
 from src.api.v1.clients.clients_service import ClientsService
 from src.api.v1.workspace.workspace_members_helpers import require_role

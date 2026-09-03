@@ -525,6 +525,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/invoices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Invoices */
+        get: operations["list_invoices_api_v1_invoices_get"];
+        put?: never;
+        /** Create Invoice */
+        post: operations["create_invoice_api_v1_invoices_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invoices/{invoice_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Invoice */
+        get: operations["get_invoice_api_v1_invoices__invoice_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invoices{invoice_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update Invoice */
+        put: operations["update_invoice_api_v1_invoices_invoice_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -555,8 +607,6 @@ export interface components {
         };
         /** ClientCreate */
         ClientCreate: {
-            /** Name */
-            name: string;
             /** Hourly Rate */
             hourly_rate?: number | string | null;
             /** Is Company */
@@ -586,6 +636,8 @@ export interface components {
             currency?: string | null;
             /** Discount Percentage */
             discount_percentage?: number | string | null;
+            /** Name */
+            name: string;
         };
         /** ClientRead */
         ClientRead: {
@@ -675,8 +727,6 @@ export interface components {
         };
         /** ClientUpdate */
         ClientUpdate: {
-            /** Name */
-            name: string;
             /** Hourly Rate */
             hourly_rate?: number | string | null;
             /** Is Company */
@@ -706,6 +756,8 @@ export interface components {
             currency?: string | null;
             /** Discount Percentage */
             discount_percentage?: number | string | null;
+            /** Name */
+            name: string | null;
         };
         /** CreateReport */
         CreateReport: {
@@ -743,6 +795,96 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** IssuedInvoiceCreate */
+        IssuedInvoiceCreate: {
+            /** Client Id */
+            client_id: number;
+            /** Number Series Id */
+            number_series_id?: number | null;
+            /**
+             * Date Issue
+             * Format: date-time
+             */
+            date_issue: string;
+            /**
+             * Date Taxing
+             * Format: date-time
+             */
+            date_taxing: string;
+            /**
+             * Date Maturity
+             * Format: date-time
+             */
+            date_maturity: string;
+            /** Items */
+            items: components["schemas"]["IssuedInvoiceItemCreate"][];
+        };
+        /** IssuedInvoiceItemCreate */
+        IssuedInvoiceItemCreate: {
+            /** Name */
+            name: string;
+            /** Unit Price */
+            unit_price: number | string;
+            /**
+             * Amount
+             * @default 1
+             */
+            amount: number | string;
+            /**
+             * Vat Rate
+             * @default 21
+             */
+            vat_rate: number | string;
+        };
+        /** IssuedInvoiceItemRead */
+        IssuedInvoiceItemRead: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            /** Unit Price */
+            unit_price: string;
+            /** Amount */
+            amount: string;
+            /** Vat Rate */
+            vat_rate: string;
+        };
+        /** IssuedInvoiceRead */
+        IssuedInvoiceRead: {
+            /** Id */
+            id: number;
+            /** Document Number */
+            document_number: string;
+            /** Client Id */
+            client_id: number;
+            /**
+             * Date Issue
+             * Format: date-time
+             */
+            date_issue: string;
+            /**
+             * Date Taxing
+             * Format: date-time
+             */
+            date_taxing: string;
+            /**
+             * Date Maturity
+             * Format: date-time
+             */
+            date_maturity: string;
+            /** Items */
+            items: components["schemas"]["IssuedInvoiceItemRead"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
         /** LiveCheck */
         LiveCheck: {
             /**
@@ -778,6 +920,19 @@ export interface components {
         Page_ClientRead_: {
             /** Items */
             items: components["schemas"]["ClientRead"][];
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Size */
+            size: number;
+            /** Pages */
+            pages: number;
+        };
+        /** Page[IssuedInvoiceRead] */
+        Page_IssuedInvoiceRead_: {
+            /** Items */
+            items: components["schemas"]["IssuedInvoiceRead"][];
             /** Total */
             total: number;
             /** Page */
@@ -1908,6 +2063,7 @@ export interface operations {
         parameters: {
             query?: {
                 project_id?: number | null;
+                client_id?: number | null;
                 start_time?: string | null;
                 end_time?: string | null;
                 billable?: boolean | null;
@@ -2792,6 +2948,147 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_invoices_api_v1_invoices_get: {
+        parameters: {
+            query?: {
+                /** @description Page number */
+                page?: number;
+                /** @description Page size */
+                size?: number;
+            };
+            header: {
+                "X-Workspace-Id": number;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_IssuedInvoiceRead_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_invoice_api_v1_invoices_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IssuedInvoiceCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssuedInvoiceRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_invoice_api_v1_invoices__invoice_id__get: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
+            path: {
+                invoice_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssuedInvoiceRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_invoice_api_v1_invoices_invoice_id__put: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
+            path: {
+                invoice_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IssuedInvoiceCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssuedInvoiceRead"];
+                };
             };
             /** @description Validation Error */
             422: {

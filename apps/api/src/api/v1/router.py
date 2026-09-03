@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from src.api.v1.auth import auth_routes
 from src.api.v1.clients import clients_routes
 from src.api.v1.health import health_routes
+from src.api.v1.invoices import invoices_routes
 from src.api.v1.notifications import notifications_routes
 from src.api.v1.projects import projects_routes, projects_schema
 from src.api.v1.reports import reports_routes
@@ -22,3 +23,4 @@ v1.include_router(time_entries_routes.router)
 v1.include_router(workspace_routes.router)
 v1.include_router(reports_routes.router)
 v1.include_router(notifications_routes.router)
+v1.include_router(invoices_routes.router)

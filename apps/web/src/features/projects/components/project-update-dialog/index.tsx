@@ -40,7 +40,7 @@ export function ProjectUpdateDialog({
   if (trigger) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>{trigger}</DialogTrigger>
+        <DialogTrigger>{trigger}</DialogTrigger>
 
         <DialogContent>
           <DialogHeader>
@@ -65,7 +65,7 @@ export function ProjectUpdateDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+      <DialogTrigger>
         <Button type="button" variant="ghost" size="sm">
           <Pencil className="size-3.5" />
           Upravit

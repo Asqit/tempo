@@ -1,8 +1,9 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint
+from sqlalchemy import DateTime, Enum, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.api.v1.invoices.invoices_misc import InvoiceStatus
 from src.api.v1.invoices.models.issued_invoice_item import IssuedInvoiceItem
 from src.core.database import Base
 
@@ -40,4 +41,13 @@ class IssuedInvoice(Base):
 
     items: Mapped[IssuedInvoiceItem] = relationship(
         back_populates="invoice", lazy="selectin", passive_deletes=True
+    )
+
+    status: Mapped[InvoiceStatus] = mapped_column(
+        Enum(
+            InvoiceStatus,
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
+        ),
+        default=InvoiceStatus.DRAFT,
+        server_default=InvoiceStatus.DRAFT.value,
     )

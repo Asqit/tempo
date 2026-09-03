@@ -1,4 +1,4 @@
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 import { ReportTable } from "./components/report-table";
 import { ReportStats } from "./components/report-stats";
 

@@ -19,7 +19,7 @@ import {
 } from "@tempo/ui/components/field";
 import { Input } from "@tempo/ui/components/input";
 import { $api } from "@/lib/api";
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 import { useNavigate } from "@tanstack/react-router";
 
 const formSchema = z.object({

@@ -1,4 +1,4 @@
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 import { useNavigate } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { cs } from "date-fns/locale";
@@ -89,14 +89,16 @@ export function ReportsList({ reports }: Props) {
                   <TableCell>
                     {report.client_snapshot.length > 0 ? (
                       <span className="inline-flex items-center gap-1.5">
-                        {report.client_snapshot.map((client) => client.name).join(", ")}
+                        {report.client_snapshot
+                          .map((client) => client.name)
+                          .join(", ")}
                         {report.client_snapshot.length === 1 &&
                           report.client_snapshot[0].hourly_rate && (
-                          <span className="text-xs text-muted-foreground">
-                            ({report.client_snapshot[0].hourly_rate}{" "}
-                            {report.client_snapshot[0].currency}/h)
-                          </span>
-                        )}
+                            <span className="text-xs text-muted-foreground">
+                              ({report.client_snapshot[0].hourly_rate}{" "}
+                              {report.client_snapshot[0].currency}/h)
+                            </span>
+                          )}
                       </span>
                     ) : (
                       <span className="text-muted-foreground">—</span>
@@ -104,7 +106,9 @@ export function ReportsList({ reports }: Props) {
                   </TableCell>
                   <TableCell>
                     {report.project_snapshot.length > 0 ? (
-                      report.project_snapshot.map((project) => project.name).join(", ")
+                      report.project_snapshot
+                        .map((project) => project.name)
+                        .join(", ")
                     ) : (
                       <span className="text-muted-foreground">—</span>
                     )}

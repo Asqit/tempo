@@ -1,4 +1,4 @@
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 import { format } from "date-fns";
 import { cs } from "date-fns/locale";
 import { parseHourlyRate } from "@/lib/money";

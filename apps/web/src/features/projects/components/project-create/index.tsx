@@ -141,8 +141,8 @@ export function ProjectCreate({ onCreated, trigger }: ProjectCreateFormProps) {
             <form.Field
               name="name"
               children={(field) => {
-                      const isInvalid =
-                        field.state.meta.isTouched && !field.state.meta.isValid;
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <Field data-invalid={isInvalid} className="flex-1">
                     <FieldLabel htmlFor={field.name}>Název projektu</FieldLabel>
@@ -248,9 +248,9 @@ export function ProjectCreate({ onCreated, trigger }: ProjectCreateFormProps) {
                         <DatePicker
                           id="project-start-time"
                           withTime
-                          value={new Date(
-                            field.state.value ?? fallbackProjectDate,
-                          )}
+                          value={
+                            new Date(field.state.value ?? fallbackProjectDate)
+                          }
                           setValue={(d) => field.handleChange(d.toISOString())}
                         />
                       </FieldContent>
@@ -271,9 +271,9 @@ export function ProjectCreate({ onCreated, trigger }: ProjectCreateFormProps) {
                         <DatePicker
                           id="project-end-time"
                           withTime
-                          value={new Date(
-                            field.state.value ?? fallbackProjectDate,
-                          )}
+                          value={
+                            new Date(field.state.value ?? fallbackProjectDate)
+                          }
                           setValue={(d) => field.handleChange(d.toISOString())}
                         />
                       </FieldContent>
@@ -294,7 +294,7 @@ export function ProjectCreate({ onCreated, trigger }: ProjectCreateFormProps) {
   if (trigger) {
     return (
       <Dialog>
-        <DialogTrigger asChild>{trigger}</DialogTrigger>
+        <DialogTrigger>{trigger}</DialogTrigger>
         {dialogContent}
       </Dialog>
     );

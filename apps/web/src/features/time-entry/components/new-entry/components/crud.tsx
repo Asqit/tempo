@@ -1,4 +1,4 @@
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 import { Button } from "@tempo/ui/components/button";
 import { ClientPicker } from "@/features/clients/components/client-picker";
 import { ProjectPicker } from "@/features/projects/components/project-picker";

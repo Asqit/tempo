@@ -1,4 +1,4 @@
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 import type { ReactNode } from "react";
 import { TimeEntryUpdateForm } from "../../time-entry-update-form";
 import {

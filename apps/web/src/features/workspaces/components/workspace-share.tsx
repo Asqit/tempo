@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "@tempo/ui/components/select";
 import { $api } from "@/lib/api";
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 import { useWorkspaceStore } from "../store";
 
 const formSchema = z.object({
@@ -38,9 +38,8 @@ const formSchema = z.object({
 
 export function WorkspaceShare() {
   const [open, setOpen] = useState(false);
-  const [role, setRole] = useState<components["schemas"]["WorkspaceRole"]>(
-    "member",
-  );
+  const [role, setRole] =
+    useState<components["schemas"]["WorkspaceRole"]>("member");
   const { activeWorkspace } = useWorkspaceStore();
   const { mutateAsync, isPending } = $api.useMutation(
     "post",
@@ -109,13 +108,17 @@ export function WorkspaceShare() {
                         type="email"
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(event) => field.handleChange(event.target.value)}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
                         aria-invalid={isInvalid}
                         placeholder="kolega@firma.cz"
                         autoComplete="email"
                         autoFocus
                       />
-                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
                     </FieldContent>
                   </Field>
                 );
@@ -123,7 +126,10 @@ export function WorkspaceShare() {
             />
             <Field>
               <FieldLabel htmlFor="invite-role">Role ve workspace</FieldLabel>
-              <Select value={role} onValueChange={(value) => setRole(value as typeof role)}>
+              <Select
+                value={role}
+                onValueChange={(value) => setRole(value as typeof role)}
+              >
                 <SelectTrigger id="invite-role">
                   <SelectValue />
                 </SelectTrigger>

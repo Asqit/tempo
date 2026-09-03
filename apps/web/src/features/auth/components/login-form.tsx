@@ -20,7 +20,7 @@ import {
 import { Input } from "@tempo/ui/components/input";
 import { $api } from "@/lib/api";
 import { useAuthStore } from "../store";
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 import { useNavigate } from "@tanstack/react-router";
 
 const formSchema = z.object({
@@ -99,7 +99,7 @@ export function LoginForm() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
-              placeholder="vas.email"
+                      placeholder="vas.email"
                       autoComplete="username"
                     />
                     {isInvalid && (

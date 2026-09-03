@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 import { Button } from "@tempo/ui/components/button";
 import { $api, getWorkspaceHeader } from "@/lib/api";
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 import {
   ClientFormFields,
   emptyClientFormValues,
@@ -16,9 +16,7 @@ type ClientCreateFormProps = {
 };
 
 export function ClientCreateForm({ onCreated }: ClientCreateFormProps) {
-  const [values, setValues] = useState<ClientFormValues>(
-    emptyClientFormValues,
-  );
+  const [values, setValues] = useState<ClientFormValues>(emptyClientFormValues);
   const workspaceHeader = getWorkspaceHeader();
   const { mutateAsync, isPending } = $api.useMutation(
     "post",

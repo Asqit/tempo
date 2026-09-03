@@ -77,10 +77,10 @@ async def get_time_entry(
 async def create_time_entry(
     payload: TimeEntryCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
-    _role: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.MEMBER))],
+    role: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.MEMBER))],
     workspace: Annotated[Workspace, Depends(get_current_workspace)],
 ):
-    return await TimeEntryService.create_time_entry(db, workspace, payload)
+    return await TimeEntryService.create_time_entry(db, workspace, payload, role)
 
 
 @router.put("/{id}", response_model=TimeEntryRead, tags=["mcp"])

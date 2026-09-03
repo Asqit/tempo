@@ -1,4 +1,4 @@
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

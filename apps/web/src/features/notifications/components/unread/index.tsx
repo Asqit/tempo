@@ -8,7 +8,7 @@ import {
 } from "@tempo/ui/components/popover";
 import { $api, queryClient } from "@/lib/api";
 import { Button } from "@tempo/ui/components/button";
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 import { Check, Bell } from "lucide-react";
 import { toast } from "sonner";
 
@@ -76,7 +76,9 @@ export function UnreadNotifications() {
     invitationId: number,
   ) => {
     try {
-      await acceptInvitation({ params: { path: { invitation_id: invitationId } } });
+      await acceptInvitation({
+        params: { path: { invitation_id: invitationId } },
+      });
       await markAsRead({ params: { path: { id: notificationId } } });
       await queryClient.invalidateQueries({
         queryKey: ["get", "/api/v1/notifications/"],

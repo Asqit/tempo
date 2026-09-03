@@ -1,4 +1,4 @@
-import type { paths } from "./api.d";
+import type { paths } from "@tempo/api-types";
 import createFetchClient, { type Middleware } from "openapi-fetch";
 import createClient from "openapi-react-query";
 import { useAuthStore } from "@/features/auth";

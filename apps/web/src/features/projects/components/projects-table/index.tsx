@@ -92,7 +92,7 @@ export function ProjectsTable(props: Props) {
 
     await bulkDelete({
       params: {
-        query: { client_id: clientId },
+        query: { client_id: clientId! },
         header: workspaceHeader,
       },
       body: { ids: selectedProjectIds },
@@ -174,7 +174,7 @@ export function ProjectsTable(props: Props) {
                   <ProjectRow
                     key={project.id}
                     project={project}
-                    compact={compact}
+                    compact={Boolean(compact)}
                     isSelected={selectedProjectIds.includes(project.id)}
                     onToggleSelection={handleToggleProjectSelection}
                   />

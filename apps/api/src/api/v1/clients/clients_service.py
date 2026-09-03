@@ -103,11 +103,8 @@ class ClientsService:
         if client is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-        if payload.name is not None:
-            client.name = payload.name
-
-        if payload.hourly_rate is not None:
-            client.hourly_rate = payload.hourly_rate
+        for field, value in payload.model_dump(exclude_none=True).items():
+            setattr(client, field, value)
 
         await db.commit()
         await db.refresh(client)

@@ -1,4 +1,4 @@
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 
 export type ClientWithBilling = components["schemas"]["ClientRead"];
 export type ClientPayload = components["schemas"]["ClientCreate"];

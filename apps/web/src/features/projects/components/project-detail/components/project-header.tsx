@@ -2,7 +2,7 @@ import { Button } from "@tempo/ui/components/button";
 import { TimeEntryCreateDialog } from "@/features/time-entry/components/time-entry-create-dialog";
 import { ProjectUpdateDialog } from "../../project-update-dialog";
 import { PlayCircle } from "lucide-react";
-import type { components } from "@/lib/api.d";
+import type { components } from "@tempo/api-types";
 
 type ProjectHeaderProps = {
   project: components["schemas"]["ProjectRead"];

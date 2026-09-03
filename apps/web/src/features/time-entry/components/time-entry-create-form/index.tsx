@@ -9,6 +9,8 @@ import { $api, getWorkspaceHeader } from "@/lib/api";
 
 type TimeEntryCreateFormProps = {
   onCreated?: () => void;
+  initialStartTime?: Date;
+  initialEndTime?: Date;
 };
 
 function toDateTimeLocalInput(value: Date): string {
@@ -34,13 +36,23 @@ function fromDateTimeLocalInput(value: string): string | null {
   return date.toISOString();
 }
 
-export function TimeEntryCreateForm({ onCreated }: TimeEntryCreateFormProps) {
+export function TimeEntryCreateForm({
+  onCreated,
+  initialStartTime,
+  initialEndTime,
+}: TimeEntryCreateFormProps) {
   const now = new Date();
   const [description, setDescription] = useState("");
   const [projectId, setProjectId] = useState<number | null>(null);
   const [clientId, setClientId] = useState<number | null>(null);
-  const [startTime, setStartTime] = useState(toDateTimeLocalInput(now));
-  const [endTime, setEndTime] = useState("");
+  const [startTime, setStartTime] = useState(
+    initialStartTime
+      ? toDateTimeLocalInput(initialStartTime)
+      : toDateTimeLocalInput(now),
+  );
+  const [endTime, setEndTime] = useState(
+    initialEndTime ? toDateTimeLocalInput(initialEndTime) : "",
+  );
   const workspaceHeader = getWorkspaceHeader();
 
   const { mutateAsync, isPending } = $api.useMutation(

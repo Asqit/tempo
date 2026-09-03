@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from pydantic import BaseModel, Field, model_validator
-
 from src.api.v1.invoices.schemas.issued_invoice_item import (
     IssuedInvoiceItemCreate,
     IssuedInvoiceItemRead,
@@ -35,3 +34,5 @@ class IssuedInvoiceRead(DBInvoice):
     date_taxing: datetime
     date_maturity: datetime
     items: list[IssuedInvoiceItemRead]
+    created_at: datetime
+    updated_at: datetime
