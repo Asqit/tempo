@@ -6,6 +6,7 @@ from sqlalchemy import exists, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.auth.auth_models import User
+from src.api.v1.invoices.models.number_series import NumberSeries
 from src.api.v1.notifications.notifications_schemas import (
     WorkspaceInviteAcceptedPayload,
     WorkspaceInvitePayload,
@@ -79,6 +80,7 @@ class WorkspaceService:
         )
 
         db.add(owner)
+        db.add(NumberSeries(workspace_id=workspace.id))
 
         await db.commit()
         await db.refresh(workspace)

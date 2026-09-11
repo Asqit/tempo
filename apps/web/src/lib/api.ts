@@ -86,6 +86,7 @@ const middleware: Middleware = {
       "/api/v1/clients",
       "/api/v1/projects",
       "/api/v1/time-entries",
+      "/api/v1/invoices",
     ].some(
       (prefix) =>
         url.pathname === prefix || url.pathname.startsWith(`${prefix}/`),

@@ -1,15 +1,61 @@
 from fastapi import HTTPException, status
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from src.api.utils.justice_registry import (
+    JusticeRegistryClient,
+)
 from src.api.v1.clients.clients_models import Client
-from src.api.v1.clients.clients_schemas import ClientCreate, ClientRead, ClientUpdate
+from src.api.v1.clients.clients_schemas import (
+    ClientCreate,
+    ClientRead,
+    ClientSearchResult,
+    ClientUpdate,
+)
+from src.api.v1.workspace.models.member_models import WorkspaceMember
 from src.api.v1.workspace.models.workspace_models import Workspace
 
 
 class ClientsService:
+    @staticmethod
+    async def search_invoice_client(
+        db: AsyncSession,
+        member: WorkspaceMember,
+        registry: JusticeRegistryClient,
+        query: str,
+    ) -> list[ClientSearchResult]:
+        rows = await db.execute(
+            select(Client).where(
+                Client.workspace_id == member.workspace_id,
+                or_(
+                    Client.ico.ilike(f"%{query}%"),
+                    Client.name.ilike(f"%{query}%"),
+                ),
+            )
+        )
+
+        clients = rows.scalars().all()
+        registry_result = await registry.search(query)
+
+        return [
+            ClientSearchResult(
+                id=client.id,
+                name=client.name,
+                ico=client.ico,
+                source="client",
+            )
+            for client in clients
+        ] + [
+            ClientSearchResult(
+                id=company["subjektId"],
+                name=company["nazev"]["value"],
+                ico=(company["ico"]["value"] if "ico" in company else None),
+                source="registry",
+            )
+            for company in registry_result["data"]
+        ]
+
     @staticmethod
     async def get_client(
         db: AsyncSession,

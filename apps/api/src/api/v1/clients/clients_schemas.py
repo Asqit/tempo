@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -58,6 +59,13 @@ class ClientRead(DBClientBase):
     discount_percentage: Decimal | None
     created_at: datetime
     updated_at: datetime
+
+
+class ClientSearchResult(BaseModel):
+    id: int
+    name: str
+    ico: str | None = None
+    source: Literal["client", "registry"]
 
 
 class ClientShallow(ClientRead):

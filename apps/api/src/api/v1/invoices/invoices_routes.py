@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -25,6 +26,15 @@ async def list_invoices(
     return await InvoiceService.list_invoices(db, member)
 
 
+@router.get("/number-series/next")
+async def get_next_number(
+    issued_date: datetime,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    member: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.MEMBER))],
+):
+    return await InvoiceService.get_next_number_preview(db, member, issued_date)
+
+
 @router.get("/{invoice_id}", response_model=IssuedInvoiceRead)
 async def get_invoice(
     invoice_id: int,
@@ -40,10 +50,10 @@ async def create_invoice(
     db: Annotated[AsyncSession, Depends(get_db)],
     member: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.ADMIN))],
 ):
-    return await InvoiceService.create_invoice()
+    return await InvoiceService.create_invoice(db, member, body)
 
 
-@router.put("{invoice_id}", response_model=IssuedInvoiceRead)
+@router.put("/{invoice_id}", response_model=IssuedInvoiceRead)
 async def update_invoice(
     invoice_id: int,
     body: IssuedInvoiceCreate,

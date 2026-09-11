@@ -16,17 +16,72 @@ from src.api.v1.workspace.models.member_models import WorkspaceMember
 class InvoiceService:
     @staticmethod
     async def __get_next_number(
-        db: AsyncSession, series_id: int, issued_date: datetime
+        db: AsyncSession,
+        series_id: int,
+        workspace_id: int,
+        issued_date: datetime,
     ) -> str:
         result = await db.execute(
             update(NumberSeries)
-            .where(NumberSeries.id == series_id)
+            .where(
+                NumberSeries.id == series_id,
+                NumberSeries.workspace_id == workspace_id,
+            )
             .values(counter=NumberSeries.counter + 1)
             .returning(NumberSeries.counter, NumberSeries.format_template)
         )
 
-        counter, format_template = result.one()
+        row = result.one_or_none()
+        if row is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Číselná řada nebyla nalezena v tomto workspace.",
+            )
+
+        counter, format_template = row
         return format_template.format(year=issued_date.year, counter=counter)
+
+    @staticmethod
+    async def __get_or_create_default_series(
+        db: AsyncSession, workspace_id: int
+    ) -> NumberSeries:
+        series = await db.scalar(
+            select(NumberSeries)
+            .where(NumberSeries.workspace_id == workspace_id)
+            .order_by(NumberSeries.id)
+        )
+        if series is not None:
+            return series
+
+        series = NumberSeries(workspace_id=workspace_id)
+        db.add(series)
+        await db.flush()
+        return series
+
+    @staticmethod
+    async def get_next_number_preview(
+        db: AsyncSession, member: WorkspaceMember, issued_date: datetime
+    ) -> dict[str, int | str | None | bool]:
+        series = await db.scalar(
+            select(NumberSeries)
+            .where(NumberSeries.workspace_id == member.workspace_id)
+            .order_by(NumberSeries.id)
+        )
+        if series is None:
+            return {
+                "number_series_id": None,
+                "document_number": f"TEMPO-{issued_date.year}-0001",
+                "reserved": False,
+            }
+
+        return {
+            "number_series_id": series.id,
+            "document_number": series.format_template.format(
+                year=issued_date.year,
+                counter=series.counter + 1,
+            ),
+            "reserved": False,
+        }
 
     # -------------------------------------------------------------- LIST INVOICES
     @staticmethod
@@ -54,10 +109,28 @@ class InvoiceService:
     async def create_invoice(
         db: AsyncSession, member: WorkspaceMember, body: IssuedInvoiceCreate
     ):
+        series = (
+            await db.get(NumberSeries, body.number_series_id)
+            if body.number_series_id is not None
+            else await InvoiceService.__get_or_create_default_series(
+                db, member.workspace_id
+            )
+        )
+        if series is None or series.workspace_id != member.workspace_id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Číselná řada nebyla nalezena v tomto workspace.",
+            )
+
+        document_number = await InvoiceService.__get_next_number(
+            db, series.id, member.workspace_id, body.date_issue
+        )
+
         invoice = IssuedInvoice(
             workspace_id=member.workspace_id,
             client_id=body.client_id,
-            number_series_id=body.number_series_id,  # | None
+            number_series_id=series.id,
+            document_number=document_number,
             date_issue=body.date_issue,
             date_taxing=body.date_taxing,
             date_maturity=body.date_maturity,

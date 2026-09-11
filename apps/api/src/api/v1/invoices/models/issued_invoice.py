@@ -22,7 +22,6 @@ class IssuedInvoice(Base):
 
     workspace_id: Mapped[int] = mapped_column(
         ForeignKey("workspaces.id", ondelete="CASCADE"),
-        unique=True,
     )
 
     client_id: Mapped[int] = mapped_column(
@@ -39,7 +38,7 @@ class IssuedInvoice(Base):
     date_taxing: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     date_maturity: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
-    items: Mapped[IssuedInvoiceItem] = relationship(
+    items: Mapped[list[IssuedInvoiceItem]] = relationship(
         back_populates="invoice", lazy="selectin", passive_deletes=True
     )
 

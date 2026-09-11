@@ -1,7 +1,22 @@
-from typing import Any
+from typing import NotRequired, TypedDict, cast
 
 import httpx
 from fastapi import Request
+
+
+class RegistryValue(TypedDict):
+    value: str
+
+
+class RegistryCompany(TypedDict):
+    subjektId: int
+    nazev: RegistryValue
+    ico: NotRequired[RegistryValue]
+
+
+class RegistrySearchResponse(TypedDict):
+    pocetCelkem: int
+    data: list[RegistryCompany]
 
 
 class JusticeRegistryClient:
@@ -13,7 +28,7 @@ class JusticeRegistryClient:
         query: str,
         *,
         registries: str = "VR",
-    ) -> dict[str, Any]:
+    ) -> RegistrySearchResponse:
         response = await self._client.get(
             "/api/rejstriky/navrhy",
             params={
@@ -23,7 +38,7 @@ class JusticeRegistryClient:
         )
         response.raise_for_status()
 
-        return response.json()
+        return cast(RegistrySearchResponse, response.json())
 
 
 # dependencies.py

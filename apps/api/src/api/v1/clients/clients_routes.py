@@ -3,12 +3,16 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio.session import AsyncSession
-
 from src.api.utils.justice_registry import (
     JusticeRegistryClient,
     get_justice_registry_client,
 )
-from src.api.v1.clients.clients_schemas import ClientCreate, ClientRead, ClientUpdate
+from src.api.v1.clients.clients_schemas import (
+    ClientCreate,
+    ClientRead,
+    ClientSearchResult,
+    ClientUpdate,
+)
 from src.api.v1.clients.clients_service import ClientsService
 from src.api.v1.workspace.models.member_models import WorkspaceMember
 from src.api.v1.workspace.models.workspace_models import Workspace
@@ -26,6 +30,16 @@ async def search_client_company(
     justice: Annotated[JusticeRegistryClient, Depends(get_justice_registry_client)],
 ):
     return await justice.search(query)
+
+
+@router.get("/search")
+async def search_invoice_client(
+    query: str,
+    justice: Annotated[JusticeRegistryClient, Depends(get_justice_registry_client)],
+    role: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.MEMBER))],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> list[ClientSearchResult]:
+    return await ClientsService.search_invoice_client(db, role, justice, query)
 
 
 @router.get("/")

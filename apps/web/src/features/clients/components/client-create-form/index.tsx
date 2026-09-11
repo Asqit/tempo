@@ -13,10 +13,17 @@ import { clientPayload } from "../client-types";
 
 type ClientCreateFormProps = {
   onCreated?: (client: components["schemas"]["ClientRead"]) => void;
+  initialValues?: Partial<ClientFormValues>;
 };
 
-export function ClientCreateForm({ onCreated }: ClientCreateFormProps) {
-  const [values, setValues] = useState<ClientFormValues>(emptyClientFormValues);
+export function ClientCreateForm({
+  onCreated,
+  initialValues,
+}: ClientCreateFormProps) {
+  const [values, setValues] = useState<ClientFormValues>(() => ({
+    ...emptyClientFormValues(),
+    ...initialValues,
+  }));
   const workspaceHeader = getWorkspaceHeader();
   const { mutateAsync, isPending } = $api.useMutation(
     "post",

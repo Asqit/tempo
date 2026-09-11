@@ -1,3 +1,4 @@
+import { IssueInvoice } from "@/features/invoices/components/issue-invoice";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/invoices/$id")({
@@ -5,5 +6,7 @@ export const Route = createFileRoute("/app/invoices/$id")({
 });
 
 function RouteComponent() {
-  return <div>Hello "/app/invoices/$id"!</div>;
+  const { id } = Route.useParams();
+
+  return <IssueInvoice invoiceId={Number(id)} />;
 }
