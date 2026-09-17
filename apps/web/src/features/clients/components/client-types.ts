@@ -1,5 +1,7 @@
 import type { components } from "@tempo/api-types";
 
+export type { ClientFormValues } from "./client-form-fields";
+
 export type ClientWithBilling = components["schemas"]["ClientRead"];
 export type ClientPayload = components["schemas"]["ClientCreate"];
 
@@ -13,8 +15,6 @@ export function clientPayload(values: {
   ico: string;
   dic: string;
   vat_payer: boolean;
-  bank_account: string;
-  iban: string;
   hourly_rate: string;
   currency: string;
   discount_percentage: string;
@@ -36,8 +36,6 @@ export function clientPayload(values: {
     ico: textOrNull(values.ico),
     dic: textOrNull(values.dic),
     vat_payer: values.vat_payer,
-    bank_account: textOrNull(values.bank_account),
-    iban: textOrNull(values.iban),
     hourly_rate: numberOrNull(values.hourly_rate),
     currency: textOrNull(values.currency)?.toUpperCase() ?? null,
     discount_percentage: numberOrNull(values.discount_percentage),

@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState, type Dispatch, type SetStateAction } from "react";
 import {
-  Building2,
-  Landmark,
-  MapPin,
-  WalletCards,
-} from "lucide-react";
+  useEffect,
+  useMemo,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
+import { Building2, Landmark, MapPin, WalletCards } from "lucide-react";
 
 import { Checkbox } from "@tempo/ui/components/checkbox";
 import {
@@ -26,8 +27,6 @@ export type ClientFormValues = {
   ico: string;
   dic: string;
   vat_payer: boolean;
-  bank_account: string;
-  iban: string;
   hourly_rate: string;
   currency: string;
   discount_percentage: string;
@@ -277,10 +276,7 @@ export function ClientFormFields({ values, setValues, disabled }: Props) {
         description="Základní údaje, podle kterých klienta poznáš."
       >
         <div className="flex flex-col gap-4">
-          <JusticeSearch
-            setValues={setValues}
-            disabled={disabled}
-          />
+          <JusticeSearch setValues={setValues} disabled={disabled} />
           <TextField
             id="client-name"
             label="Název klienta"
@@ -325,7 +321,9 @@ export function ClientFormFields({ values, setValues, disabled }: Props) {
               id="client-dic"
               label="DIČ"
               value={values.dic}
-              onChange={(value) => setText(setValues, "dic", value.toUpperCase())}
+              onChange={(value) =>
+                setText(setValues, "dic", value.toUpperCase())
+              }
               placeholder="CZ12345678"
               disabled={disabled}
             />
@@ -422,26 +420,6 @@ export function ClientFormFields({ values, setValues, disabled }: Props) {
               }}
             />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <TextField
-              id="client-bank-account"
-              label="Bankovní účet"
-              value={values.bank_account}
-              onChange={(value) => setText(setValues, "bank_account", value)}
-              placeholder="19-123456789 / 0800"
-              disabled={disabled}
-            />
-            <TextField
-              id="client-iban"
-              label="IBAN"
-              value={values.iban}
-              onChange={(value) =>
-                setText(setValues, "iban", value.toUpperCase())
-              }
-              placeholder="CZ65 0800 0000 1920 0014 5399"
-              disabled={disabled}
-            />
-          </div>
         </div>
       </Section>
 
@@ -464,8 +442,6 @@ export function emptyClientFormValues(): ClientFormValues {
     ico: "",
     dic: "",
     vat_payer: false,
-    bank_account: "",
-    iban: "",
     hourly_rate: "",
     currency: "CZK",
     discount_percentage: "",

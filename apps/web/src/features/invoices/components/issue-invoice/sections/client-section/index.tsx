@@ -320,8 +320,6 @@ export function ClientSection() {
                       ico: clientDetails.ico ?? "",
                       dic: clientDetails.dic ?? "",
                       vat_payer: clientDetails.vat_payer ?? false,
-                      bank_account: clientDetails.bank_account ?? "",
-                      iban: clientDetails.iban ?? "",
                       currency: clientDetails.currency ?? "CZK",
                       hourly_rate: clientDetails.hourly_rate ?? "",
                       discount_percentage:

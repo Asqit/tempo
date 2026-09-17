@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.api.v1.clients.clients_models import Client
 from src.api.v1.time_entries.time_entires_models import TimeEntry
+from src.api.v1.workspace.models.billing_profile_models import WorkspaceBillingProfile
 from src.core.database import Base
 
 if TYPE_CHECKING:
@@ -30,6 +31,13 @@ class Workspace(Base):
 
     clients: Mapped[list[Client]] = relationship(
         back_populates="workspace", cascade="all, delete-orphan", lazy="selectin"
+    )
+
+    billing_profile: Mapped[WorkspaceBillingProfile] = relationship(
+        back_populates="workspace",
+        cascade="all, delete-orphan",
+        uselist=False,
+        lazy="selectin",
     )
 
     time_entries: Mapped[list[TimeEntry]] = relationship(

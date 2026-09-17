@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.auth.auth_helpers import get_current_user
 from src.api.v1.auth.auth_models import User
+from src.api.v1.workspace.models.billing_profile_models import WorkspaceBillingProfile
 from src.api.v1.workspace.models.member_models import WorkspaceMember
 from src.api.v1.workspace.schemas.invitation_schemas import (
     WorkspaceInvitationCreate,
@@ -17,6 +18,8 @@ from src.api.v1.workspace.schemas.member_schemas import (
     WorkspaceRole,
 )
 from src.api.v1.workspace.schemas.workspace_schemas import (
+    WorkspaceBillingProfileRead,
+    WorkspaceBillingProfileUpdate,
     WorkspaceCreate,
     WorkspaceRead,
 )
@@ -50,6 +53,23 @@ async def delete_workspace(
     member: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.OWNER))],
 ):
     return await WorkspaceService.delete_workspace(db, member)
+
+
+@router.put("/billing-profile", response_model=WorkspaceBillingProfileRead)
+async def update_billing_profile(
+    body: WorkspaceBillingProfileUpdate,
+    member: Annotated[WorkspaceMember, Depends(require_role(WorkspaceRole.ADMIN))],
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    workspace = member.workspace
+    workspace.billing_profile = workspace.billing_profile or WorkspaceBillingProfile(
+        workspace_id=workspace.id
+    )
+    for field, value in body.model_dump().items():
+        setattr(workspace.billing_profile, field, value)
+    await db.commit()
+    await db.refresh(workspace.billing_profile)
+    return workspace.billing_profile
 
 
 # --------------------------------------------------------------------------------------- MEMBERS <<--

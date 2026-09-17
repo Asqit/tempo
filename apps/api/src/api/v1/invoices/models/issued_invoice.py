@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, UniqueConstraint
+from sqlalchemy import JSON, DateTime, Enum, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.api.v1.invoices.invoices_misc import InvoiceStatus
@@ -37,6 +37,10 @@ class IssuedInvoice(Base):
     date_issue: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     date_taxing: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     date_maturity: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    issuer_snapshot: Mapped[dict] = mapped_column(JSON)
+    client_snapshot: Mapped[dict] = mapped_column(JSON)
+    payment_snapshot: Mapped[dict] = mapped_column(JSON)
 
     items: Mapped[list[IssuedInvoiceItem]] = relationship(
         back_populates="invoice", lazy="selectin", passive_deletes=True

@@ -5,12 +5,14 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.v1.clients.clients_models import Client
 from src.api.v1.invoices.invoices_misc import InvoiceStatus
 from src.api.v1.invoices.models.issued_invoice import IssuedInvoice
 from src.api.v1.invoices.models.issued_invoice_item import IssuedInvoiceItem
 from src.api.v1.invoices.models.number_series import NumberSeries
 from src.api.v1.invoices.schemas.issued_invoice import IssuedInvoiceCreate
 from src.api.v1.workspace.models.member_models import WorkspaceMember
+from src.api.v1.workspace.models.workspace_models import Workspace
 
 
 class InvoiceService:
@@ -126,6 +128,21 @@ class InvoiceService:
             db, series.id, member.workspace_id, body.date_issue
         )
 
+        client = await db.scalar(
+            select(Client).where(
+                Client.id == body.client_id,
+                Client.workspace_id == member.workspace_id,
+            )
+        )
+        workspace = await db.get(Workspace, member.workspace_id)
+        if client is None or workspace is None or workspace.billing_profile is None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Workspace musí mít fakturační profil a klient musí patřit do workspace.",
+            )
+
+        billing = workspace.billing_profile
+
         invoice = IssuedInvoice(
             workspace_id=member.workspace_id,
             client_id=body.client_id,
@@ -134,6 +151,32 @@ class InvoiceService:
             date_issue=body.date_issue,
             date_taxing=body.date_taxing,
             date_maturity=body.date_maturity,
+            issuer_snapshot={
+                "legal_name": billing.legal_name,
+                "street": billing.street,
+                "city": billing.city,
+                "postal_code": billing.postal_code,
+                "country": billing.country,
+                "ico": billing.ico,
+                "dic": billing.dic,
+                "vat_payer": billing.vat_payer,
+            },
+            client_snapshot={
+                "name": client.name,
+                "is_company": client.is_company,
+                "street": client.street,
+                "city": client.city,
+                "postal_code": client.postal_code,
+                "country": client.country,
+                "ico": client.ico,
+                "dic": client.dic,
+                "vat_payer": client.vat_payer,
+            },
+            payment_snapshot={
+                "bank_account": billing.bank_account,
+                "iban": billing.iban,
+                "currency": billing.currency,
+            },
             items=[
                 IssuedInvoiceItem(
                     name=item.name,

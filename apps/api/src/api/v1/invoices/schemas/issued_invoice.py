@@ -33,6 +33,9 @@ class IssuedInvoiceRead(DBInvoice):
     date_issue: datetime
     date_taxing: datetime
     date_maturity: datetime
+    issuer_snapshot: dict
+    client_snapshot: dict
+    payment_snapshot: dict
     items: list[IssuedInvoiceItemRead]
     created_at: datetime
     updated_at: datetime

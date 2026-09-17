@@ -60,8 +60,6 @@ function toValues(initialValues?: ClientEditorValues): ClientFormValues {
     country: initialValues?.country ?? defaults.country,
     ico: initialValues?.ico ?? defaults.ico,
     dic: initialValues?.dic ?? defaults.dic,
-    bank_account: initialValues?.bank_account ?? defaults.bank_account,
-    iban: initialValues?.iban ?? defaults.iban,
     hourly_rate: initialValues?.hourly_rate ?? defaults.hourly_rate,
     currency: initialValues?.currency ?? defaults.currency,
     discount_percentage:
@@ -179,12 +177,6 @@ export function ClientEditor({
           value={values.country}
           onChange={(value) => setValue("country", value.toUpperCase())}
           placeholder="CZ"
-        />
-        <TextField
-          label="Bankovní účet"
-          value={values.bank_account}
-          onChange={(value) => setValue("bank_account", value)}
-          placeholder="19-2000145399/0800"
         />
         <TextField
           label="Měna"

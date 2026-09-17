@@ -30,28 +30,64 @@ import { useWorkspaceStore } from "../store";
 
 function CreateWorkspaceDialog() {
   const [open, setOpen] = useState(false);
+  const [step, setStep] = useState<1 | 2>(1);
   const [name, setName] = useState("");
+  const [legalName, setLegalName] = useState("");
+  const [street, setStreet] = useState("");
+  const [city, setCity] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [ico, setIco] = useState("");
+  const [dic, setDic] = useState("");
+  const [bankAccount, setBankAccount] = useState("");
+  const [iban, setIban] = useState("");
   const queryClient = useQueryClient();
   const { setWorkspace } = useWorkspaceStore();
 
-  const { mutate, isPending } = $api.useMutation(
-    "post",
-    "/api/v1/workspaces",
-    {
-      onSuccess: (workspace) => {
-        queryClient.invalidateQueries({
-          queryKey: ["get", "/api/v1/workspaces"],
-        });
-        setWorkspace(workspace.id);
-        setName("");
-        setOpen(false);
-      },
+  const { mutate, isPending } = $api.useMutation("post", "/api/v1/workspaces", {
+    onSuccess: (workspace) => {
+      queryClient.invalidateQueries({
+        queryKey: ["get", "/api/v1/workspaces"],
+      });
+      setWorkspace(workspace.id);
+      setName("");
+      setLegalName("");
+      setStreet("");
+      setCity("");
+      setPostalCode("");
+      setIco("");
+      setDic("");
+      setBankAccount("");
+      setIban("");
+      setStep(1);
+      setOpen(false);
     },
-  );
+  });
 
   const handleCreate = () => {
-    if (name.trim().length < 3) return;
-    mutate({ body: { name: name.trim() } });
+    if (name.trim().length < 3 || legalName.trim().length < 1) return;
+    mutate({
+      body: {
+        name: name.trim(),
+        billing_profile: {
+          legal_name: legalName.trim(),
+          street: street.trim() || null,
+          city: city.trim() || null,
+          postal_code: postalCode.trim() || null,
+          country: "CZ",
+          ico: ico.trim() || null,
+          dic: dic.trim() || null,
+          vat_payer: Boolean(dic.trim()),
+          bank_account: bankAccount.trim() || null,
+          iban: iban.trim() || null,
+          currency: "CZK",
+        },
+      },
+    });
+  };
+
+  const close = () => {
+    setStep(1);
+    setOpen(false);
   };
 
   return (
@@ -60,33 +96,110 @@ function CreateWorkspaceDialog() {
         <Plus className="mr-2 h-4 w-4" />
         Nový workspace
       </DialogTrigger>
-      <DialogContent className="sm:max-w-sm">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Vytvořit workspace</DialogTitle>
+          <DialogTitle>
+            {step === 1 ? "Vytvořit workspace" : "Fakturační údaje"}
+          </DialogTitle>
         </DialogHeader>
-        <div className="space-y-2">
-          <Label htmlFor="ws-name">Název</Label>
-          <Input
-            id="ws-name"
-            placeholder="Můj workspace"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-            autoFocus
-          />
-          {name.length > 0 && name.trim().length < 3 && (
-            <p className="text-xs text-destructive">Minimálně 3 znaky</p>
-          )}
-        </div>
+        {step === 1 ? (
+          <div className="space-y-2">
+            <Label htmlFor="ws-name">Název workspace</Label>
+            <Input
+              id="ws-name"
+              placeholder="Můj workspace"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoFocus
+            />
+            {name.length > 0 && name.trim().length < 3 && (
+              <p className="text-xs text-destructive">Minimálně 3 znaky</p>
+            )}
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="billing-legal-name">
+                Název / jméno na faktuře
+              </Label>
+              <Input
+                id="billing-legal-name"
+                value={legalName}
+                onChange={(e) => setLegalName(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="billing-street">Ulice a číslo</Label>
+              <Input
+                id="billing-street"
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="billing-city">Město</Label>
+              <Input
+                id="billing-city"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="billing-postal-code">PSČ</Label>
+              <Input
+                id="billing-postal-code"
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="billing-ico">IČO</Label>
+              <Input
+                id="billing-ico"
+                value={ico}
+                onChange={(e) => setIco(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="billing-dic">DIČ</Label>
+              <Input
+                id="billing-dic"
+                value={dic}
+                onChange={(e) => setDic(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="billing-bank-account">Číslo účtu</Label>
+              <Input
+                id="billing-bank-account"
+                value={bankAccount}
+                onChange={(e) => setBankAccount(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="billing-iban">IBAN</Label>
+              <Input
+                id="billing-iban"
+                value={iban}
+                onChange={(e) => setIban(e.target.value)}
+              />
+            </div>
+          </div>
+        )}
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)}>
+          <Button variant="ghost" onClick={close}>
             Zrušit
           </Button>
           <Button
-            onClick={handleCreate}
-            disabled={name.trim().length < 3 || isPending}
+            onClick={() => (step === 1 ? setStep(2) : handleCreate())}
+            disabled={
+              isPending ||
+              name.trim().length < 3 ||
+              (step === 2 && legalName.trim().length < 1)
+            }
           >
-            {isPending ? "Vytvářím…" : "Vytvořit"}
+            {isPending ? "Vytvářím…" : step === 1 ? "Pokračovat" : "Vytvořit"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -146,7 +259,12 @@ function WorkspaceCard({
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Users className="h-3.5 w-3.5" />
           <span>
-            {clientCount} {clientCount === 1 ? "klient" : clientCount >= 2 && clientCount <= 4 ? "klienti" : "klientů"}
+            {clientCount}{" "}
+            {clientCount === 1
+              ? "klient"
+              : clientCount >= 2 && clientCount <= 4
+                ? "klienti"
+                : "klientů"}
           </span>
         </div>
       </CardContent>
@@ -191,16 +309,21 @@ export function WorkspaceOverview() {
         <div className="relative flex flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-xl">
             <div className="mb-4 flex items-center gap-3">
-              {user && <ColorAvatar name={user.name} className="size-9 text-xs" />}
+              {user && (
+                <ColorAvatar name={user.name} className="size-9 text-xs" />
+              )}
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-sidebar-foreground/60">
                 Přehled workspace
               </span>
             </div>
             <h1 className="text-3xl font-black tracking-tight md:text-5xl">
-              {user ? `Rádi vás vidíme, ${user.name.split(" ")[0]}.` : "Vytvořte si prostor pro dobrou práci."}
+              {user
+                ? `Rádi vás vidíme, ${user.name.split(" ")[0]}.`
+                : "Vytvořte si prostor pro dobrou práci."}
             </h1>
             <p className="mt-3 max-w-md text-sm leading-6 text-sidebar-foreground/65 md:text-base">
-              Vyberte workspace a pokračujte v práci, nebo vytvořte nový pro jiný tým či projekt.
+              Vyberte workspace a pokračujte v práci, nebo vytvořte nový pro
+              jiný tým či projekt.
             </p>
           </div>
           <CreateWorkspaceDialog />
@@ -209,8 +332,12 @@ export function WorkspaceOverview() {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Vaše workspace</p>
-          <h2 className="mt-1 text-2xl font-bold tracking-tight">Vyberte, kde chcete pracovat</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            Vaše workspace
+          </p>
+          <h2 className="mt-1 text-2xl font-bold tracking-tight">
+            Vyberte, kde chcete pracovat
+          </h2>
         </div>
         <Link
           to="/app/settings/account"
@@ -239,7 +366,7 @@ export function WorkspaceOverview() {
           ))}
         </div>
       ) : workspaces.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
           <Briefcase className="mb-3 h-8 w-8 text-muted-foreground" />
           <p className="font-medium">Zatím nemáte žádný workspace</p>
           <p className="mt-1 text-sm text-muted-foreground">

@@ -4,7 +4,6 @@ import {
   Building2,
   FolderKanban,
   Hash,
-  Landmark,
   MapPin,
   Percent,
 } from "lucide-react";
@@ -118,7 +117,10 @@ export function ClientDetail({ id }: ClientDetailProps) {
           label="Hodinová sazba"
           value={
             client.hourly_rate
-              ? formatMoney(Number(client.hourly_rate), client.currency ?? undefined)
+              ? formatMoney(
+                  Number(client.hourly_rate),
+                  client.currency ?? undefined,
+                )
               : "—"
           }
           description={
@@ -170,29 +172,38 @@ export function ClientDetail({ id }: ClientDetailProps) {
             <InfoRow
               icon={Building2}
               label="Typ / DPH"
-              value={[
-                client.is_company === null
-                  ? null
-                  : client.is_company
-                    ? "Firma"
-                    : "Fyzická osoba",
-                client.vat_payer === null
-                  ? null
-                  : client.vat_payer
-                    ? "Plátce DPH"
-                    : "Neplátce DPH",
-              ]
-                .filter(Boolean)
-                .join(" · ") || "Neuvedeno"}
+              value={
+                [
+                  client.is_company === null
+                    ? null
+                    : client.is_company
+                      ? "Firma"
+                      : "Fyzická osoba",
+                  client.vat_payer === null
+                    ? null
+                    : client.vat_payer
+                      ? "Plátce DPH"
+                      : "Neplátce DPH",
+                ]
+                  .filter(Boolean)
+                  .join(" · ") || "Neuvedeno"
+              }
             />
-            <InfoRow icon={Hash} label="IČO" value={client.ico || "Neuvedeno"} mono />
-            <InfoRow icon={Hash} label="DIČ" value={client.dic || "Neuvedeno"} mono />
+            <InfoRow
+              icon={Hash}
+              label="IČO"
+              value={client.ico || "Neuvedeno"}
+              mono
+            />
+            <InfoRow
+              icon={Hash}
+              label="DIČ"
+              value={client.dic || "Neuvedeno"}
+              mono
+            />
           </DetailCard>
 
-          <DetailCard
-            title="Kontaktní údaje"
-            description="Adresa a platební informace"
-          >
+          <DetailCard title="Kontaktní údaje" description="Adresa a sazby">
             <InfoRow
               icon={MapPin}
               label="Adresa"
@@ -204,20 +215,14 @@ export function ClientDetail({ id }: ClientDetailProps) {
               wrap
             />
             <InfoRow
-              icon={Landmark}
-              label="Bankovní údaje"
-              value={
-                [client.bank_account, client.iban].filter(Boolean).join(" · ") ||
-                "Neuvedeno"
-              }
-              wrap
-            />
-            <InfoRow
               icon={CircleDollarSign}
               label="Výchozí sazba"
               value={
                 client.hourly_rate
-                  ? formatMoney(Number(client.hourly_rate), client.currency ?? undefined) + "/h"
+                  ? formatMoney(
+                      Number(client.hourly_rate),
+                      client.currency ?? undefined,
+                    ) + "/h"
                   : "Nenastaveno"
               }
             />
@@ -354,8 +359,16 @@ function InfoRow({
         <p
           className={
             mono
-            ? cn("mt-0.5", wrap ? "break-words" : "truncate", "font-mono text-xs")
-            : cn("mt-0.5", wrap ? "break-words" : "truncate", "text-sm font-medium")
+              ? cn(
+                  "mt-0.5",
+                  wrap ? "break-words" : "truncate",
+                  "font-mono text-xs",
+                )
+              : cn(
+                  "mt-0.5",
+                  wrap ? "break-words" : "truncate",
+                  "text-sm font-medium",
+                )
           }
         >
           {value}

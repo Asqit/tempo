@@ -322,6 +322,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/workspaces/billing-profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update Billing Profile */
+        put: operations["update_billing_profile_api_v1_workspaces_billing_profile_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/workspaces/members": {
         parameters: {
             query?: never;
@@ -646,10 +663,6 @@ export interface components {
              * @default false
              */
             vat_payer: boolean | null;
-            /** Bank Account */
-            bank_account?: string | null;
-            /** Iban */
-            iban?: string | null;
             /** Currency */
             currency?: string | null;
             /** Discount Percentage */
@@ -681,10 +694,6 @@ export interface components {
             dic: string | null;
             /** Vat Payer */
             vat_payer: boolean | null;
-            /** Bank Account */
-            bank_account: string | null;
-            /** Iban */
-            iban: string | null;
             /** Currency */
             currency: string | null;
             /** Discount Percentage */
@@ -738,10 +747,6 @@ export interface components {
             dic: string | null;
             /** Vat Payer */
             vat_payer: boolean | null;
-            /** Bank Account */
-            bank_account: string | null;
-            /** Iban */
-            iban: string | null;
             /** Currency */
             currency: string | null;
             /** Discount Percentage */
@@ -780,10 +785,6 @@ export interface components {
              * @default false
              */
             vat_payer: boolean | null;
-            /** Bank Account */
-            bank_account?: string | null;
-            /** Iban */
-            iban?: string | null;
             /** Currency */
             currency?: string | null;
             /** Discount Percentage */
@@ -904,6 +905,18 @@ export interface components {
              * Format: date-time
              */
             date_maturity: string;
+            /** Issuer Snapshot */
+            issuer_snapshot: {
+                [key: string]: unknown;
+            };
+            /** Client Snapshot */
+            client_snapshot: {
+                [key: string]: unknown;
+            };
+            /** Payment Snapshot */
+            payment_snapshot: {
+                [key: string]: unknown;
+            };
             /** Items */
             items: components["schemas"]["IssuedInvoiceItemRead"][];
             /**
@@ -1323,10 +1336,127 @@ export interface components {
             /** Context */
             ctx?: Record<string, never>;
         };
+        /** WorkspaceBillingProfileCreate */
+        WorkspaceBillingProfileCreate: {
+            /** Legal Name */
+            legal_name: string;
+            /** Street */
+            street?: string | null;
+            /** City */
+            city?: string | null;
+            /** Postal Code */
+            postal_code?: string | null;
+            /**
+             * Country
+             * @default CZ
+             */
+            country: string;
+            /** Ico */
+            ico?: string | null;
+            /** Dic */
+            dic?: string | null;
+            /**
+             * Vat Payer
+             * @default false
+             */
+            vat_payer: boolean;
+            /** Bank Account */
+            bank_account?: string | null;
+            /** Iban */
+            iban?: string | null;
+            /**
+             * Currency
+             * @default CZK
+             */
+            currency: string;
+        };
+        /** WorkspaceBillingProfileRead */
+        WorkspaceBillingProfileRead: {
+            /** Legal Name */
+            legal_name: string;
+            /** Street */
+            street?: string | null;
+            /** City */
+            city?: string | null;
+            /** Postal Code */
+            postal_code?: string | null;
+            /**
+             * Country
+             * @default CZ
+             */
+            country: string;
+            /** Ico */
+            ico?: string | null;
+            /** Dic */
+            dic?: string | null;
+            /**
+             * Vat Payer
+             * @default false
+             */
+            vat_payer: boolean;
+            /** Bank Account */
+            bank_account?: string | null;
+            /** Iban */
+            iban?: string | null;
+            /**
+             * Currency
+             * @default CZK
+             */
+            currency: string;
+            /** Id */
+            id: number;
+            /** Workspace Id */
+            workspace_id: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** WorkspaceBillingProfileUpdate */
+        WorkspaceBillingProfileUpdate: {
+            /** Legal Name */
+            legal_name: string;
+            /** Street */
+            street?: string | null;
+            /** City */
+            city?: string | null;
+            /** Postal Code */
+            postal_code?: string | null;
+            /**
+             * Country
+             * @default CZ
+             */
+            country: string;
+            /** Ico */
+            ico?: string | null;
+            /** Dic */
+            dic?: string | null;
+            /**
+             * Vat Payer
+             * @default false
+             */
+            vat_payer: boolean;
+            /** Bank Account */
+            bank_account?: string | null;
+            /** Iban */
+            iban?: string | null;
+            /**
+             * Currency
+             * @default CZK
+             */
+            currency: string;
+        };
         /** WorkspaceCreate */
         WorkspaceCreate: {
             /** Name */
             name: string;
+            billing_profile: components["schemas"]["WorkspaceBillingProfileCreate"];
         };
         /** WorkspaceInvitationCreate */
         WorkspaceInvitationCreate: {
@@ -1441,6 +1571,7 @@ export interface components {
             clients: components["schemas"]["ClientShallow"][];
             /** Time Entries */
             time_entries: components["schemas"]["TimeEntryRead"][];
+            billing_profile: components["schemas"]["WorkspaceBillingProfileRead"];
             /**
              * Created At
              * Format: date-time
@@ -2483,6 +2614,41 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_billing_profile_api_v1_workspaces_billing_profile_put: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Workspace-Id": number;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WorkspaceBillingProfileUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkspaceBillingProfileRead"];
+                };
             };
             /** @description Validation Error */
             422: {

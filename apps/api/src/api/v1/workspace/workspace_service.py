@@ -15,6 +15,7 @@ from src.api.v1.notifications.notifications_schemas import (
     WorkspaceRoleChangedPayload,
 )
 from src.api.v1.notifications.notifications_service import NotificationsService
+from src.api.v1.workspace.models.billing_profile_models import WorkspaceBillingProfile
 from src.api.v1.workspace.models.invitation_models import WorkspaceInvitation
 from src.api.v1.workspace.models.workspace_models import Workspace
 from src.api.v1.workspace.schemas.invitation_schemas import WorkspaceInvitationCreate
@@ -68,6 +69,9 @@ class WorkspaceService:
         workspace = Workspace(
             name=body.name,
             user_id=user_id,
+            billing_profile=WorkspaceBillingProfile(
+                **body.billing_profile.model_dump()
+            ),
         )
 
         db.add(workspace)

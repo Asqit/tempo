@@ -3,10 +3,7 @@ import { toast } from "sonner";
 
 import { Button } from "@tempo/ui/components/button";
 import { $api, getWorkspaceHeader } from "@/lib/api";
-import {
-  ClientFormFields,
-  type ClientFormValues,
-} from "../client-form-fields";
+import { ClientFormFields, type ClientFormValues } from "../client-form-fields";
 import { clientPayload, type ClientWithBilling } from "../client-types";
 
 type ClientEditFormProps = {
@@ -25,8 +22,6 @@ function valuesFromClient(client: ClientWithBilling): ClientFormValues {
     ico: client.ico ?? "",
     dic: client.dic ?? "",
     vat_payer: client.vat_payer ?? false,
-    bank_account: client.bank_account ?? "",
-    iban: client.iban ?? "",
     hourly_rate: client.hourly_rate?.toString() ?? "",
     currency: client.currency ?? "CZK",
     discount_percentage: client.discount_percentage?.toString() ?? "",

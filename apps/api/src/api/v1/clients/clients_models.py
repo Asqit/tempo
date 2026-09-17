@@ -36,9 +36,6 @@ class Client(Base):
     dic: Mapped[str | None] = mapped_column(String(20), nullable=True)
     vat_payer: Mapped[bool] = mapped_column(default=False, server_default="false")
 
-    # Banka + měna
-    bank_account: Mapped[str | None] = mapped_column(String(34), nullable=True)
-    iban: Mapped[str | None] = mapped_column(String(34), nullable=True)
     currency: Mapped[str] = mapped_column(
         String(3), default="CZK", server_default="CZK"
     )
