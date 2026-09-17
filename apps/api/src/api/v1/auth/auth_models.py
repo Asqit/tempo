@@ -33,28 +33,21 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-
     name: Mapped[str] = mapped_column(String(64))
-
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
-
     country: Mapped[str] = mapped_column(String())
-
     hashed_password: Mapped[str] = mapped_column(String(255))
-
-    workspaces: Mapped[list[Workspace]] = relationship(
-        back_populates="user", cascade="all, delete-orphan"
-    )
-
-    workspace_accesses: Mapped[list[WorkspaceMember]] = relationship(
-        back_populates="user", lazy="selectin"
-    )
-
     last_login_at: Mapped[datetime | None] = mapped_column(nullable=True)
-
     locale: Mapped[str | None] = mapped_column(String(10), default="cs")
 
     timezone: Mapped[str | None] = mapped_column(
         String(64),
         default="Europe/Prague",
+    )
+
+    workspaces: Mapped[list[Workspace]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    workspace_accesses: Mapped[list[WorkspaceMember]] = relationship(
+        back_populates="user", lazy="selectin"
     )

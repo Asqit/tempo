@@ -7,7 +7,7 @@ import { ItemsSection } from "./sections/items-section";
 import { InvoiceDetailsSection } from "./sections/invoice-details-section";
 import { $api, getWorkspaceHeader } from "@/lib/api";
 import { Button } from "@tempo/ui/components/button";
-import { ArrowLeft, FileText, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import * as z from "zod";
@@ -116,13 +116,10 @@ export function IssueInvoice({ invoiceId, defaultValues }: Props) {
     <FormProvider {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-6 sm:px-8 sm:py-8"
+        className="mx-auto flex w-full flex-col gap-5 px-4 py-6 sm:px-8 sm:py-8"
       >
         <header className="flex flex-wrap items-end justify-between gap-5 pb-2">
           <div className="min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Faktury / detail
-            </p>
             <div className="mt-2 flex flex-wrap items-center gap-3">
               <h1 className="font-heading text-4xl font-black tracking-[-0.04em] sm:text-5xl">
                 {isUpdate
@@ -141,17 +138,9 @@ export function IssueInvoice({ invoiceId, defaultValues }: Props) {
           </div>
           <div className="flex items-center gap-2">
             <Button
-              type="button"
-              variant="ghost"
-              onClick={() => navigate({ to: "/app/invoices" })}
-              disabled={isPending}
-            >
-              <ArrowLeft data-icon="inline-start" /> Zpět
-            </Button>
-            <Button
               type="submit"
               disabled={isPending || isInvoiceLoading}
-              className="bg-fuchsia-500 text-white hover:bg-fuchsia-400 dark:bg-fuchsia-500 dark:hover:bg-fuchsia-400"
+              size={"lg"}
             >
               <Save data-icon="inline-start" />
               {isPending
@@ -162,12 +151,6 @@ export function IssueInvoice({ invoiceId, defaultValues }: Props) {
             </Button>
           </div>
         </header>
-
-        {isInvoiceLoading ? (
-          <div className="rounded-xl border border-border/70 p-5 text-sm text-muted-foreground">
-            Načítám fakturu...
-          </div>
-        ) : null}
         <InvoiceDetailsSection />
         <ClientSection />
         <ItemsSection />

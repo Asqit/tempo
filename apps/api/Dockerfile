@@ -11,4 +11,4 @@ COPY src ./src
 COPY alembic.ini .
 COPY alembic ./alembic
 
-CMD ["uv", "run", "python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uv run alembic upgrade head && exec uv run python -m uvicorn src.main:app --host 0.0.0.0 --port 8000"]

@@ -1,16 +1,14 @@
 import asyncio
 from logging.config import fileConfig
 
+from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-
-from alembic import context
 from src.api.v1.auth.auth_models import *
 from src.api.v1.clients.clients_models import *
 from src.api.v1.projects.projects_models import *
 from src.api.v1.time_entries.time_entires_models import *
-from src.api.v1.workspace import invitation_models, workspace_members_models, workspace_models
 from src.core.config import app_config
 from src.core.database import Base
 
